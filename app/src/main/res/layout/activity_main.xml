@@ -30,11 +30,13 @@
                 android:layout_height="200dp"
                 >
             </android.support.v7.widget.RecyclerView>
-            <TextView
+            <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="Click to Pair"/>
+                android:text="Discover"
+                android:onClick="refreshDiscovered"
+                />
         </LinearLayout>
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/ll_paired"
@@ -55,11 +57,13 @@
                 android:layout_height="200dp"
                 >
             </android.support.v7.widget.RecyclerView>
-            <TextView
+            <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="Click to Connect"/>
+                android:text="Refresh Paired"
+                android:onClick="refreshPaired"
+                />
         </LinearLayout>
     </LinearLayout>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"

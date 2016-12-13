@@ -22,9 +22,9 @@ import java.util.Locale;
 class RecyclerViewManager
 {
     private RecyclerView mRecyclerView;
+    private MyAdapter mAdapter;
 
     RecyclerViewManager(Activity a, int id) {
-
         // Get the desired RecyclerView.
         mRecyclerView = (RecyclerView) a.findViewById(id);
         mRecyclerView.setHasFixedSize(true);
@@ -33,13 +33,14 @@ class RecyclerViewManager
         mRecyclerView.setLayoutManager(new LinearLayoutManager(a));
 
         // Set the adapter. It is the same for both RecyclerViews.
-        RecyclerView.Adapter mAdapter = new MyAdapter();
+        mAdapter = new MyAdapter();
         mRecyclerView.setAdapter(mAdapter);
     }
+    MyAdapter getAdapter() { return mAdapter; }
 }
 
 class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
-    ArrayList<BluetoothDevice> bluetoothDevices = new ArrayList<>();
+    BluetoothDevices bluetoothDevices = new BluetoothDevices();
 
     static class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView mTextView;
@@ -50,7 +51,7 @@ class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     }
 
     // For adding/deleting devices from the list.
-    ArrayList<BluetoothDevice> getDevices() { return bluetoothDevices; }
+    BluetoothDevices getDevices() { return bluetoothDevices; }
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
