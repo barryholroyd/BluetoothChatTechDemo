@@ -24,7 +24,7 @@ public class Support {
         log("OUT: " + name);
     }
 
-    public static void userError(Activity a, String msg) {
+    public static void userMsg(Activity a, String msg) {
         Toast t = Toast.makeText(a, msg, Toast.LENGTH_LONG);
         t.show();
     }

@@ -1,6 +1,7 @@
 package com.barryholroyd.bluetoothdemo;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -9,6 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.barryholroyd.bluetoothdemo.bluetooth.BluetoothClient;
+import com.barryholroyd.bluetoothdemo.bluetooth.BluetoothDevices;
 
 import java.util.Locale;
 
@@ -21,7 +25,7 @@ class RecyclerViewManager
     private RecyclerView mRecyclerView;
     private MyAdapter mAdapter;
 
-    RecyclerViewManager(Activity a, int id) {
+    RecyclerViewManager(Activity a, int id, BluetoothAdapter mBluetoothAdapter) {
         // Get the desired RecyclerView.
         mRecyclerView = (RecyclerView) a.findViewById(id);
         mRecyclerView.setHasFixedSize(true);
@@ -30,14 +34,21 @@ class RecyclerViewManager
         mRecyclerView.setLayoutManager(new LinearLayoutManager(a));
 
         // Set the adapter. It is the same for both RecyclerViews.
-        mAdapter = new MyAdapter();
+        mAdapter = new MyAdapter(a, mBluetoothAdapter);
         mRecyclerView.setAdapter(mAdapter);
     }
     MyAdapter getAdapter() { return mAdapter; }
 }
 
 class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
-    BluetoothDevices bluetoothDevices = new BluetoothDevices();
+    final Activity a;
+    final BluetoothAdapter mBluetoothAdapter;
+    final BluetoothDevices bluetoothDevices = new BluetoothDevices();
+
+    MyAdapter(Activity _a, BluetoothAdapter _mBluetoothAdapter) {
+        a = _a;
+        mBluetoothAdapter = _mBluetoothAdapter;
+    }
 
     static class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView mTvText;
@@ -89,6 +100,13 @@ class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             String mac = (String) tvMac.getText();
             String text = (String) tvText.getText();
             Support.log(String.format(Locale.US, "CLICKED ON: %s -> %s", text, mac));
+
+            BluetoothDevice bd = bluetoothDevices.getDevice(mac);
+            if (bd == null) {
+                Support.userFatalError(a, String.format(Locale.US, "Device missing: %s", mac));
+            }
+
+            (new BluetoothClient(a, mBluetoothAdapter, bd)).run();
         }
     }
 }

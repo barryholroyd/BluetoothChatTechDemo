@@ -10,6 +10,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
+import com.barryholroyd.bluetoothdemo.bluetooth.BluetoothDevices;
+import com.barryholroyd.bluetoothdemo.bluetooth.BluetoothServer;
+
 import java.util.Locale;
 import java.util.Set;
 
@@ -36,14 +39,15 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        configureRecyclerViews();
         configureBluetooth();
+        configureRecyclerViews();
+        startServer();
     }
 
     private void configureRecyclerViews() {
         Support.in("configureRecyclerViews");
-        rvmDiscovered = new RecyclerViewManager(this, R.id.rv_discovered);
-        rvmPaired = new RecyclerViewManager(this, R.id.rv_paired);
+        rvmDiscovered = new RecyclerViewManager(this, R.id.rv_discovered, mBluetoothAdapter);
+        rvmPaired = new RecyclerViewManager(this, R.id.rv_paired, mBluetoothAdapter);
         Support.out("configureRecyclerViews");
     }
 
@@ -73,6 +77,9 @@ public class MainActivity extends AppCompatActivity
         Support.out("configureBluetooth");
     }
 
+    private void startServer() {
+        (new BluetoothServer(mBluetoothAdapter)).run();
+    }
     /**
      * Do a device scan.
      * <p>
