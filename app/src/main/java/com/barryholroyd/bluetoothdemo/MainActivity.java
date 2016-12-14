@@ -26,62 +26,53 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        rvmDiscovered = new RecyclerViewManager(this, R.id.rv_discovered);
-        rvmPaired = new RecyclerViewManager(this, R.id.rv_paired);
-
+        configureRecyclerViews();
         configureBluetooth();
     }
 
+    private void configureRecyclerViews() {
+        rvmDiscovered = new RecyclerViewManager(this, R.id.rv_discovered);
+        rvmPaired = new RecyclerViewManager(this, R.id.rv_paired);
+    }
+
     private void configureBluetooth() {
+        // Get the Bluetooth adapter.
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             Support.userFatalError(this, "Device does not support Bluetooth.");
         }
+
+        // Ensure it is enabled; if not, ask the user for permission. We will exit, if refused.
         if (!mBluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
+
+        // Register receiver for handling newly discovered devices during a scan.
         registerDeviceFoundBroadcastReceiver();
-        refreshPaired(null); // initialize; don't need the View
+
+        // Initialize the "paired devices" RecyclerView.
+        refreshPaired(null);
+
+        // Ask the user for permission to be discoverable.
         requestDiscoverable();
     }
 
     /**
-     * Register the broadcast receiver which will record each device found
-     * during a Bluetooth scan.
+     * Do a device scan.
+     * <p>
+     *     This will automatically refresh the "Discovered"
+     *     RecyclerView.
+     *
+     * @param v the View which the user clicked on.
      */
-    private void registerDeviceFoundBroadcastReceiver() {
-        mReceiver = new BroadcastReceiver() {
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                    BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                    BluetoothDevices btds = rvmDiscovered.getAdapter().getDevices();
-                    btds.add(device);
-                    Support.log(String.format(Locale.US, "Found new device: %s -> %s",
-                            device.getName(), device.getAddress()));
-                    rvmPaired.getAdapter().getDevices().add(device);
-                }
-            }
-        };
-
-        // Register the BroadcastReceiver
-        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        registerReceiver(mReceiver, filter);
-
-        // TBD: Don't forget to unregister during onDestroy
-
-    }
-
-    @Override
-    public void onDestroy() {
-        unregisterReceiver(mReceiver);
-    }
-
     public void refreshDiscovered(View v) {
         mBluetoothAdapter.startDiscovery();
     }
 
+    /**
+     * Ask the user for permission to make this device discoverable.
+     */
     private void requestDiscoverable() {
         Intent discoverableIntent = new
                 Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
@@ -90,36 +81,68 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Find devices which are already paired with this one.
+     * Find and display devices which are already paired with this one.
      *
      * @param v the View the user clicked on.
      */
     public void refreshPaired(View v) {
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
         if (pairedDevices.size() > 0) {
-            BluetoothDevices btds = rvmPaired.getAdapter().getDevices();
+            MyAdapter myAdapter = rvmPaired.getAdapter();
+            BluetoothDevices btds = myAdapter.getDevices();
             btds.clear();
             for (BluetoothDevice device : pairedDevices) {
                 Support.log(String.format(Locale.US, "Found paired device: %s -> %s",
                         device.getName(), device.getAddress()));
                 btds.add(device);
             }
+            myAdapter.notifyDataSetChanged();
         }
     }
 
+    /**
+     * Register the broadcast receiver which will record each device found
+     * during a Bluetooth scan.
+     */
+    private void registerDeviceFoundBroadcastReceiver() {
+        // Create the receiver.
+        mReceiver = new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                    MyAdapter myAdapter = rvmDiscovered.getAdapter();
+                    BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                    BluetoothDevices btds = myAdapter.getDevices();
+                    Support.log(String.format(Locale.US, "Found new device: %s -> %s",
+                            device.getName(), device.getAddress()));
+                    btds.add(device);
+                    myAdapter.notifyDataSetChanged();
+                }
+            }
+        };
+
+        // Register the receiver.
+        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        registerReceiver(mReceiver, filter);
+    }
 
     @Override
     protected void onActivityResult( int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case REQUEST_ENABLE_BT:
                 if (resultCode == RESULT_OK) {
-                    return; // TBD: do anything else here?
+                    return;
                 }
                 else {
-                    // TBD: userError("No bluetooth available.");
+                    Support.userFatalError(this, "No Bluetooth available.");
                 }
                 break;
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        unregisterReceiver(mReceiver);
     }
 }
 
