@@ -1,15 +1,15 @@
-package com.barryholroyd.bluetoothdemo.bluetooth;
+package com.barryholroyd.bluetoothchatdemo.bluetooth;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 
-import com.barryholroyd.bluetoothdemo.Support;
+import com.barryholroyd.bluetoothchatdemo.Support;
 
 import java.io.IOException;
 
-import static com.barryholroyd.bluetoothdemo.bluetooth.BluetoothServer.MY_UUID;
+import static com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothServer.MY_UUID;
 
 /**
  * Bluetooth client implementation for chatting.
@@ -23,7 +23,7 @@ public class BluetoothClient extends Thread
     public BluetoothClient(Activity a, BluetoothAdapter _mBluetoothAdapter, BluetoothDevice device) {
         mBluetoothAdapter = _mBluetoothAdapter;
         if ((mSocket != null) && mSocket.isConnected()) {
-            Support.userMsg(a, "Dropping current connection...");
+            Support.userMessage(a, "Dropping current connection...");
             closeSocket(mSocket);
         }
         try {

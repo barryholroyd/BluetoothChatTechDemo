@@ -1,4 +1,4 @@
-package com.barryholroyd.bluetoothdemo;
+package com.barryholroyd.bluetoothchatdemo;
 
 import org.junit.Test;
 

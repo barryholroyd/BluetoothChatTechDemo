@@ -1,4 +1,4 @@
-package com.barryholroyd.bluetoothdemo;
+package com.barryholroyd.bluetoothchatdemo;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -10,8 +10,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
-import com.barryholroyd.bluetoothdemo.bluetooth.BluetoothDevices;
-import com.barryholroyd.bluetoothdemo.bluetooth.BluetoothServer;
+import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothDevices;
+import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothServer;
 
 import java.util.Locale;
 import java.util.Set;
@@ -39,9 +39,13 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        configureBluetooth();
+        // These are order-sensitive.
+        configureBluetoothAdapter();
         configureRecyclerViews();
+        configureBluetooth();
+        Support.log("onCreate() 1");
         startServer();
+        Support.log("onCreate() 2");
     }
 
     private void configureRecyclerViews() {
@@ -51,20 +55,21 @@ public class MainActivity extends AppCompatActivity
         Support.out("configureRecyclerViews");
     }
 
-    private void configureBluetooth() {
-        Support.in("configureBluetooth");
-
+    private void configureBluetoothAdapter() {
         // Get the Bluetooth adapter.
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
-            Support.userFatalError(this, "Device does not support Bluetooth.");
+            Support.fatalError(this, "Device does not support Bluetooth.");
         }
-
         // Ensure it is enabled; if not, ask the user for permission. We will exit, if refused.
         if (!mBluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
+    }
+
+    private void configureBluetooth() {
+        Support.in("configureBluetooth");
 
         // Register receiver for handling newly discovered devices during a scan.
         registerDeviceFoundBroadcastReceiver();
@@ -78,7 +83,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void startServer() {
-        (new BluetoothServer(mBluetoothAdapter)).run();
+        (new BluetoothServer(this, mBluetoothAdapter)).start();
     }
     /**
      * Do a device scan.
@@ -167,7 +172,7 @@ public class MainActivity extends AppCompatActivity
                     return;
                 }
                 else {
-                    Support.userFatalError(this, "No Bluetooth available.");
+                    Support.fatalError(this, "No Bluetooth available.");
                 }
                 break;
         }

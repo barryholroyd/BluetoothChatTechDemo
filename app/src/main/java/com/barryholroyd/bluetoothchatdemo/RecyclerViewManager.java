@@ -1,4 +1,4 @@
-package com.barryholroyd.bluetoothdemo;
+package com.barryholroyd.bluetoothchatdemo;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -11,8 +11,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.barryholroyd.bluetoothdemo.bluetooth.BluetoothClient;
-import com.barryholroyd.bluetoothdemo.bluetooth.BluetoothDevices;
+import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothClient;
+import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothDevices;
 
 import java.util.Locale;
 
@@ -103,10 +103,10 @@ class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
             BluetoothDevice bd = bluetoothDevices.getDevice(mac);
             if (bd == null) {
-                Support.userFatalError(a, String.format(Locale.US, "Device missing: %s", mac));
+                Support.fatalError(a, String.format(Locale.US, "Device missing: %s", mac));
             }
 
-            (new BluetoothClient(a, mBluetoothAdapter, bd)).run();
+            (new BluetoothClient(a, mBluetoothAdapter, bd)).start();
         }
     }
 }

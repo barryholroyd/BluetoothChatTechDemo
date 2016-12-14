@@ -1,4 +1,4 @@
-package com.barryholroyd.bluetoothdemo;
+package com.barryholroyd.bluetoothchatdemo;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.barryholroyd.bluetoothdemo", appContext.getPackageName());
+        assertEquals("com.barryholroyd.bluetoothchatdemo", appContext.getPackageName());
     }
 }

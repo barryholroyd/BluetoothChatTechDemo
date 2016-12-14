@@ -1,4 +1,4 @@
-package com.barryholroyd.bluetoothdemo.bluetooth;
+package com.barryholroyd.bluetoothchatdemo.bluetooth;
 
 import android.bluetooth.BluetoothDevice;
 
