@@ -1,20 +1,15 @@
 package com.barryholroyd.bluetoothchatdemo;
 
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
-import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothDevices;
-import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothServer;
+import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothMgr;
+import com.barryholroyd.bluetoothchatdemo.recyclerview.RecyclerViewManager;
 
-import java.util.Locale;
-import java.util.Set;
+import static com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothMgr.REQUEST_ENABLE_BT;
 
 /*
  * TBD: cancel discovery when not needed.
@@ -28,11 +23,12 @@ import java.util.Set;
 
 public class MainActivity extends AppCompatActivity
 {
-    private static final int REQUEST_ENABLE_BT = 1;
-    private RecyclerViewManager rvmDiscovered;
-    private RecyclerViewManager rvmPaired;
-    private BroadcastReceiver mReceiver;
-    private BluetoothAdapter mBluetoothAdapter;
+    private static RecyclerViewManager rvmDiscovered;
+    private static RecyclerViewManager rvmPaired;
+    private static BluetoothAdapter mBluetoothAdapter;
+
+    public static RecyclerViewManager getRvmDiscovered() { return rvmDiscovered; }
+    public static RecyclerViewManager getRvmPaired()     { return rvmPaired; }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,12 +36,8 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         // These are order-sensitive.
-        configureBluetoothAdapter();
+        mBluetoothAdapter = BluetoothMgr.configureAdapter(this);
         configureRecyclerViews();
-        configureBluetooth();
-        Support.log("onCreate() 1");
-        startServer();
-        Support.log("onCreate() 2");
     }
 
     private void configureRecyclerViews() {
@@ -55,56 +47,13 @@ public class MainActivity extends AppCompatActivity
         Support.out("configureRecyclerViews");
     }
 
-    private void configureBluetoothAdapter() {
-        // Get the Bluetooth adapter.
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mBluetoothAdapter == null) {
-            Support.fatalError(this, "Device does not support Bluetooth.");
-        }
-        // Ensure it is enabled; if not, ask the user for permission. We will exit, if refused.
-        if (!mBluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        }
-    }
-
-    private void configureBluetooth() {
-        Support.in("configureBluetooth");
-
-        // Register receiver for handling newly discovered devices during a scan.
-        registerDeviceFoundBroadcastReceiver();
-
-        // Initialize the "paired devices" RecyclerView.
-        refreshPaired(null);
-
-        // Ask the user for permission to be discoverable.
-        requestDiscoverable();
-        Support.out("configureBluetooth");
-    }
-
-    private void startServer() {
-        (new BluetoothServer(this, mBluetoothAdapter)).start();
-    }
     /**
      * Do a device scan.
-     * <p>
-     *     This will automatically refresh the "Discovered"
-     *     RecyclerView.
      *
      * @param v the View which the user clicked on.
      */
-    public void refreshDiscovered(View v) {
-        mBluetoothAdapter.startDiscovery();
-    }
-
-    /**
-     * Ask the user for permission to make this device discoverable.
-     */
-    private void requestDiscoverable() {
-        Intent discoverableIntent = new
-                Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-        startActivity(discoverableIntent);
+    public static void refreshDiscovered(View v) {
+        BluetoothMgr.refreshDiscovered(v);
     }
 
     /**
@@ -112,55 +61,8 @@ public class MainActivity extends AppCompatActivity
      *
      * @param v the View the user clicked on.
      */
-    public void refreshPaired(View v) {
-        Support.in("refreshPaired");
-        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-        if (pairedDevices.size() > 0) {
-            MyAdapter myAdapter = rvmPaired.getAdapter();
-            BluetoothDevices btds = myAdapter.getDevices();
-            btds.clear();
-            for (BluetoothDevice device : pairedDevices) {
-                Support.log(String.format(Locale.US, "Found paired device: %s -> %s",
-                        device.getName(), device.getAddress()));
-                btds.add(device);
-            }
-            Support.in("refreshPaired:notifyDataSetChanged");
-            myAdapter.notifyDataSetChanged();
-            Support.out("refreshPaired:notifyDataSetChanged");
-        }
-        Support.out("refreshPaired");
-    }
-
-    /**
-     * Register the broadcast receiver which will record each device found
-     * during a Bluetooth scan.
-     */
-    private void registerDeviceFoundBroadcastReceiver() {
-        Support.in("registerDeviceFoundBroadcastReceiver");
-// Create the receiver.
-        mReceiver = new BroadcastReceiver() {
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                Support.in("onReceive");
-                if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                    MyAdapter myAdapter = rvmDiscovered.getAdapter();
-                    BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                    BluetoothDevices btds = myAdapter.getDevices();
-                    Support.log(String.format(Locale.US, "Found new device: %s -> %s",
-                            device.getName(), device.getAddress()));
-                    btds.add(device);
-                    Support.in("onReceive:notifyDataSetChanged");
-                    myAdapter.notifyDataSetChanged();
-                    Support.out("onReceive:notifyDataSetChanged");
-                }
-                Support.out("onReceive");
-            }
-        };
-
-        // Register the receiver.
-        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        registerReceiver(mReceiver, filter);
-        Support.out("registerDeviceFoundBroadcastReceiver");
+    public static void refreshPaired(View v) {
+        BluetoothMgr.refreshPaired(v);
     }
 
     @Override
@@ -169,11 +71,11 @@ public class MainActivity extends AppCompatActivity
         switch (requestCode) {
             case REQUEST_ENABLE_BT:
                 if (resultCode == RESULT_OK) {
+                    BluetoothMgr.configureBluetooth(this);
+                    BluetoothMgr.startServer(this);
                     return;
                 }
-                else {
-                    Support.fatalError(this, "No Bluetooth available.");
-                }
+                else { Support.fatalError(this, "No Bluetooth available."); }
                 break;
         }
         Support.out("onActivityResult");
@@ -182,7 +84,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(mReceiver);
+        BluetoothMgr.unregisterMyReceiver(this);
     }
 }
 

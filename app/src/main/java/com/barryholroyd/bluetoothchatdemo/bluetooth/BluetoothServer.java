@@ -42,7 +42,7 @@ public class BluetoothServer extends Thread
                 Support.log("run() 2");
                 socket = mmServerSocket.accept();
                 if (socket != null) {
-                    BluetoothComm.start(socket);
+                    BluetoothComm.start("SERVER", socket);
                     mmServerSocket.close();
                     Support.log("run() 3");
                     break;

@@ -33,16 +33,23 @@ public class BluetoothClient extends Thread
 
     public void run() {
         // Cancel discovery if in progress.
-        mBluetoothAdapter.cancelDiscovery();
+        if (mBluetoothAdapter.isDiscovering()) {
+            mBluetoothAdapter.cancelDiscovery();
+            Support.log("Client cancelling discovery...");
+        }
         try {
+            Support.log("Client connecting...");
             mSocket.connect();
+            Support.log("Client connected...");
         } catch (IOException connectException) {
+            Support.log("Client IOException...");
             closeSocket(mSocket);
             return;
         }
 
         // Start communications.
-        BluetoothComm.start(mSocket);
+        Support.log("Client starting communications...");
+        BluetoothComm.start("CLIENT", mSocket);
     }
 
     private void closeSocket(BluetoothSocket bs) {
