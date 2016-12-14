@@ -31,12 +31,15 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void configureRecyclerViews() {
+        Support.in("configureRecyclerViews");
         rvmDiscovered = new RecyclerViewManager(this, R.id.rv_discovered);
         rvmPaired = new RecyclerViewManager(this, R.id.rv_paired);
+        Support.out("configureRecyclerViews");
     }
 
     private void configureBluetooth() {
-        // Get the Bluetooth adapter.
+        Support.in("configureBluetooth");
+// Get the Bluetooth adapter.
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             Support.userFatalError(this, "Device does not support Bluetooth.");
@@ -56,6 +59,7 @@ public class MainActivity extends AppCompatActivity
 
         // Ask the user for permission to be discoverable.
         requestDiscoverable();
+        Support.out("configureBluetooth");
     }
 
     /**
@@ -86,6 +90,7 @@ public class MainActivity extends AppCompatActivity
      * @param v the View the user clicked on.
      */
     public void refreshPaired(View v) {
+        Support.in("refreshPaired");
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
         if (pairedDevices.size() > 0) {
             MyAdapter myAdapter = rvmPaired.getAdapter();
@@ -96,8 +101,11 @@ public class MainActivity extends AppCompatActivity
                         device.getName(), device.getAddress()));
                 btds.add(device);
             }
+            Support.in("refreshPaired:notifyDataSetChanged");
             myAdapter.notifyDataSetChanged();
+            Support.out("refreshPaired:notifyDataSetChanged");
         }
+        Support.out("refreshPaired");
     }
 
     /**
@@ -105,10 +113,12 @@ public class MainActivity extends AppCompatActivity
      * during a Bluetooth scan.
      */
     private void registerDeviceFoundBroadcastReceiver() {
-        // Create the receiver.
+        Support.in("registerDeviceFoundBroadcastReceiver");
+// Create the receiver.
         mReceiver = new BroadcastReceiver() {
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
+                Support.in("onReceive");
                 if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                     MyAdapter myAdapter = rvmDiscovered.getAdapter();
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
@@ -116,18 +126,23 @@ public class MainActivity extends AppCompatActivity
                     Support.log(String.format(Locale.US, "Found new device: %s -> %s",
                             device.getName(), device.getAddress()));
                     btds.add(device);
+                    Support.in("onReceive:notifyDataSetChanged");
                     myAdapter.notifyDataSetChanged();
+                    Support.out("onReceive:notifyDataSetChanged");
                 }
+                Support.out("onReceive");
             }
         };
 
         // Register the receiver.
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(mReceiver, filter);
+        Support.out("registerDeviceFoundBroadcastReceiver");
     }
 
     @Override
     protected void onActivityResult( int requestCode, int resultCode, Intent data) {
+        Support.in("onActivityResult");
         switch (requestCode) {
             case REQUEST_ENABLE_BT:
                 if (resultCode == RESULT_OK) {
@@ -138,6 +153,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 break;
         }
+        Support.out("onActivityResult");
     }
 
     @Override

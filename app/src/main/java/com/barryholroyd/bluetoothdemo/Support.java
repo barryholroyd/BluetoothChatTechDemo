@@ -13,7 +13,15 @@ import com.barryholroyd.bluetoothdemo.dialog.ErrorDialog;
 
 public class Support {
     public static void log(String msg) {
-        Log.v("BLUETOOTH_ DEMO", msg);
+        Log.v("BLUETOOTH_DEMO", msg);
+    }
+
+    public static void in(String name) {
+        log("IN:  " + name);
+    }
+
+    public static void out(String name) {
+        log("OUT: " + name);
     }
 
     public static void userError(Activity a, String msg) {

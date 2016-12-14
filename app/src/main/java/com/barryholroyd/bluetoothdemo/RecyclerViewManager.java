@@ -1,19 +1,13 @@
 package com.barryholroyd.bluetoothdemo;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.bluetooth.BluetoothDevice;
-import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.Locale;
 
 /**
  * Created by Barry on 12/13/2016.
@@ -55,18 +49,22 @@ class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        Support.in("onCreateViewHolder");
         LinearLayout ll = (LinearLayout)
                 LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_row, parent, false);
         TextView tv = (TextView) ll.findViewById(R.id.row_text);
         MyViewHolder vh = new MyViewHolder(tv);
+        Support.out("onCreateViewHolder");
         return vh;
     }
 
     @Override
     public void onBindViewHolder(MyViewHolder mvh, int position) {
+        Support.in("onBindViewHolder");
         BluetoothDevice bd = bluetoothDevices.get(position);
         String text = String.format("%s: %s", bd.getName(), bd.getAddress());
         mvh.mTextView.setText(text);
+        Support.out("onBindViewHolder");
     }
 
     @Override
