@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothDevice;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -51,6 +52,7 @@ class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         Support.in("onCreateViewHolder");
         TextView tv = (TextView)
                 LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_row, parent, false);
+        tv.setOnClickListener(new OnClickListenerConnectDevice());
         MyViewHolder vh = new MyViewHolder(tv);
         Support.out("onCreateViewHolder");
         return vh;
@@ -68,5 +70,12 @@ class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     @Override
     public int getItemCount() {
         return bluetoothDevices.size();
+    }
+
+    class OnClickListenerConnectDevice implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+
+        }
     }
 }

@@ -13,6 +13,16 @@ import android.view.View;
 import java.util.Locale;
 import java.util.Set;
 
+/*
+ * TBD: cancel discovery when not needed.
+ * Performing device discovery is a heavy procedure for the Bluetooth adapter and will
+ * consume a lot of its resources. Once you have found a device to connect, be certain
+ * that you always stop discovery with cancelDiscovery() before attempting a connection.
+ * Also, if you already hold a connection with a device, then performing discovery can
+ * significantly reduce the bandwidth available for the connection, so you should not
+ * perform discovery while connected
+ */
+
 public class MainActivity extends AppCompatActivity
 {
     private static final int REQUEST_ENABLE_BT = 1;
@@ -39,7 +49,8 @@ public class MainActivity extends AppCompatActivity
 
     private void configureBluetooth() {
         Support.in("configureBluetooth");
-// Get the Bluetooth adapter.
+
+        // Get the Bluetooth adapter.
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             Support.userFatalError(this, "Device does not support Bluetooth.");
@@ -158,6 +169,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onDestroy() {
+        super.onDestroy();
         unregisterReceiver(mReceiver);
     }
 }
