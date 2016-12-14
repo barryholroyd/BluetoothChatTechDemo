@@ -50,9 +50,8 @@ class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Support.in("onCreateViewHolder");
-        LinearLayout ll = (LinearLayout)
+        TextView tv = (TextView)
                 LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_row, parent, false);
-        TextView tv = (TextView) ll.findViewById(R.id.row_text);
         MyViewHolder vh = new MyViewHolder(tv);
         Support.out("onCreateViewHolder");
         return vh;
