@@ -1,6 +1,8 @@
 package com.barryholroyd.bluetoothchatdemo;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -33,4 +35,10 @@ public class Support {
                 .newInstance("Fatal Error", msg)
                 .show(a.getFragmentManager(), "error_dialog");
     }
+
+    public static void startAFR(Activity a, String action, int requestCode) {
+        Intent intent = new Intent(action);
+        a.startActivityForResult(intent, requestCode);
+    }
+
 }

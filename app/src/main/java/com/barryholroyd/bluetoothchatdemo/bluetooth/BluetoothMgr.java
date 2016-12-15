@@ -21,26 +21,18 @@ import java.util.Set;
  */
 
 public class BluetoothMgr {
-    public static final int REQUEST_ENABLE_BT = 1;
+    public static final int RT_BTENABLED = 1;
+    public static final int RT_BT_STATE_CHANGED = 2;
+    public static final int RT_BT_SCANMODE_CHANGED = 3;
     private static BluetoothAdapter mBluetoothAdapter;
     static BroadcastReceiver mReceiver;
 
-    public static BluetoothAdapter configureAdapter(MainActivity ma) {
+    public static BluetoothAdapter getBluetoothAdapter(MainActivity ma) {
         // Get the Bluetooth adapter.
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             Support.fatalError(ma, "Device does not support Bluetooth.");
         }
-        // Ensure it is enabled; if not, ask the user for permission. We will exit, if refused.
-        if (!mBluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            ma.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        }
-        else {
-            configureBluetooth(ma);
-            startServer(ma);
-        }
-
         return mBluetoothAdapter;
     }
 
@@ -62,7 +54,8 @@ public class BluetoothMgr {
     private static void requestDiscoverable(Activity a) {
         Intent discoverableIntent = new
                 Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+        // TBD: set max duration to 300 seconds when done.
+        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0);
         a.startActivity(discoverableIntent);
     }
 
@@ -75,7 +68,7 @@ public class BluetoothMgr {
      */
     public static void refreshDiscovered(View v) {
         boolean ret = mBluetoothAdapter.startDiscovery();
-        Support.log(String.format(Locale.US, "refreshDiscovered:startDiscovery() => %b", ret));
+        Support.log(String.format(Locale.US, "clickRefreshDiscovered:startDiscovery() => %b", ret));
     }
 
     /**
@@ -84,8 +77,10 @@ public class BluetoothMgr {
      * @param v the View the user clicked on.
      */
     public static void refreshPaired(View v) {
-        Support.in("refreshPaired");
+        Support.in("clickRefreshPaired");
+        Support.log(String.format(Locale.US, "BT Adapter state: %d", mBluetoothAdapter.getState()));
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+        Support.log(String.format(Locale.US, "Paired devices: %d", pairedDevices.size()));
         if (pairedDevices.size() > 0) {
             MyAdapter myAdapter = MainActivity.getRvmPaired().getAdapter();
             BluetoothDevices btds = myAdapter.getDevices();
@@ -95,11 +90,11 @@ public class BluetoothMgr {
                         device.getName(), device.getAddress()));
                 btds.add(device);
             }
-            Support.in("refreshPaired:notifyDataSetChanged");
+            Support.in("clickRefreshPaired:notifyDataSetChanged");
             myAdapter.notifyDataSetChanged();
-            Support.out("refreshPaired:notifyDataSetChanged");
+            Support.out("clickRefreshPaired:notifyDataSetChanged");
         }
-        Support.out("refreshPaired");
+        Support.out("clickRefreshPaired");
     }
 
     /**
@@ -112,7 +107,8 @@ public class BluetoothMgr {
         mReceiver = new BroadcastReceiver() {
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
-                Support.in("onReceive");
+                Support.in(String.format(Locale.US, "onReceive: %s", action));
+                // TBD: doesn't this *have* to be true?
                 if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                     MyAdapter myAdapter = ma.getRvmDiscovered().getAdapter();
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
@@ -130,8 +126,19 @@ public class BluetoothMgr {
 
         // Register the receiver.
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        Intent intent = ma.registerReceiver(mReceiver, filter); // DEL: delete when not needed.
+        Intent intent = ma.registerReceiver(mReceiver, filter); // DEL: delete "intent" when not needed.
         Support.out("registerDeviceFoundBroadcastReceiver");
+
+        filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
+        mReceiver = new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                Support.log(String.format(Locale.US, "Broadcast Receiver received: %s", action));
+            }
+        };
+        ma.registerReceiver(mReceiver, filter);
+        filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        ma.registerReceiver(mReceiver, filter);
     }
     /**
      * Fire up a Bluetooth server on this device.

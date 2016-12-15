@@ -28,13 +28,14 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         a = _a;
     }
 
-    static class MyViewHolder extends RecyclerView.ViewHolder {
+    class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView mTvText;
         public TextView mTvMac;
-        MyViewHolder(LinearLayout ll, TextView tv, TextView mac) {
+        MyViewHolder(LinearLayout ll) {
             super(ll);
-            mTvText = tv;
-            mTvMac = mac;
+            mTvMac  = (TextView) ll.findViewById(R.id.row_mac);
+            mTvText = (TextView) ll.findViewById(R.id.row_text);
+            mTvText.setOnClickListener(new OnClickListenerConnectDevice());
         }
     }
 
@@ -46,10 +47,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         Support.in("onCreateViewHolder");
         LinearLayout ll = (LinearLayout)
                 LayoutInflater.from(parent.getContext()).inflate(R.layout.rvrow, parent, false);
-        TextView tv = (TextView) ll.findViewById(R.id.row_text);
-        tv.setOnClickListener(new OnClickListenerConnectDevice());
-        TextView mac = (TextView) ll.findViewById(R.id.row_mac);
-        MyViewHolder vh = new MyViewHolder(ll, tv, mac);
+        MyViewHolder vh = new MyViewHolder(ll);
         Support.out("onCreateViewHolder");
         return vh;
     }
@@ -57,6 +55,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     @Override
     public void onBindViewHolder(MyViewHolder mvh, int position) {
         Support.in("onBindViewHolder");
+        Support.log(String.format(Locale.US, "  position=%d", position));
         BluetoothDevice bd = bluetoothDevices.get(position);
         String text = String.format("%s: %s", bd.getName(), bd.getAddress());
         mvh.mTvText.setText(text);
@@ -66,6 +65,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     @Override
     public int getItemCount() {
+        Support.log(String.format(Locale.US, "##### getItemCount(): %d", bluetoothDevices.size()));
         return bluetoothDevices.size();
     }
 
