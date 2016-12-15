@@ -44,28 +44,22 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Support.in("onCreateViewHolder");
         LinearLayout ll = (LinearLayout)
                 LayoutInflater.from(parent.getContext()).inflate(R.layout.rvrow, parent, false);
         MyViewHolder vh = new MyViewHolder(ll);
-        Support.out("onCreateViewHolder");
         return vh;
     }
 
     @Override
     public void onBindViewHolder(MyViewHolder mvh, int position) {
-        Support.in("onBindViewHolder");
-        Support.log(String.format(Locale.US, "  position=%d", position));
         BluetoothDevice bd = bluetoothDevices.get(position);
         String text = String.format("%s: %s", bd.getName(), bd.getAddress());
         mvh.mTvText.setText(text);
         mvh.mTvMac.setText(bd.getAddress());
-        Support.out("onBindViewHolder");
     }
 
     @Override
     public int getItemCount() {
-        Support.log(String.format(Locale.US, "##### getItemCount(): %d", bluetoothDevices.size()));
         return bluetoothDevices.size();
     }
 

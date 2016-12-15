@@ -11,14 +11,6 @@ import com.barryholroyd.bluetoothchatdemo.recyclerview.RecyclerViewManager;
 
 import java.util.Locale;
 
-import static android.bluetooth.BluetoothAdapter.EXTRA_PREVIOUS_SCAN_MODE;
-import static android.bluetooth.BluetoothAdapter.EXTRA_PREVIOUS_STATE;
-import static android.bluetooth.BluetoothAdapter.EXTRA_SCAN_MODE;
-import static android.bluetooth.BluetoothAdapter.EXTRA_STATE;
-import static com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothMgr.RT_BTENABLED;
-import static com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothMgr.RT_BT_SCANMODE_CHANGED;
-import static com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothMgr.RT_BT_STATE_CHANGED;
-
 /*
  * TBD: cancel discovery when not needed.
  * Performing device discovery is a heavy procedure for the Bluetooth adapter and will
@@ -34,6 +26,7 @@ public class MainActivity extends AppCompatActivity
     private static RecyclerViewManager rvmDiscovered;
     private static RecyclerViewManager rvmPaired;
     private static BluetoothAdapter mBluetoothAdapter;
+    public static final int RT_BT_ENABLED = 1;
 
     // Getters
     public static RecyclerViewManager getRvmDiscovered()    { return rvmDiscovered; }
@@ -52,14 +45,12 @@ public class MainActivity extends AppCompatActivity
 
         // Ensure it is enabled; if not, ask the user for permission.
         if (!mBluetoothAdapter.isEnabled()) {
-            Support.startAFR(this, BluetoothAdapter.ACTION_REQUEST_ENABLE, RT_BTENABLED);
+            Support.startAFR(this, BluetoothAdapter.ACTION_REQUEST_ENABLE, RT_BT_ENABLED);
         }
         else {
             BluetoothMgr.configureBluetooth(this);
             BluetoothMgr.startServer(this);
         }
-        Support.startAFR(this, BluetoothAdapter.ACTION_STATE_CHANGED, RT_BT_STATE_CHANGED);
-        Support.startAFR(this, BluetoothAdapter.ACTION_SCAN_MODE_CHANGED, RT_BT_SCANMODE_CHANGED);
     }
 
     /**
@@ -84,11 +75,9 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult( int requestCode, int resultCode, Intent data) {
         Support.log(String.format(Locale.US, "***** ActivityResult: request=%d result=%d",
                 requestCode, resultCode));
-        Bundle extras = data.getExtras();
-        String msg = "";
         switch (requestCode) {
-            case RT_BTENABLED:
-                Support.log("ActivityResult[RT_BTENABLED]");
+            case RT_BT_ENABLED:
+                Support.log("ActivityResult[RT_BT_ENABLED]");
                 if (resultCode == RESULT_OK) {
                     BluetoothMgr.configureBluetooth(this);
                     BluetoothMgr.startServer(this);
@@ -96,30 +85,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 else { Support.fatalError(this, "No Bluetooth available."); }
                 break;
-
-            case RT_BT_STATE_CHANGED:
-                if (extras != null) {
-                    msg = String.format(Locale.US, ": Old=%d New=%d",
-                            extras.getInt(EXTRA_PREVIOUS_STATE),
-                            extras.getInt(EXTRA_STATE));
-                }
-                Support.log(String.format(Locale.US,
-                        "ActivityResult[RT_BT_STATE_CHANGED]%s", msg));
-                break;
-            case RT_BT_SCANMODE_CHANGED:
-                if (extras != null) {
-                    msg = String.format(Locale.US, ": Old=%d New=%d",
-                            extras.getInt(EXTRA_PREVIOUS_SCAN_MODE),
-                            extras.getInt(EXTRA_SCAN_MODE));
-                }
-                Support.log(String.format(Locale.US,
-                        "ActivityResult[RT_BT_SCANMODE_CHANGED]%s", msg));
-                break;
-            default:
-                Support.log("ActivityResult: other");
-                break;
         }
-        Support.out("onActivityResult");
     }
 
     @Override

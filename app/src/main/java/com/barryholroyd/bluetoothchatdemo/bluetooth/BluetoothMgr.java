@@ -21,9 +21,6 @@ import java.util.Set;
  */
 
 public class BluetoothMgr {
-    public static final int RT_BTENABLED = 1;
-    public static final int RT_BT_STATE_CHANGED = 2;
-    public static final int RT_BT_SCANMODE_CHANGED = 3;
     private static BluetoothAdapter mBluetoothAdapter;
     static BroadcastReceiver mReceiver;
 
@@ -40,7 +37,7 @@ public class BluetoothMgr {
         Support.in("configureBluetooth");
 
         // Register receiver for handling newly discovered devices during a scan.
-        registerDeviceFoundBroadcastReceiver(ma);
+        registerBroadcastReceivers(ma);
         refreshPaired(null);
         refreshDiscovered(null);
         requestDiscoverable(ma);
@@ -77,10 +74,9 @@ public class BluetoothMgr {
      * @param v the View the user clicked on.
      */
     public static void refreshPaired(View v) {
-        Support.in("clickRefreshPaired");
-        Support.log(String.format(Locale.US, "BT Adapter state: %d", mBluetoothAdapter.getState()));
+        Support.log(String.format(Locale.US, "BT Adapter state: %s",
+                BluetoothMaps.BtState.get(mBluetoothAdapter.getState())));
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-        Support.log(String.format(Locale.US, "Paired devices: %d", pairedDevices.size()));
         if (pairedDevices.size() > 0) {
             MyAdapter myAdapter = MainActivity.getRvmPaired().getAdapter();
             BluetoothDevices btds = myAdapter.getDevices();
@@ -90,56 +86,69 @@ public class BluetoothMgr {
                         device.getName(), device.getAddress()));
                 btds.add(device);
             }
-            Support.in("clickRefreshPaired:notifyDataSetChanged");
+            Support.log("clickRefreshPaired:notifyDataSetChanged");
             myAdapter.notifyDataSetChanged();
-            Support.out("clickRefreshPaired:notifyDataSetChanged");
         }
-        Support.out("clickRefreshPaired");
     }
 
     /**
      * Register the broadcast receiver which will record each device found
      * during a Bluetooth scan.
      */
-    private static void registerDeviceFoundBroadcastReceiver(final MainActivity ma) {
-        Support.in("registerDeviceFoundBroadcastReceiver");
-        // Create the receiver.
-        mReceiver = new BroadcastReceiver() {
+    private static void registerBroadcastReceivers(final MainActivity ma) {
+        Support.in("registerBroadcastReceivers");
+
+        registerBr(ma);
+
+        IntentFilter ifilter = new IntentFilter();
+
+        mReceiver = new BluetoothBroadcastReceiver(ma);
+
+//       TBD:  ifilter.addAction(BluetoothDevice.ACTION_FOUND);
+        ifilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+        ifilter.addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
+        ifilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
+        ifilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+
+        // Register the receiver.
+        Intent intent = ma.registerReceiver(mReceiver, ifilter); // DEL: delete "intent" when not needed.
+        String action = "<null>";
+        if (intent != null)
+            action = intent.getAction();
+        Support.log(String.format(Locale.US, "registerBroadcastReceivers: intent=%s", action));
+    }
+
+    private static void registerBr(final MainActivity ma) {
+        Support.in("registerBr");
+        final MyAdapter myAdapterDiscovered = ma.getRvmDiscovered().getAdapter();
+        final BroadcastReceiver mReceiver = new BroadcastReceiver() {
             public void onReceive(Context context, Intent intent) {
+                Support.log("***************** RECEIVED NEW DEVICE!!! *****************");
                 String action = intent.getAction();
-                Support.in(String.format(Locale.US, "onReceive: %s", action));
-                // TBD: doesn't this *have* to be true?
+                // When discovery finds a device
                 if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                    MyAdapter myAdapter = ma.getRvmDiscovered().getAdapter();
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                    BluetoothDevices btds = myAdapter.getDevices();
+                    BluetoothDevices btds = myAdapterDiscovered.getDevices();
                     Support.log(String.format(Locale.US, "Found new device: %s -> %s",
                             device.getName(), device.getAddress()));
                     btds.add(device);
-                    Support.in("onReceive:notifyDataSetChanged");
-                    myAdapter.notifyDataSetChanged();
-                    Support.out("onReceive:notifyDataSetChanged");
+                    Support.log("myAdapterDiscovered.notifyDataSetChanged");
+                    myAdapterDiscovered.notifyDataSetChanged();
                 }
-                Support.out("onReceive");
             }
+
+
         };
 
-        // Register the receiver.
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        // TBD: Don't forget to unregister during onDestroy
         Intent intent = ma.registerReceiver(mReceiver, filter); // DEL: delete "intent" when not needed.
-        Support.out("registerDeviceFoundBroadcastReceiver");
-
-        filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
-        mReceiver = new BroadcastReceiver() {
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                Support.log(String.format(Locale.US, "Broadcast Receiver received: %s", action));
-            }
-        };
-        ma.registerReceiver(mReceiver, filter);
-        filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        ma.registerReceiver(mReceiver, filter);
+        String action = "<null>";
+        if (intent != null)
+            action = intent.getAction();
+        Support.log(String.format(Locale.US, "registerBr: intent=%s", action));
     }
+
     /**
      * Fire up a Bluetooth server on this device.
      * <p>
@@ -151,7 +160,7 @@ public class BluetoothMgr {
     }
 
     /**
-     * Destroy the broadcast received; called by main Activity's onDestroy() method.
+     * Destroy the broadcast receiver; called by main Activity's onDestroy() method.
      *
      * @param a the current Activity.
      */
