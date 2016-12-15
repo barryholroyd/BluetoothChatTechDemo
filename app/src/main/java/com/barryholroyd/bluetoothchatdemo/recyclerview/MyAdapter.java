@@ -22,12 +22,10 @@ import java.util.Locale;
  */
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     final Activity a;
-    final BluetoothAdapter mBluetoothAdapter;
     final BluetoothDevices bluetoothDevices = new BluetoothDevices();
 
-    MyAdapter(Activity _a, BluetoothAdapter _mBluetoothAdapter) {
+    MyAdapter(Activity _a) {
         a = _a;
-        mBluetoothAdapter = _mBluetoothAdapter;
     }
 
     static class MyViewHolder extends RecyclerView.ViewHolder {
@@ -86,7 +84,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
                 Support.fatalError(a, String.format(Locale.US, "Device missing: %s", mac));
             }
 
-            (new BluetoothClient(a, mBluetoothAdapter, bd)).start();
+            (new BluetoothClient(a, bd)).start();
         }
     }
 }

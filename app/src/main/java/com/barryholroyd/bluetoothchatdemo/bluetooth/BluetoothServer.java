@@ -36,22 +36,17 @@ public class BluetoothServer extends Thread
 
     public void run() {
         BluetoothSocket socket = null;
-        Support.log("run() 1");
         while (true) {
             try {
-                Support.log("run() 2");
                 socket = mmServerSocket.accept();
                 if (socket != null) {
                     BluetoothComm.start("SERVER", socket);
                     mmServerSocket.close();
-                    Support.log("run() 3");
                     break;
                 }
             } catch (IOException e) {
-                Support.log("run() 4");
                 break;
             }
-            Support.log("run() 5");
         }
     }
 

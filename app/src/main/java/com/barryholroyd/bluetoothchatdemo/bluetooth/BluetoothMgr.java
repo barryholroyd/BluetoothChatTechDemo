@@ -25,19 +25,20 @@ public class BluetoothMgr {
     private static BluetoothAdapter mBluetoothAdapter;
     static BroadcastReceiver mReceiver;
 
-    public static BluetoothAdapter configureAdapter(Activity a) {
+    public static BluetoothAdapter configureAdapter(MainActivity ma) {
         // Get the Bluetooth adapter.
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
-            Support.fatalError(a, "Device does not support Bluetooth.");
+            Support.fatalError(ma, "Device does not support Bluetooth.");
         }
         // Ensure it is enabled; if not, ask the user for permission. We will exit, if refused.
         if (!mBluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            a.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            ma.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
         else {
-            startServer(a);
+            configureBluetooth(ma);
+            startServer(ma);
         }
 
         return mBluetoothAdapter;
@@ -129,7 +130,7 @@ public class BluetoothMgr {
 
         // Register the receiver.
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        ma.registerReceiver(mReceiver, filter);
+        Intent intent = ma.registerReceiver(mReceiver, filter); // DEL: delete when not needed.
         Support.out("registerDeviceFoundBroadcastReceiver");
     }
     /**

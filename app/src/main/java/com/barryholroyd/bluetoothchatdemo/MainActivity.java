@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity
 
     public static RecyclerViewManager getRvmDiscovered() { return rvmDiscovered; }
     public static RecyclerViewManager getRvmPaired()     { return rvmPaired; }
+    public static BluetoothAdapter getBluetoothAdapter()     { return mBluetoothAdapter; }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,14 +37,14 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         // These are order-sensitive.
-        mBluetoothAdapter = BluetoothMgr.configureAdapter(this);
         configureRecyclerViews();
+        mBluetoothAdapter = BluetoothMgr.configureAdapter(this);
     }
 
     private void configureRecyclerViews() {
         Support.in("configureRecyclerViews");
-        rvmDiscovered = new RecyclerViewManager(this, R.id.rv_discovered, mBluetoothAdapter);
-        rvmPaired = new RecyclerViewManager(this, R.id.rv_paired, mBluetoothAdapter);
+        rvmDiscovered = new RecyclerViewManager(this, R.id.rv_discovered);
+        rvmPaired = new RecyclerViewManager(this, R.id.rv_paired);
         Support.out("configureRecyclerViews");
     }
 

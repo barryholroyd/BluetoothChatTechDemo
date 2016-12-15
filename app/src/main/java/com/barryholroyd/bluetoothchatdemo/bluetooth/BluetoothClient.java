@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 
+import com.barryholroyd.bluetoothchatdemo.MainActivity;
 import com.barryholroyd.bluetoothchatdemo.Support;
 
 import java.io.IOException;
@@ -20,8 +21,8 @@ public class BluetoothClient extends Thread
     private BluetoothSocket mSocket = null;
     private final BluetoothAdapter mBluetoothAdapter;
 
-    public BluetoothClient(Activity a, BluetoothAdapter _mBluetoothAdapter, BluetoothDevice device) {
-        mBluetoothAdapter = _mBluetoothAdapter;
+    public BluetoothClient(Activity a, BluetoothDevice device) {
+        mBluetoothAdapter = MainActivity.getBluetoothAdapter();
         if ((mSocket != null) && mSocket.isConnected()) {
             Support.userMessage(a, "Dropping current connection...");
             closeSocket(mSocket);

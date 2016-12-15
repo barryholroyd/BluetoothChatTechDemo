@@ -14,7 +14,7 @@ public class RecyclerViewManager
     private RecyclerView mRecyclerView;
     private MyAdapter mAdapter;
 
-    public RecyclerViewManager(Activity a, int id, BluetoothAdapter mBluetoothAdapter) {
+    public RecyclerViewManager(Activity a, int id) {
         // Get the desired RecyclerView.
         mRecyclerView = (RecyclerView) a.findViewById(id);
         mRecyclerView.setHasFixedSize(true);
@@ -23,7 +23,7 @@ public class RecyclerViewManager
         mRecyclerView.setLayoutManager(new LinearLayoutManager(a));
 
         // Set the adapter. It is the same for both RecyclerViews.
-        mAdapter = new MyAdapter(a, mBluetoothAdapter);
+        mAdapter = new MyAdapter(a);
         mRecyclerView.setAdapter(mAdapter);
     }
     public MyAdapter getAdapter() { return mAdapter; }
