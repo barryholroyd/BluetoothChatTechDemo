@@ -6,7 +6,11 @@ android {
     defaultConfig {
         applicationId "com.barryholroyd.bluetoothchatdemo"
         minSdkVersion 19
-//        targetSdkVersion 24
+        /*
+         * Bug in SDK 23, 24. Device discovery fails.
+         * See: https://code.google.com/p/android/issues/detail?id=189090
+         */
+        // targetSdkVersion 24
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
