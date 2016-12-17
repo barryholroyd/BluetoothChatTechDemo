@@ -9,6 +9,7 @@ import com.barryholroyd.bluetoothchatdemo.MainActivity;
 import com.barryholroyd.bluetoothchatdemo.Support;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.Locale;
 
 import static com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothServer.MY_UUID;
@@ -22,15 +23,20 @@ public class BluetoothClient extends Thread
     private BluetoothSocket mSocket = null;
     private final BluetoothAdapter mBluetoothAdapter;
 
+    BluetoothDevice d;
+
     public BluetoothClient(Activity a, BluetoothDevice device) {
         mBluetoothAdapter = MainActivity.getBluetoothAdapter();
-        if ((mSocket != null) && mSocket.isConnected()) {
-            Support.userMessage(a, "Dropping current connection...");
-            closeSocket(mSocket);
-        }
-        try {
-            mSocket = device.createRfcommSocketToServiceRecord(MY_UUID);
-        } catch (IOException e) { }
+
+        d = device;
+        // TBD: restore?
+//        if ((mSocket != null) && mSocket.isConnected()) {
+//            Support.userMessage(a, "Dropping current connection...");
+//            closeSocket(mSocket);
+//        }
+//        try {
+//            mSocket = device.createRfcommSocketToServiceRecord(MY_UUID);
+//        } catch (IOException e) { }
     }
 
     public void run() {
@@ -39,14 +45,32 @@ public class BluetoothClient extends Thread
             mBluetoothAdapter.cancelDiscovery();
             Support.log("Client cancelling discovery...");
         }
-        try {
-            Support.log("Client connecting...");
-            mSocket.connect();
-            Support.log("Client connected...");
-        } catch (IOException ioe) {
-            Support.log(String.format(Locale.US, "Client IOException: %s", ioe.getMessage()));
-            closeSocket(mSocket);
-            return;
+        // TBD: restore?
+//        try {
+//            Support.log("Client connecting...");
+//            mSocket.connect();
+//            Support.log("Client connected...");
+//        } catch (IOException ioe) {
+//            Support.log(String.format(Locale.US, "Client IOException: %s", ioe.getMessage()));
+//            closeSocket(mSocket);
+//            return;
+//        }
+
+        try{
+            mSocket = d.createRfcommSocketToServiceRecord( MY_UUID );
+            mSocket.connect( );
+        } catch ( IOException exception ){
+            Method m = null;
+            Support.log("*** Attempting alternate approach to connect...");
+            try {
+                m = d.getClass().getMethod("createRfcommSocket", new Class[] {int.class});
+                mSocket = (BluetoothSocket) m.invoke(d, 1);
+                mSocket.connect();
+            } catch (Exception e) {
+                Support.log(String.format(Locale.US, "EXCEPTION: %s"));
+                return;
+            }
+            Support.log("*** Connection succeeded!");
         }
 
         // Start communications.
