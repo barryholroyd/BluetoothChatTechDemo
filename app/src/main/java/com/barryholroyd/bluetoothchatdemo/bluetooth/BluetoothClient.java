@@ -21,53 +21,44 @@ import static com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothServer.MY_UU
 public class BluetoothClient extends Thread
 {
     private BluetoothSocket mSocket = null;
-    private final BluetoothAdapter mBluetoothAdapter;
+    private BluetoothDevice btdevice;
 
-    BluetoothDevice d;
-
-    public BluetoothClient(Activity a, BluetoothDevice device) {
-        mBluetoothAdapter = MainActivity.getBluetoothAdapter();
-
-        d = device;
-        // TBD: restore?
-//        if ((mSocket != null) && mSocket.isConnected()) {
-//            Support.userMessage(a, "Dropping current connection...");
-//            closeSocket(mSocket);
-//        }
-//        try {
-//            mSocket = device.createRfcommSocketToServiceRecord(MY_UUID);
-//        } catch (IOException e) { }
+    public BluetoothClient(Activity a, BluetoothDevice _btdevice) {
+        btdevice = _btdevice;
+        if ((mSocket != null) && mSocket.isConnected()) {
+            Support.userMessage(a, "Dropping current connection...");
+            closeSocket(mSocket);
+        }
     }
 
     public void run() {
         // Cancel discovery if in progress.
+        final BluetoothAdapter mBluetoothAdapter = MainActivity.getBluetoothAdapter();
         if (mBluetoothAdapter.isDiscovering()) {
             mBluetoothAdapter.cancelDiscovery();
             Support.log("Client cancelling discovery...");
         }
-        // TBD: restore?
-//        try {
-//            Support.log("Client connecting...");
-//            mSocket.connect();
-//            Support.log("Client connected...");
-//        } catch (IOException ioe) {
-//            Support.log(String.format(Locale.US, "Client IOException: %s", ioe.getMessage()));
-//            closeSocket(mSocket);
-//            return;
-//        }
 
         try{
-            mSocket = d.createRfcommSocketToServiceRecord( MY_UUID );
+            mSocket = btdevice.createRfcommSocketToServiceRecord( MY_UUID );
+            Support.log("Client connecting...");
             mSocket.connect( );
-        } catch ( IOException exception ){
-            Method m = null;
+            Support.log("Client connected...");
+        } catch ( IOException ioe ){
+            Support.log(String.format(Locale.US, "Client IOException: %s", ioe.getMessage()));
+
+            /*
+             * This is a workaround for a bug in Google's Bluetooth library implementation.
+             * See: https://code.google.com/p/android/issues/detail?id=41415.
+             */
             Support.log("*** Attempting alternate approach to connect...");
             try {
-                m = d.getClass().getMethod("createRfcommSocket", new Class[] {int.class});
-                mSocket = (BluetoothSocket) m.invoke(d, 1);
+                Method m = btdevice.getClass().getMethod("createRfcommSocket", new Class[] {int.class});
+                mSocket = (BluetoothSocket) m.invoke(btdevice, 1);
                 mSocket.connect();
             } catch (Exception e) {
                 Support.log(String.format(Locale.US, "EXCEPTION: %s"));
+                closeSocket(mSocket);
                 return;
             }
             Support.log("*** Connection succeeded!");
