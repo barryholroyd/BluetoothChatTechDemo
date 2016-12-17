@@ -53,7 +53,11 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     @Override
     public void onBindViewHolder(MyViewHolder mvh, int position) {
         BluetoothDevice bd = bluetoothDevices.get(position);
-        String text = String.format("%s: %s", bd.getName(), bd.getAddress());
+        String name = bd.getName();
+        if (name == null) {
+            name = "<unknown>";
+        }
+        String text = String.format("%s: %s", name, bd.getAddress());
         mvh.mTvText.setText(text);
         mvh.mTvMac.setText(bd.getAddress());
     }

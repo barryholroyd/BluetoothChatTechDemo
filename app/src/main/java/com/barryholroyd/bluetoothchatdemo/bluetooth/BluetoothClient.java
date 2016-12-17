@@ -9,6 +9,7 @@ import com.barryholroyd.bluetoothchatdemo.MainActivity;
 import com.barryholroyd.bluetoothchatdemo.Support;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import static com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothServer.MY_UUID;
 
@@ -42,8 +43,8 @@ public class BluetoothClient extends Thread
             Support.log("Client connecting...");
             mSocket.connect();
             Support.log("Client connected...");
-        } catch (IOException connectException) {
-            Support.log("Client IOException...");
+        } catch (IOException ioe) {
+            Support.log(String.format(Locale.US, "Client IOException: %s", ioe.getMessage()));
             closeSocket(mSocket);
             return;
         }

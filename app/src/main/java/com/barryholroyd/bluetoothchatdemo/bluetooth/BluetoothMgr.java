@@ -97,13 +97,13 @@ public class BluetoothMgr {
     private static void registerBroadcastReceivers(final MainActivity ma) {
         Support.in("registerBroadcastReceivers");
 
-        registerBr(ma);
+//        registerBr(ma);
 
         IntentFilter ifilter = new IntentFilter();
 
         mReceiver = new BluetoothBroadcastReceiver(ma);
 
-//       TBD:  ifilter.addAction(BluetoothDevice.ACTION_FOUND);
+        ifilter.addAction(BluetoothDevice.ACTION_FOUND);
         ifilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         ifilter.addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
         ifilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
@@ -117,36 +117,36 @@ public class BluetoothMgr {
         Support.log(String.format(Locale.US, "registerBroadcastReceivers: intent=%s", action));
     }
 
-    private static void registerBr(final MainActivity ma) {
-        Support.in("registerBr");
-        final MyAdapter myAdapterDiscovered = ma.getRvmDiscovered().getAdapter();
-        final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-            public void onReceive(Context context, Intent intent) {
-                Support.log("***************** RECEIVED NEW DEVICE!!! *****************");
-                String action = intent.getAction();
-                // When discovery finds a device
-                if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                    BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                    BluetoothDevices btds = myAdapterDiscovered.getDevices();
-                    Support.log(String.format(Locale.US, "Found new device: %s -> %s",
-                            device.getName(), device.getAddress()));
-                    btds.add(device);
-                    Support.log("myAdapterDiscovered.notifyDataSetChanged");
-                    myAdapterDiscovered.notifyDataSetChanged();
-                }
-            }
-
-
-        };
-
-        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        // TBD: Don't forget to unregister during onDestroy
-        Intent intent = ma.registerReceiver(mReceiver, filter); // DEL: delete "intent" when not needed.
-        String action = "<null>";
-        if (intent != null)
-            action = intent.getAction();
-        Support.log(String.format(Locale.US, "registerBr: intent=%s", action));
-    }
+//    private static void registerBr(final MainActivity ma) {
+//        Support.in("registerBr");
+//        final MyAdapter myAdapterDiscovered = ma.getRvmDiscovered().getAdapter();
+//        final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+//            public void onReceive(Context context, Intent intent) {
+//                Support.log("***************** RECEIVED NEW DEVICE!!! *****************");
+//                String action = intent.getAction();
+//                // When discovery finds a device
+//                if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+//                    BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+//                    BluetoothDevices btds = myAdapterDiscovered.getDevices();
+//                    Support.log(String.format(Locale.US, "Found new device: %s -> %s",
+//                            device.getName(), device.getAddress()));
+//                    btds.add(device);
+//                    Support.log("myAdapterDiscovered.notifyDataSetChanged");
+//                    myAdapterDiscovered.notifyDataSetChanged();
+//                }
+//            }
+//
+//
+//        };
+//
+//        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+//        // TBD: Don't forget to unregister during onDestroy
+//        Intent intent = ma.registerReceiver(mReceiver, filter); // DEL: delete "intent" when not needed.
+//        String action = "<null>";
+//        if (intent != null)
+//            action = intent.getAction();
+//        Support.log(String.format(Locale.US, "registerBr: intent=%s", action));
+//    }
 
     /**
      * Fire up a Bluetooth server on this device.
