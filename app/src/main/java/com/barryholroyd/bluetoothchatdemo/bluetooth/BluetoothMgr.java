@@ -51,8 +51,7 @@ public class BluetoothMgr {
     private static void requestDiscoverable(Activity a) {
         Intent discoverableIntent = new
                 Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-        // TBD: set max duration to 300 seconds when done.
-        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0);
+        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
         a.startActivity(discoverableIntent);
     }
 
