@@ -14,15 +14,7 @@ import com.barryholroyd.bluetoothchatdemo.dialog.ErrorDialog;
 
 public class Support {
     public static void log(String msg) {
-        Log.v("BLUETOOTH_DEMO", msg);
-    }
-
-    public static void in(String name) {
-        log("IN:  " + name);
-    }
-
-    public static void out(String name) {
-        log("OUT: " + name);
+        Log.d("BLUETOOTH_DEMO", msg);
     }
 
     public static void userMessage(Activity a, String msg) {

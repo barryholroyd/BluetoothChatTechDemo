@@ -33,15 +33,11 @@ public class BluetoothMgr {
     }
 
     public static void configureBluetooth(MainActivity ma) {
-        Support.in("configureBluetooth");
-
         // Register receiver for handling newly discovered devices during a scan.
         registerBroadcastReceiver(ma);
         refreshPaired(null);
         refreshDiscovered(null);
         requestDiscoverable(ma);
-
-        Support.out("configureBluetooth");
     }
 
     /**
@@ -63,7 +59,6 @@ public class BluetoothMgr {
      */
     public static void refreshDiscovered(View v) {
         boolean ret = mBluetoothAdapter.startDiscovery();
-        Support.log(String.format(Locale.US, "clickRefreshDiscovered:startDiscovery() => %b", ret));
     }
 
     /**
@@ -72,8 +67,6 @@ public class BluetoothMgr {
      * @param v the View the user clicked on.
      */
     public static void refreshPaired(View v) {
-        Support.log(String.format(Locale.US, "BT Adapter state: %s",
-                BluetoothMaps.BtState.get(mBluetoothAdapter.getState())));
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
         if (pairedDevices.size() > 0) {
             MyAdapter myAdapter = MainActivity.getRvmPaired().getAdapter();
@@ -84,7 +77,6 @@ public class BluetoothMgr {
                         device.getName(), device.getAddress()));
                 btds.add(device);
             }
-            Support.log("clickRefreshPaired:notifyDataSetChanged");
             myAdapter.notifyDataSetChanged();
         }
     }

@@ -75,7 +75,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             TextView tvMac = (TextView) ll.findViewById(R.id.row_mac);
             String mac = (String) tvMac.getText();
             String text = (String) tvText.getText();
-            Support.log(String.format(Locale.US, "CLICKED ON: %s -> %s", text, mac));
 
             BluetoothDevice bd = bluetoothDevices.getDevice(mac);
             if (bd == null) {

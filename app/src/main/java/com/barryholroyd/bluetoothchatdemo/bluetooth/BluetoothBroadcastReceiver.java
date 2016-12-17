@@ -21,7 +21,7 @@ import static android.bluetooth.BluetoothAdapter.EXTRA_SCAN_MODE;
 import static android.bluetooth.BluetoothAdapter.EXTRA_STATE;
 
 /**
- * Created by Barry on 12/15/2016.
+ * Broadcast Receiver for receiving Bluetooth broadcasts.
  */
 
 public class BluetoothBroadcastReceiver extends BroadcastReceiver
@@ -57,7 +57,11 @@ public class BluetoothBroadcastReceiver extends BroadcastReceiver
     }
 }
 
+/**
+ * Bluetooth Broadcast Receiver logging.
+ */
 class BrLog {
+    /** Log changes to the Bluetooth state. */
     static void logActionStateChanged(Intent intent) {
         Bundle extras = intent.getExtras();
         Support.log(String.format(Locale.US,
@@ -66,6 +70,7 @@ class BrLog {
                 BluetoothMaps.BtState.get(extras.getInt(EXTRA_STATE))));
     }
 
+    /** Log changes when the Bluetooth scanning mode changes. */
     static void logScanModeChanged(Intent intent) {
         Bundle extras = intent.getExtras();
         brlog(String.format(Locale.US,
@@ -74,6 +79,7 @@ class BrLog {
                 BluetoothMaps.BtScanMode.get(extras.getInt(EXTRA_SCAN_MODE))));
     }
 
+    /** Wrapper for Bluetooth Broad Receiver log messages. */
     private static void brlog(String s) {
         Support.log(String.format(Locale.US, "  > Broadcast received: [%s]", s));
     }
