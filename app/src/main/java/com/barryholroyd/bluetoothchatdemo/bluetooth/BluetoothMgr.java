@@ -58,7 +58,10 @@ public class BluetoothMgr {
      * @param v the View which the user clicked on.
      */
     public static void refreshDiscovered(View v) {
-        boolean ret = mBluetoothAdapter.startDiscovery();
+        MyAdapter myAdapter = MainActivity.getRvmDiscovered().getAdapter();
+        BluetoothDevices btds = myAdapter.getDevices();
+        btds.clear();
+        mBluetoothAdapter.startDiscovery();
     }
 
     /**
