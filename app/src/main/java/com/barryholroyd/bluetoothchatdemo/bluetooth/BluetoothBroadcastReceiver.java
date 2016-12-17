@@ -34,7 +34,6 @@ public class BluetoothBroadcastReceiver extends BroadcastReceiver
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
-        Support.log(String.format(Locale.US, "### Broadcast received: %s", action));
         switch (action) {
             case BluetoothDevice.ACTION_FOUND:
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
@@ -42,7 +41,6 @@ public class BluetoothBroadcastReceiver extends BroadcastReceiver
                 Support.log(String.format(Locale.US, "Found new device: %s -> %s",
                         device.getName(), device.getAddress()));
                 btds.add(device);
-                Support.log("myAdapterDiscovered.notifyDataSetChanged");
                 myAdapterDiscovered.notifyDataSetChanged();
                 break;
             case BluetoothAdapter.ACTION_DISCOVERY_STARTED:
