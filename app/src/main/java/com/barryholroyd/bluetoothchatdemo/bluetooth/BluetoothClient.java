@@ -57,7 +57,7 @@ public class BluetoothClient extends Thread
                 mSocket = (BluetoothSocket) m.invoke(btdevice, 1);
                 mSocket.connect();
             } catch (Exception e) {
-                Support.log(String.format(Locale.US, "EXCEPTION: %s"));
+                Support.log(String.format(Locale.US, "EXCEPTION: %s", e.getMessage()));
                 closeSocket(mSocket);
                 return;
             }
