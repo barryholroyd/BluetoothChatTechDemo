@@ -1,6 +1,5 @@
 package com.barryholroyd.bluetoothchatdemo.bluetooth;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -60,10 +59,10 @@ public class BluetoothClient extends Thread
                 mSocket = (BluetoothSocket) m.invoke(btdevice, 1);
                 mSocket.connect();
             } catch (IOException ioe2) {
-                Support.userMessage(
-                        "Could not connect to remote device. Is BluetoothChatDemo running on the remote device?");
-                Support.userMessage("HI");
-                Support.userMessage("Bye");
+                String msg = String.format(Locale.US,
+                        "Could not connect to remote device. Is %s running on the remote device?",
+                        Support.getAppLabel());
+                Support.userMessage(msg);
                 closeSocket(mSocket);
                 return;
             }

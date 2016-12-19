@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -15,10 +17,22 @@ import com.barryholroyd.bluetoothchatdemo.dialog.ErrorDialog;
 
 public class Support {
     private static Toaster toaster = null;
+    private static String appLabel = null;
 
     public static void init(Context c) {
         toaster = new Toaster(c);
+        PackageManager pm = c.getPackageManager();
+        try {
+            ApplicationInfo ai = pm.getApplicationInfo(c.getPackageName(), 0);
+            appLabel = (String) pm.getApplicationLabel(ai);
+        }
+        catch (PackageManager.NameNotFoundException nnfe) {
+            log("Could not get package name.");
+            throw new MissingPackageName("Could not get package name.");
+        }
     }
+
+    public static String getAppLabel() { return appLabel; }
 
     public static void log(String msg) {
         Log.d("BLUETOOTH_DEMO", msg);
@@ -42,5 +56,11 @@ public class Support {
         Intent intent = new Intent(action);
         a.startActivityForResult(intent, requestCode);
     }
+}
 
+class MissingPackageName extends RuntimeException
+{
+    MissingPackageName(String msg) {
+        super(msg);
+    }
 }
