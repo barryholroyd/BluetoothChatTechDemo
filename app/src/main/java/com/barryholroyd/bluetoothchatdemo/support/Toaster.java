@@ -52,7 +52,7 @@ public class Toaster {
                 offset = 10; // DEL:
                 String msg = (String) message.obj;
                 final Toast toast = Toast.makeText(ac, msg, LENGTH_LONG);
-                toast.setGravity(Gravity.TOP | Gravity.CENTER, 0, offset);
+                toast.setGravity(Gravity.CENTER, 0, 0);
                 toast.show();
             }
         };
