@@ -5,7 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 
-import com.barryholroyd.bluetoothchatdemo.Support;
+import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.io.IOException;
 import java.util.UUID;

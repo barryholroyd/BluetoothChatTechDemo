@@ -10,7 +10,7 @@ import android.view.View;
 
 import com.barryholroyd.bluetoothchatdemo.MainActivity;
 import com.barryholroyd.bluetoothchatdemo.recyclerview.MyAdapter;
-import com.barryholroyd.bluetoothchatdemo.Support;
+import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.util.Locale;
 import java.util.Set;

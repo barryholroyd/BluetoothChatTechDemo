@@ -9,10 +9,9 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.barryholroyd.bluetoothchatdemo.MainActivity;
-import com.barryholroyd.bluetoothchatdemo.Support;
+import com.barryholroyd.bluetoothchatdemo.support.Support;
 import com.barryholroyd.bluetoothchatdemo.recyclerview.MyAdapter;
 
-import java.util.HashMap;
 import java.util.Locale;
 
 import static android.bluetooth.BluetoothAdapter.EXTRA_PREVIOUS_SCAN_MODE;

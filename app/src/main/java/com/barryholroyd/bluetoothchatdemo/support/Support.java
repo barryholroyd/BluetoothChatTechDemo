@@ -1,7 +1,8 @@
-package com.barryholroyd.bluetoothchatdemo;
+package com.barryholroyd.bluetoothchatdemo.support;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
@@ -13,13 +14,22 @@ import com.barryholroyd.bluetoothchatdemo.dialog.ErrorDialog;
  */
 
 public class Support {
+    private static Toaster toaster = null;
+
+    public static void init(Context c) {
+        toaster = new Toaster(c);
+    }
+
     public static void log(String msg) {
         Log.d("BLUETOOTH_DEMO", msg);
     }
 
-    public static void userMessage(Activity a, String msg) {
-        Toast t = Toast.makeText(a, msg, Toast.LENGTH_LONG);
-        t.show();
+    public static void userMessage(String msg) {
+        if (toaster == null) {
+            throw new IllegalStateException(
+                    "Support.userMessage() called before Support.init().");
+        }
+        Toaster.display(msg);
     }
 
     public static void fatalError(Activity a, String msg) {

@@ -8,6 +8,7 @@ import android.view.View;
 
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothMgr;
 import com.barryholroyd.bluetoothchatdemo.recyclerview.RecyclerViewManager;
+import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.util.Locale;
 
@@ -37,6 +38,8 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Support.init(this);
 
         // These are order-sensitive.
         rvmDiscovered     = new RecyclerViewManager(this, R.id.rv_discovered);

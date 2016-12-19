@@ -6,7 +6,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 
 import com.barryholroyd.bluetoothchatdemo.MainActivity;
-import com.barryholroyd.bluetoothchatdemo.Support;
+import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -23,10 +23,10 @@ public class BluetoothClient extends Thread
     private BluetoothSocket mSocket = null;
     private BluetoothDevice btdevice;
 
-    public BluetoothClient(Activity a, BluetoothDevice _btdevice) {
+    public BluetoothClient(BluetoothDevice _btdevice) {
         btdevice = _btdevice;
         if ((mSocket != null) && mSocket.isConnected()) {
-            Support.userMessage(a, "Dropping current connection...");
+            Support.userMessage("Dropping current connection...");
             closeSocket(mSocket);
         }
     }
@@ -39,6 +39,7 @@ public class BluetoothClient extends Thread
             Support.log("Client cancelling discovery...");
         }
 
+        // TBD: provide user with message indicating other end may not be running the app.
         try{
             mSocket = btdevice.createRfcommSocketToServiceRecord( MY_UUID );
             Support.log("Client connecting...");
@@ -52,12 +53,21 @@ public class BluetoothClient extends Thread
              * See: https://code.google.com/p/android/issues/detail?id=41415.
              */
             Support.log("*** Attempting alternate approach to connect...");
+            // TBD: understand this.
             try {
-                Method m = btdevice.getClass().getMethod("createRfcommSocket", new Class[] {int.class});
+                Method m = btdevice.getClass().getMethod("createRfcommSocket",
+                        new Class[] {int.class});
                 mSocket = (BluetoothSocket) m.invoke(btdevice, 1);
                 mSocket.connect();
-            } catch (Exception e) {
-                Support.log(String.format(Locale.US, "EXCEPTION: %s", e.getMessage()));
+            } catch (IOException ioe2) {
+                Support.userMessage("Could not connect to remote device. Is BluetoothChatDemo running on the remove device?");
+                closeSocket(mSocket);
+                return;
+            }
+            catch (Exception e) {
+                String msg = String.format(Locale.US, "Exception: %s", e.getMessage());
+                Support.userMessage(msg);
+                Support.log(msg);
                 closeSocket(mSocket);
                 return;
             }
@@ -66,6 +76,7 @@ public class BluetoothClient extends Thread
 
         // Start communications.
         Support.log("Client starting communications...");
+        Support.userMessage("Connected!");
         BluetoothComm.start("CLIENT", mSocket);
     }
 

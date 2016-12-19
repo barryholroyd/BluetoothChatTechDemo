@@ -2,7 +2,7 @@ package com.barryholroyd.bluetoothchatdemo.bluetooth;
 
 import android.bluetooth.BluetoothSocket;
 
-import com.barryholroyd.bluetoothchatdemo.Support;
+import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 /**
  * Created by Barry on 12/14/2016.
