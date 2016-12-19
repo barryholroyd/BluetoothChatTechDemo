@@ -60,7 +60,10 @@ public class BluetoothClient extends Thread
                 mSocket = (BluetoothSocket) m.invoke(btdevice, 1);
                 mSocket.connect();
             } catch (IOException ioe2) {
-                Support.userMessage("Could not connect to remote device. Is BluetoothChatDemo running on the remove device?");
+                Support.userMessage(
+                        "Could not connect to remote device. Is BluetoothChatDemo running on the remote device?");
+                Support.userMessage("HI");
+                Support.userMessage("Bye");
                 closeSocket(mSocket);
                 return;
             }

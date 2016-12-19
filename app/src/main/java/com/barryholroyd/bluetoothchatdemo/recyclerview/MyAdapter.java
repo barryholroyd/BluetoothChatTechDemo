@@ -79,8 +79,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             if (bd == null) {
                 Support.fatalError(a, String.format(Locale.US, "Device missing: %s", mac));
             }
-
-            (new BluetoothClient(a, bd)).start();
+            (new BluetoothClient(bd)).start();
         }
     }
 }
+
+
+
