@@ -69,7 +69,6 @@ public class BluetoothClient extends Thread
             catch (Exception e) {
                 String msg = String.format(Locale.US, "Exception: %s", e.getMessage());
                 Support.userMessage(msg);
-                Support.log(msg);
                 closeSocket(mSocket);
                 return;
             }
@@ -77,9 +76,8 @@ public class BluetoothClient extends Thread
         }
 
         // Start communications.
-        Support.log("Client starting communications...");
         Support.userMessage("Connected!");
-        BluetoothComm.start("CLIENT", mSocket);
+        (new BluetoothComm("CLIENT", mSocket)).start();
     }
 
     private void closeSocket(BluetoothSocket bs) {

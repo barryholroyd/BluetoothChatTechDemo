@@ -35,12 +35,12 @@ public class BluetoothServer extends Thread
     }
 
     public void run() {
-        BluetoothSocket socket = null;
+        BluetoothSocket mSocket;
         while (true) {
             try {
-                socket = mmServerSocket.accept();
-                if (socket != null) {
-                    BluetoothComm.start("SERVER", socket);
+                mSocket = mmServerSocket.accept();
+                if (mSocket != null) {
+                    (new BluetoothComm("SERVER", mSocket)).start();
                     mmServerSocket.close();
                     break;
                 }

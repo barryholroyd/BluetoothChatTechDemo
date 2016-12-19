@@ -2,7 +2,10 @@ package com.barryholroyd.bluetoothchatdemo.bluetooth;
 
 import android.bluetooth.BluetoothDevice;
 
+import com.barryholroyd.bluetoothchatdemo.support.Support;
+
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * Class created primarily to assist with type safety.
@@ -11,6 +14,25 @@ import java.util.ArrayList;
  */
 public class BluetoothDevices extends ArrayList<BluetoothDevice>
 {
+    /**
+     * Avoid adding duplicates.
+     * <p>
+     *     Remote Bluetooth devices may "advertise" multiple times, so we have to filter
+     *     out duplicates. See
+     *     {@link <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/225">
+     *         Discovery Duplicates
+     *         </a>}.
+     */
+    public void addNoDup(BluetoothDevice device) {
+        String deviceAddress = device.getAddress();
+        for (BluetoothDevice bd : this) {
+            if (deviceAddress.equals(bd.getAddress())) {
+                Support.log(String.format(Locale.US, "### Avoiding dup: %s", deviceAddress));
+                return;
+            }
+        }
+        add(device);
+    }
     /**
      * Find a BluetoothDevice based on its mac value.
      *

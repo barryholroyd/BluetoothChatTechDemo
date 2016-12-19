@@ -7,6 +7,8 @@ import android.os.Message;
 import android.view.Gravity;
 import android.widget.Toast;
 
+import java.util.Locale;
+
 import static android.widget.Toast.LENGTH_LONG;
 
 /**
@@ -36,10 +38,21 @@ public class Toaster {
         mHandler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(Message message) {
-                String msg = (String) message.obj;
-                final Toast toast = Toast.makeText(ac, msg, LENGTH_LONG);
-                toast.setGravity(Gravity.CENTER, 0, 0);
-                toast.show();
+                if (message.what == TOAST) {
+                    String msg = (String) message.obj;
+                    final Toast toast = Toast.makeText(ac, msg, LENGTH_LONG);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                }
+                else {
+                    String msg = String.format(Locale.US,
+                            "TBD: ***** Unexpected message type in Toaster: %d.",
+                            message.what);
+                    Support.log(msg);
+                    final Toast toast = Toast.makeText(ac, msg, LENGTH_LONG);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                }
             }
         };
     }

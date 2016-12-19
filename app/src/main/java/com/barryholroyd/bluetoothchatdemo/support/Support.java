@@ -12,13 +12,13 @@ import android.widget.Toast;
 import com.barryholroyd.bluetoothchatdemo.dialog.ErrorDialog;
 
 /**
- * Created by Barry on 12/13/2016.
+ * General static support methods.
  */
-
 public class Support {
     private static Toaster toaster = null;
     private static String appLabel = null;
 
+    /** Initialization */
     public static void init(Context c) {
         toaster = new Toaster(c);
         PackageManager pm = c.getPackageManager();
@@ -32,32 +32,42 @@ public class Support {
         }
     }
 
+    /** Return the app label as defined in the manifest. */
     public static String getAppLabel() { return appLabel; }
 
+    /** Basic logging for the app. */
     public static void log(String msg) {
         Log.d("BLUETOOTH_DEMO", msg);
     }
 
+    /**
+     * Send the user a message via a Toast, from either the foreground or background,
+     * and log it.
+     */
     public static void userMessage(String msg) {
         if (toaster == null) {
             throw new IllegalStateException(
                     "Support.userMessage() called before Support.init().");
         }
         Toaster.display(msg);
+        log(msg);
     }
 
+    /** Display a Dialog to the user indicating a fatal error, then exit the app. */
     public static void fatalError(Activity a, String msg) {
         ErrorDialog
                 .newInstance("Fatal Error", msg)
                 .show(a.getFragmentManager(), "error_dialog");
     }
 
+    /** Utility wrapper for starting an Activity which returns a result. */
     public static void startAFR(Activity a, String action, int requestCode) {
         Intent intent = new Intent(action);
         a.startActivityForResult(intent, requestCode);
     }
 }
 
+/** Exception thrown if we could not obtain the package name. */
 class MissingPackageName extends RuntimeException
 {
     MissingPackageName(String msg) {

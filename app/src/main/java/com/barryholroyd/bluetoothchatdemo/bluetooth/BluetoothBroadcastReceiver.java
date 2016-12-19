@@ -22,7 +22,6 @@ import static android.bluetooth.BluetoothAdapter.EXTRA_STATE;
 /**
  * Broadcast Receiver for receiving Bluetooth broadcasts.
  */
-
 public class BluetoothBroadcastReceiver extends BroadcastReceiver
 {
     MyAdapter myAdapterDiscovered;
@@ -30,6 +29,12 @@ public class BluetoothBroadcastReceiver extends BroadcastReceiver
         myAdapterDiscovered = ma.getRvmDiscovered().getAdapter();
     }
 
+    /**
+     * Callback called by the system when a broadcast is received.
+     *
+     * @param context standard Context parameter
+     * @param intent  standard Intent parameter
+     */
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
@@ -39,7 +44,7 @@ public class BluetoothBroadcastReceiver extends BroadcastReceiver
                 BluetoothDevices btds = myAdapterDiscovered.getDevices();
                 Support.log(String.format(Locale.US, "Found new device: %s -> %s",
                         device.getName(), device.getAddress()));
-                btds.add(device);
+                btds.addNoDup(device);
                 myAdapterDiscovered.notifyDataSetChanged();
                 break;
             case BluetoothAdapter.ACTION_DISCOVERY_STARTED:

@@ -5,11 +5,15 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 
+import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothComm;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothMgr;
 import com.barryholroyd.bluetoothchatdemo.recyclerview.RecyclerViewManager;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
 /*
@@ -27,12 +31,16 @@ public class MainActivity extends AppCompatActivity
     private static RecyclerViewManager rvmDiscovered;
     private static RecyclerViewManager rvmPaired;
     private static BluetoothAdapter mBluetoothAdapter;
+    private static EditText etTextSend;
+    private static TextView tvTextReceive;
     public static final int RT_BT_ENABLED = 1;
 
     // Getters
     public static RecyclerViewManager getRvmDiscovered()    { return rvmDiscovered; }
     public static RecyclerViewManager getRvmPaired()        { return rvmPaired; }
     public static BluetoothAdapter    getBluetoothAdapter() { return mBluetoothAdapter; }
+    public static EditText            getEditTextSend()     { return etTextSend; }
+    public static TextView            getTextViewReceive()  { return tvTextReceive; }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +62,9 @@ public class MainActivity extends AppCompatActivity
             BluetoothMgr.configureBluetooth(this);
             BluetoothMgr.startServer(this);
         }
+
+        etTextSend = (EditText) findViewById(R.id.text_send);
+        tvTextReceive = (TextView) findViewById(R.id.text_receive);
     }
 
     /**
@@ -72,6 +83,29 @@ public class MainActivity extends AppCompatActivity
      */
     public static void clickRefreshPaired(View v) {
         BluetoothMgr.refreshPaired(v);
+    }
+
+    public static void clickSend(View v) {
+        String text = etTextSend.getText().toString();
+        byte[] bytes;
+        try {
+            bytes = text.getBytes("UTF-8");
+        }
+        catch (UnsupportedEncodingException uee) {
+            String msg = String.format(Locale.US, "Unsupported encoding: %s", uee.getMessage());
+            Support.userMessage(msg);
+            return;
+        }
+
+        if (bytes.length > BluetoothComm.BUFSIZE) {
+            Support.userMessage(String.format(Locale.US,
+                    "Message is too long (%d). Maximum length is %d.",
+                    bytes.length, BluetoothComm.BUFSIZE));
+            return;
+        }
+
+        Support.log(String.format(Locale.US, "=> clickSend(): bytes len = %d", bytes.length));
+        BluetoothComm.writeChat(bytes);
     }
 
     @Override

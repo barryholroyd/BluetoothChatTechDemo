@@ -9,12 +9,12 @@
         android:id="@+id/ll_setup"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         >
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/ll_discovered"
             android:orientation="vertical"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_width="0dp"
             android:layout_weight="1"
             >
@@ -41,7 +41,7 @@
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/ll_paired"
             android:orientation="vertical"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_width="0dp"
             android:layout_weight="1"
             >
@@ -70,41 +70,44 @@
         android:id="@+id/ll_sendreceive"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         >
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/ll_send"
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/ll_send"
             >
-            <TextView
-                android:layout_width="wrap_content"
+            <Button
+                android:layout_width="100dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Send:"/>
+                android:text="Send"
+                android:onClick="clickSend"
+                />
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:maxLength="1024"
+                android:id="@+id/text_send"
                 android:hint="text to send"
                 />
         </LinearLayout>
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/ll_receive"
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/ll_receive"
             >
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="100dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:text="Received:"/>
             <TextView
-                android:id="@+id/text_received"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:maxLength="1024"
+                android:hint="text received"
+                android:id="@+id/text_receive"
                 />
         </LinearLayout>
     </LinearLayout>
