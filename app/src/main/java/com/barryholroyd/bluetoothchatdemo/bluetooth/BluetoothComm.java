@@ -106,6 +106,7 @@ public class BluetoothComm extends Thread
             catch (IOException ioe) {
                 Support.userMessage(String.format(Locale.US,
                         "Could not read message: %s", ioe.getMessage()));
+                break;
             }
             Support.log(String.format(Locale.US, "BluetoothComm.run(): len=%d, bytes[].length=%d",
                     len, bytes.length));
