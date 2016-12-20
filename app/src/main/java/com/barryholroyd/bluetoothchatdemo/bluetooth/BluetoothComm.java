@@ -108,7 +108,6 @@ public class BluetoothComm extends Thread
             Support.log(String.format(Locale.US, "BluetoothComm.run(): len=%d, bytes[].length=%d",
                     len, bytes.length));
             Message m = mHandler.obtainMessage(CHATTEXT, bytes);
-            // DEL: ? m.arg1 = bytes;
             mHandler.sendMessage(m);
         }
     }

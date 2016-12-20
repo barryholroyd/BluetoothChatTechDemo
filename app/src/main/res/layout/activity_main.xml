@@ -4,73 +4,57 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
     >
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:id="@+id/ll_setup"
         android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/LinearLayout2"
         >
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/ll_discovered"
-            android:orientation="vertical"
-            android:layout_height="wrap_content"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            style="@style/LinearLayout3"
             >
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Discovered"/>
+                style="@style/Header"
+                android:text="Discovered"
+                />
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rv_discovered"
-                android:scrollbars="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
+                style="@style/RecyclerViewStyle"
                 >
             </android.support.v7.widget.RecyclerView>
+
             <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Discover"
+                style="@style/ButtonStyle"
+                android:text="Refresh Discovered"
                 android:onClick="clickRefreshDiscovered"
                 />
         </LinearLayout>
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/ll_paired"
-            android:orientation="vertical"
-            android:layout_height="wrap_content"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            style="@style/LinearLayout3"
             >
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Paired"/>
+                style="@style/Header"
+                android:text="Paired"
+                />
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rv_paired"
-                android:scrollbars="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
+                style="@style/RecyclerViewStyle"
                 >
             </android.support.v7.widget.RecyclerView>
             <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                style="@style/ButtonStyle"
                 android:text="Refresh Paired"
                 android:onClick="clickRefreshPaired"
                 />
         </LinearLayout>
     </LinearLayout>
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:id="@+id/ll_sendreceive"
         android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/LinearLayout2"
         >
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:orientation="horizontal"
@@ -79,15 +63,13 @@
             android:id="@+id/ll_send"
             >
             <Button
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
+                style="@style/ButtonStyle"
                 android:text="Send"
+                android:minWidth="150sp"
                 android:onClick="clickSend"
                 />
             <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:maxLength="1024"
+                style="@style/TextIo"
                 android:id="@+id/text_send"
                 android:hint="text to send"
                 />
@@ -99,13 +81,14 @@
             android:id="@+id/ll_receive"
             >
             <TextView
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:text="Received:"/>
+                style="@style/Header"
+                android:minWidth="150sp"
+                android:textSize="15sp"
+                android:text="RECEIVED"
+                />
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:maxLength="1024"
+                style="@style/TextIo"
+                android:background="@color/green_light_1"
                 android:hint="text received"
                 android:id="@+id/text_receive"
                 />

@@ -24,6 +24,11 @@ import java.util.Locale;
  * Also, if you already hold a connection with a device, then performing discovery can
  * significantly reduce the bandwidth available for the connection, so you should not
  * perform discovery while connected
+ * TBD: Reformat screen.
+ * TBD: Must connect before using buttons.
+ * TBD: Do not include devices in Discovered if already paired.
+ * TBD: Do cancellations where appropriate.
+ * TBD: Clear "received" field before re-filling.
  */
 
 public class MainActivity extends AppCompatActivity
