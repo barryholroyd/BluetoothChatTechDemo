@@ -88,7 +88,7 @@
                 />
             <TextView
                 style="@style/TextIo"
-                android:background="@color/green_light_1"
+                android:background="@color/yellow_amber"
                 android:hint="text received"
                 android:id="@+id/text_receive"
                 />

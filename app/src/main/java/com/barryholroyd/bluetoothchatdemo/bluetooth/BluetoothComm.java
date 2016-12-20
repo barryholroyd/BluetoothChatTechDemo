@@ -23,6 +23,7 @@ public class BluetoothComm extends Thread
 {
     private static String tag;
     private static BluetoothSocket socket;
+    private static boolean connected = false;
 
     /** Message command: TOAST */
     private static final int CHATTEXT = 1;
@@ -54,6 +55,7 @@ public class BluetoothComm extends Thread
             Support.userMessage(msg);
         }
 
+        connected = true;
         mHandler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(Message message) {
@@ -120,6 +122,11 @@ public class BluetoothComm extends Thread
      * @param bytes the buffer of bytes to write out.
      */
     static public void writeChat(byte[] bytes) {
+        if (!connected) {
+            Support.userMessage("Please connect first by clicking on a device in the\n" +
+                                "\"Discovered\" or \"Paired\" panel.");
+            return;
+        }
         try {
             Support.log(String.format(Locale.US, "=> writeChat(): bytes len = %d", bytes.length));
             btOut.write(bytes, 0, bytes.length);

@@ -3,4 +3,7 @@
     <color name="colorPrimary">@color/purple_indigo</color>
     <color name="colorPrimaryDark">@color/blue_deep</color>
     <color name="colorAccent">#FF4081</color>
+
+    <color name="Active">@color/blue_deep</color>
+
 </resources>

@@ -109,7 +109,6 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
-        Support.log(String.format(Locale.US, "=> clickSend(): bytes len = %d", bytes.length));
         BluetoothComm.writeChat(bytes);
     }
 

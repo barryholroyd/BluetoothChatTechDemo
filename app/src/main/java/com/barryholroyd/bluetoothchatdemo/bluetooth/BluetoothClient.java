@@ -19,8 +19,8 @@ import static com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothServer.MY_UU
 
 public class BluetoothClient extends Thread
 {
-    private BluetoothSocket mSocket = null;
-    private BluetoothDevice btdevice;
+    private static BluetoothSocket mSocket = null;
+    private static BluetoothDevice btdevice;
 
     public BluetoothClient(BluetoothDevice _btdevice) {
         btdevice = _btdevice;
@@ -60,8 +60,8 @@ public class BluetoothClient extends Thread
                 mSocket.connect();
             } catch (IOException ioe2) {
                 String msg = String.format(Locale.US,
-                        "Could not connect to remote device. Is %s running on the remote device?",
-                        Support.getAppLabel());
+                        "Could not connect to remote device %s:%s. Is %s running on it?",
+                        btdevice.getName(), btdevice.getAddress(), Support.getAppLabel());
                 Support.userMessage(msg);
                 closeSocket(mSocket);
                 return;
