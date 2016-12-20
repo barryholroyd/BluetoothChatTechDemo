@@ -70,7 +70,6 @@ public class BluetoothComm extends Thread
                 }
             }
         };
-        // TBD: close the socket when done.
     }
 
     private void processMessage(Message m) {
@@ -86,6 +85,7 @@ public class BluetoothComm extends Thread
             Support.userMessage(msg);
             return;
         }
+        Support.log(String.format(Locale.US, "SETTING TEXT: [%s]", text));
         tv.setText(text);
     }
 
@@ -108,11 +108,10 @@ public class BluetoothComm extends Thread
                         "Could not read message: %s", ioe.getMessage()));
                 break;
             }
-            Support.log(String.format(Locale.US, "BluetoothComm.run(): len=%d, bytes[].length=%d",
-                    len, bytes.length));
             Message m = mHandler.obtainMessage(CHATTEXT, bytes);
             mHandler.sendMessage(m);
         }
+        closeConnection();
     }
 
     /**
@@ -129,12 +128,26 @@ public class BluetoothComm extends Thread
             return;
         }
         try {
-            Support.log(String.format(Locale.US, "=> writeChat(): bytes len = %d", bytes.length));
             btOut.write(bytes, 0, bytes.length);
         }
         catch (IOException ioe) {
             Support.userMessage(String.format(Locale.US,
                     "Could not write message: %s", ioe.getMessage()));
+        }
+    }
+    /**
+     * Close the current open connection if there is one.
+     * TBD: does it matter if the connection is open or not?
+     */
+    static public void closeConnection() {
+        try {
+            if (socket != null) {
+                Support.log("Closing the connection...");
+                socket.close();
+            }
+        } catch (IOException ioe) {
+            Support.log(String.format(Locale.US,
+                    "*** Failed to close the connection: %s", ioe.getMessage()));
         }
     }
 }

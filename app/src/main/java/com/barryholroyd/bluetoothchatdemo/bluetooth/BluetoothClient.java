@@ -14,14 +14,19 @@ import java.util.Locale;
 import static com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothServer.MY_UUID;
 
 /**
- * Bluetooth client implementation for chatting.
+ * Bluetooth "chat" client implementation.
+ * <p>
+ *     Runs in a background thread.
  */
-
 public class BluetoothClient extends Thread
 {
+    /** client socket */
     private static BluetoothSocket mSocket = null;
+
+    /** remote Bluetooth device */
     private static BluetoothDevice btdevice;
 
+    /** Constructor for initialization. */
     public BluetoothClient(BluetoothDevice _btdevice) {
         btdevice = _btdevice;
         if ((mSocket != null) && mSocket.isConnected()) {
@@ -30,20 +35,25 @@ public class BluetoothClient extends Thread
         }
     }
 
+    /**
+     * Create a connection to a remove Bluetooth server and the pass it to BluetoothComm
+     * to run the chat session.
+     */
     public void run() {
-        // Cancel discovery if in progress.
+        /*
+         * Discovery is very intensive -- it can slow down the connection attempt
+         * and cause it to fail. To prevent that, if discovery is running we cancel it
+         * before attempting to make a connection.
+         */
         final BluetoothAdapter mBluetoothAdapter = MainActivity.getBluetoothAdapter();
         if (mBluetoothAdapter.isDiscovering()) {
             mBluetoothAdapter.cancelDiscovery();
             Support.log("Client cancelling discovery...");
         }
 
-        // TBD: provide user with message indicating other end may not be running the app.
         try{
             mSocket = btdevice.createRfcommSocketToServiceRecord( MY_UUID );
-            Support.log("Client connecting...");
             mSocket.connect( );
-            Support.log("Client connected...");
         } catch ( IOException ioe ){
             Support.log(String.format(Locale.US, "Client IOException: %s", ioe.getMessage()));
 
@@ -72,7 +82,6 @@ public class BluetoothClient extends Thread
                 closeSocket(mSocket);
                 return;
             }
-            Support.log("*** Connection succeeded!");
         }
 
         // Start communications.
@@ -80,12 +89,17 @@ public class BluetoothClient extends Thread
         (new BluetoothComm("CLIENT", mSocket)).start();
     }
 
-    private void closeSocket(BluetoothSocket bs) {
-        try   { bs.close(); }
-        catch (IOException closeException) { }
-    }
-
-    public void cancel() {
-        closeSocket(mSocket);
+    /** Local method to close the socket if it hasn't been passed to BluetoothComm yet. */
+    private void closeSocket(BluetoothSocket socket) {
+        try   {
+            if (socket != null) {
+                Support.log("Closing the client socket...");
+                socket.close();
+            }
+        }
+        catch (IOException ioe) {
+            Support.log(String.format(Locale.US,
+                    "*** Failed to close the client connection: %s", ioe.getMessage()));
+        }
     }
 }

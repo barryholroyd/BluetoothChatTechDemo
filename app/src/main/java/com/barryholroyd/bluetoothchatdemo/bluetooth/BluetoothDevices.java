@@ -27,7 +27,6 @@ public class BluetoothDevices extends ArrayList<BluetoothDevice>
         String deviceAddress = device.getAddress();
         for (BluetoothDevice bd : this) {
             if (deviceAddress.equals(bd.getAddress())) {
-                Support.log(String.format(Locale.US, "### Avoiding dup: %s", deviceAddress));
                 return;
             }
         }

@@ -17,7 +17,8 @@ import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothDevices;
 import java.util.Locale;
 
 /**
- * Created by Barry on 12/14/2016.
+ * RecyclerView adapter used for displaying both the list of discovered devices
+ * and the list of paired devices.
  */
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     final Activity a;

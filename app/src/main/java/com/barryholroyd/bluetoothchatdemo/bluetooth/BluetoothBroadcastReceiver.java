@@ -20,11 +20,14 @@ import static android.bluetooth.BluetoothAdapter.EXTRA_SCAN_MODE;
 import static android.bluetooth.BluetoothAdapter.EXTRA_STATE;
 
 /**
- * Broadcast Receiver for receiving Bluetooth broadcasts.
+ * Broadcast Receiver for Bluetooth broadcasts.
  */
 public class BluetoothBroadcastReceiver extends BroadcastReceiver
 {
+    /** RecyclerView adapter instance for discovered devices. */
     MyAdapter myAdapterDiscovered;
+
+    /** Constructor needed for setting the RecyclerView adapter instance. */
     BluetoothBroadcastReceiver(MainActivity ma) {
         myAdapterDiscovered = ma.getRvmDiscovered().getAdapter();
     }
@@ -40,16 +43,17 @@ public class BluetoothBroadcastReceiver extends BroadcastReceiver
         String action = intent.getAction();
         switch (action) {
             case BluetoothDevice.ACTION_FOUND:
+                BrLog.brlog("Device Found");
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 BluetoothDevices btds = myAdapterDiscovered.getDevices();
-                Support.log(String.format(Locale.US, "Found new device: %s -> %s",
-                        device.getName(), device.getAddress()));
                 btds.addNoDup(device);
                 myAdapterDiscovered.notifyDataSetChanged();
                 break;
             case BluetoothAdapter.ACTION_DISCOVERY_STARTED:
+                BrLog.brlog("Discovery Started");
                 break;
             case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
+                BrLog.brlog("Discovery Finished");
                 break;
             case BluetoothAdapter.ACTION_STATE_CHANGED:
                 BrLog.logActionStateChanged(intent);
@@ -68,8 +72,8 @@ class BrLog {
     /** Log changes to the Bluetooth state. */
     static void logActionStateChanged(Intent intent) {
         Bundle extras = intent.getExtras();
-        Support.log(String.format(Locale.US,
-                "ActionStateChanged: Old=%s New=%s",
+        brlog(String.format(Locale.US,
+                "State Changed: Old=%s New=%s",
                 BluetoothMaps.BtState.get(extras.getInt(EXTRA_PREVIOUS_STATE)),
                 BluetoothMaps.BtState.get(extras.getInt(EXTRA_STATE))));
     }
@@ -78,13 +82,13 @@ class BrLog {
     static void logScanModeChanged(Intent intent) {
         Bundle extras = intent.getExtras();
         brlog(String.format(Locale.US,
-                "ScanModeChanged: Old=%s New=%s",
+                "Scan Mode Changed: Old=%s New=%s",
                 BluetoothMaps.BtScanMode.get(extras.getInt(EXTRA_PREVIOUS_SCAN_MODE)),
                 BluetoothMaps.BtScanMode.get(extras.getInt(EXTRA_SCAN_MODE))));
     }
 
     /** Wrapper for Bluetooth Broad Receiver log messages. */
-    private static void brlog(String s) {
-        Support.log(String.format(Locale.US, "  > Broadcast received: [%s]", s));
+    static void brlog(String s) {
+        Support.log(String.format(Locale.US, "> Broadcast received: [%s]", s));
     }
 }

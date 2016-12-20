@@ -93,5 +93,11 @@
                 android:id="@+id/text_receive"
                 />
         </LinearLayout>
+        <Button
+            style="@style/ButtonStyle"
+            android:text="Cancel"
+            android:onClick="clickCancel"
+            />
+
     </LinearLayout>
 </LinearLayout>

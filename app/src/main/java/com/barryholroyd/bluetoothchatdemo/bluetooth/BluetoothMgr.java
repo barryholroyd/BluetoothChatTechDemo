@@ -54,6 +54,8 @@ public class BluetoothMgr {
      * Do a device scan.
      * <p>
      *     This will automatically refresh the "Discovered" RecyclerView.
+     *     When new devices are discovered, a broadcast is sent.
+     *     See {@link BluetoothBroadcastReceiver#onReceive}.
      *
      * @param v the View which the user clicked on.
      */
@@ -76,8 +78,6 @@ public class BluetoothMgr {
             BluetoothDevices btds = myAdapter.getDevices();
             btds.clear();
             for (BluetoothDevice device : pairedDevices) {
-                Support.log(String.format(Locale.US, "Found paired device: %s -> %s",
-                        device.getName(), device.getAddress()));
                 btds.add(device);
             }
             myAdapter.notifyDataSetChanged();

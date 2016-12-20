@@ -18,17 +18,13 @@ import java.util.Locale;
 
 /*
  * TBD: cancel discovery when not needed.
- * Performing device discovery is a heavy procedure for the Bluetooth adapter and will
- * consume a lot of its resources. Once you have found a device to connect, be certain
- * that you always stop discovery with cancelDiscovery() before attempting a connection.
- * Also, if you already hold a connection with a device, then performing discovery can
- * significantly reduce the bandwidth available for the connection, so you should not
- * perform discovery while connected
  * TBD: Reformat screen.
  * TBD: Must connect before using buttons.
  * TBD: Do not include devices in Discovered if already paired.
  * TBD: Do cancellations where appropriate.
  * TBD: Clear "received" field before re-filling.
+ * TBD: Finish comments.
+ * TBD: clean out TBDs, log()s, etc.
  */
 
 public class MainActivity extends AppCompatActivity
@@ -110,6 +106,15 @@ public class MainActivity extends AppCompatActivity
         }
 
         BluetoothComm.writeChat(bytes);
+    }
+
+    /**
+     * Cancel the connection if it exists.
+     *
+     * @param v the View the user clicked on.
+     */
+    public static void clickCancel(View v) {
+        BluetoothComm.closeConnection();
     }
 
     @Override
