@@ -6,98 +6,75 @@
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
     >
-    <LinearLayout
-        android:id="@+id/ll_setup"
-        android:orientation="horizontal"
-        style="@style/LinearLayout2"
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         >
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/ll_discovered"
-            style="@style/LinearLayout3"
-            >
-            <TextView
-                style="@style/Header"
-                android:text="Discovered"
-                />
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/rv_discovered"
-                style="@style/RecyclerViewStyle"
-                >
-            </android.support.v7.widget.RecyclerView>
-
-            <Button
-                style="@style/ButtonStyle"
-                android:text="Refresh Discovered"
-                android:onClick="clickRefreshDiscovered"
-                />
-        </LinearLayout>
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/ll_paired"
-            style="@style/LinearLayout3"
-            >
-            <TextView
-                style="@style/Header"
-                android:text="Paired"
-                />
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/rv_paired"
-                style="@style/RecyclerViewStyle"
-                >
-            </android.support.v7.widget.RecyclerView>
-            <Button
-                style="@style/ButtonStyle"
-                android:text="Refresh Paired"
-                android:onClick="clickRefreshPaired"
-                />
-        </LinearLayout>
-    </LinearLayout>
-    <LinearLayout
-        android:id="@+id/ll_sendreceive"
-        android:orientation="vertical"
-        style="@style/LinearLayout2"
-        >
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/ll_send"
-            >
-            <Button
-                style="@style/ButtonStyle"
-                android:text="Send"
-                android:minWidth="150sp"
-                android:onClick="clickSend"
-                />
-            <EditText
-                style="@style/TextIo"
-                android:id="@+id/text_send"
-                android:hint="text to send"
-                />
-        </LinearLayout>
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/ll_receive"
-            >
-            <TextView
-                style="@style/Header"
-                android:minWidth="150sp"
-                android:textSize="15sp"
-                android:text="RECEIVED"
-                />
-            <TextView
-                style="@style/TextIo"
-                android:background="@color/yellow_amber"
-                android:hint="text received"
-                android:id="@+id/text_receive"
-                />
-        </LinearLayout>
-        <Button
-            style="@style/ButtonStyle"
-            android:text="Cancel"
-            android:onClick="clickCancel"
+        <TextView
+            style="@style/Header"
+            android:text="Bluetooth Devices"
             />
+    </FrameLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="8"
+        >
+        <LinearLayout
+            android:id="@+id/ll_setup"
+            android:orientation="horizontal"
+            style="@style/LinearLayoutHorizRvs"
+            >
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/ll_discovered"
+                style="@style/LinearLayoutDiscoverContainer"
+                >
+                <TextView
+                    style="@style/Header"
+                    android:text="Discovered"
+                    />
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rv_discovered"
+                    style="@style/RecyclerViewStyle"
+                    >
+                </android.support.v7.widget.RecyclerView>
 
-    </LinearLayout>
+                <Button
+                    style="@style/ButtonStyle"
+                    android:text="Refresh Discovered"
+                    android:onClick="clickRefreshDiscovered"
+                    />
+            </LinearLayout>
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/ll_paired"
+                style="@style/LinearLayoutDiscoverContainer"
+                >
+                <TextView
+                    style="@style/Header"
+                    android:text="Paired"
+                    />
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rv_paired"
+                    style="@style/RecyclerViewStyle"
+                    >
+                </android.support.v7.widget.RecyclerView>
+                <Button
+                    style="@style/ButtonStyle"
+                    android:text="Refresh Paired"
+                    android:onClick="clickRefreshPaired"
+                    />
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        >
+        <TextView
+            style="@style/TextInfo"
+            android:text="Click on an entry in either list to initiate a connection."
+        />
+    </FrameLayout>
 </LinearLayout>

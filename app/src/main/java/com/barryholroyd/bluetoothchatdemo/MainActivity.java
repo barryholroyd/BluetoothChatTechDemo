@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity
      *
      * @param v the View the user clicked on.
      */
-    public static void clickCancel(View v) {
+    public static void clickDone(View v) {
         BluetoothComm.closeConnection();
     }
 

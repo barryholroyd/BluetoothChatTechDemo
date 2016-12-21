@@ -9,18 +9,18 @@
     </style>
 
     <!-- LinearLayouts -->
-    <style name="LinearLayout2">
+    <style name="LinearLayoutHorizRvs">
         <item name="android:orientation">horizontal</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_margin">5dp</item>
         <item name="android:background">@color/brown_deep_1</item>
     </style>
-    <style name="LinearLayout3">
+    <style name="LinearLayoutDiscoverContainer">
         <item name="android:orientation">vertical</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_weight">1</item>
+        <item name="android:layout_width">0dp</item> <!-- TBD: don't need this? -->
+        <item name="android:layout_weight">1</item>  <!-- TBD: don't need this? -->
         <item name="android:layout_margin">5dp</item>
     </style>
 
@@ -35,8 +35,8 @@
 
     <!-- Buttons -->
     <style name="ButtonStyle">
-        <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_margin">5dp</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:gravity">center</item>
@@ -62,13 +62,23 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:gravity">center</item>
-        <item name="android:textSize" tools:ignore="SpUsage">20dp</item>
+        <item name="android:textSize">20sp</item>
         <item name="android:minLines">3</item>
         <item name="android:maxLines">3</item>
         <item name="android:maxLength">1024</item>
         <item name="android:layout_margin">5dp</item>
         <item name="android:background">@color/blue_light_4</item>
         <item name="android:padding">10dp</item>
+    </style>
+    <style name="TextInfo">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">5dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:background">@color/blue_light_4</item>
+        <item name="android:padding">5dp</item>
     </style>
 
 </resources>
