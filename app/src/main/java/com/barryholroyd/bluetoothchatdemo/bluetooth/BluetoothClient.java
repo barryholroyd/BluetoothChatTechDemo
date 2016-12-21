@@ -1,9 +1,13 @@
 package com.barryholroyd.bluetoothchatdemo.bluetooth;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Intent;
 
+import com.barryholroyd.bluetoothchatdemo.ApplicationGlobalState;
+import com.barryholroyd.bluetoothchatdemo.ChatActivity;
 import com.barryholroyd.bluetoothchatdemo.MainActivity;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
@@ -14,9 +18,12 @@ import java.util.Locale;
 import static com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothServer.MY_UUID;
 
 /**
- * Bluetooth "chat" client implementation.
+ * Bluetooth "chat" client connection set up.
  * <p>
- *     Runs in a background thread.
+ *     Runs in a background thread. Since the user doesn't have anything else to do
+ *     until this completes, we don't really need to do it in the background, but
+ *     for most Bluetooth/networking apps setting up the connection in the background
+ *     would probably be a good idea, so it is modelled here.
  */
 public class BluetoothClient extends Thread
 {
@@ -84,9 +91,18 @@ public class BluetoothClient extends Thread
             }
         }
 
+        // Make the Bluetooth socket available to other components.
+        Activity a = MainActivity.getActivity();
+        ApplicationGlobalState ags = (ApplicationGlobalState) a.getApplication();
+        ags.setBtSocket(mSocket);
+
         // Start communications.
         Support.userMessage("Connected!");
-        (new BluetoothComm("CLIENT", mSocket)).start();
+
+        // Pass control to the chat Activity.
+        Intent intent = new Intent(a, ChatActivity.class);
+        intent.putExtra(Support.BUNDLE_KEY_BTDEVICE, btdevice);
+        a.startActivity(intent);
     }
 
     /** Local method to close the socket if it hasn't been passed to BluetoothComm yet. */

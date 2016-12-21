@@ -1,12 +1,14 @@
 package com.barryholroyd.bluetoothchatdemo.bluetooth;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.widget.TextView;
 
-import com.barryholroyd.bluetoothchatdemo.MainActivity;
+import com.barryholroyd.bluetoothchatdemo.ApplicationGlobalState;
+import com.barryholroyd.bluetoothchatdemo.ChatActivity;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.io.IOException;
@@ -21,7 +23,6 @@ import java.util.Locale;
 
 public class BluetoothComm extends Thread
 {
-    private static String tag;
     private static BluetoothSocket socket;
     private static boolean connected = false;
 
@@ -40,8 +41,7 @@ public class BluetoothComm extends Thread
     /** Bluetooth output stream. */
     private static OutputStream btOut;
 
-    BluetoothComm(String _tag, BluetoothSocket _socket) {
-        tag = _tag;
+    public BluetoothComm(BluetoothSocket _socket) {
         socket = _socket;
 
         try {
@@ -76,7 +76,7 @@ public class BluetoothComm extends Thread
         byte[] bytes = (byte[]) m.obj;
         String text;
 
-        TextView tv = MainActivity.getTextViewReceive();
+        TextView tv = ChatActivity.getTextViewReceive();
         try {
             text = new String(bytes, "UTF-8");
         }
@@ -91,7 +91,7 @@ public class BluetoothComm extends Thread
 
     @Override
     public void run() {
-        Support.log("COMM ATTEMPT: " + tag);
+        Support.log("Running read loop for input: ");
         byte[] bytes = new byte[BUFSIZE];
         int len = 0;
 
@@ -111,7 +111,7 @@ public class BluetoothComm extends Thread
             Message m = mHandler.obtainMessage(CHATTEXT, bytes);
             mHandler.sendMessage(m);
         }
-        closeConnection();
+        closeConnection(null);
     }
 
     /**
@@ -139,11 +139,20 @@ public class BluetoothComm extends Thread
      * Close the current open connection if there is one.
      * TBD: does it matter if the connection is open or not?
      */
-    static public void closeConnection() {
+    static public void closeConnection(Activity a) {
         try {
             if (socket != null) {
                 Support.log("Closing the connection...");
                 socket.close();
+                ApplicationGlobalState ags =
+                        (ApplicationGlobalState)  ChatActivity.getActivity().getApplication();
+                ags.setBtSocket(null);
+
+                if (a != null)
+                    a.finish();
+                else
+                    Support.log("TBD: NOT FINISHING ACTIVITY.");
+
             }
         } catch (IOException ioe) {
             Support.log(String.format(Locale.US,

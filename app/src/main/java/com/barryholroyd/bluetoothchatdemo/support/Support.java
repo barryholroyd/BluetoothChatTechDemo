@@ -18,6 +18,8 @@ public class Support {
     private static Toaster toaster = null;
     private static String appLabel = null;
 
+    public static final String BUNDLE_KEY_BTDEVICE = "com.barryholroyd.bluetoothchatdemo.BTDEVICE";
+
     /** Initialization */
     public static void init(Context c) {
         toaster = new Toaster(c);
@@ -37,7 +39,7 @@ public class Support {
 
     /** Basic logging for the app. */
     public static void log(String msg) {
-        Log.d("BLUETOOTH_DEMO", msg);
+        Log.d("BLUETOOTH_CHAT_DEMO", msg);
     }
 
     /**

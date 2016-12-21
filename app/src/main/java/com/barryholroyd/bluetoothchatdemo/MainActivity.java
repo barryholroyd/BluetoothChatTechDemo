@@ -1,5 +1,6 @@
 package com.barryholroyd.bluetoothchatdemo;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -39,23 +40,20 @@ public class MainActivity extends AppCompatActivity
 {
     private static RecyclerViewManager rvmDiscovered;
     private static RecyclerViewManager rvmPaired;
+    private static Activity activity = null;
     private static BluetoothAdapter mBluetoothAdapter;
-    private static EditText etTextSend;
-    private static TextView tvTextReceive;
     public static final int RT_BT_ENABLED = 1;
 
     // Getters
     public static RecyclerViewManager getRvmDiscovered()    { return rvmDiscovered; }
     public static RecyclerViewManager getRvmPaired()        { return rvmPaired; }
     public static BluetoothAdapter    getBluetoothAdapter() { return mBluetoothAdapter; }
-    public static EditText            getEditTextSend()     { return etTextSend; }
-    public static TextView            getTextViewReceive()  { return tvTextReceive; }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        activity = this;
         setContentView(R.layout.activity_main);
-
         Support.init(this);
 
         // These are order-sensitive.
@@ -69,11 +67,13 @@ public class MainActivity extends AppCompatActivity
         }
         else {
             BluetoothMgr.configureBluetooth(this);
-            BluetoothMgr.startServer(this);
+            BluetoothMgr.startServer((ApplicationGlobalState) getApplication());
         }
+    }
 
-        etTextSend = (EditText) findViewById(R.id.text_send);
-        tvTextReceive = (TextView) findViewById(R.id.text_receive);
+    /** Getter to return the current activity to a worker thread, to create an Intent. */
+    public static Activity getActivity() {
+        return activity;
     }
 
     /**
@@ -94,37 +94,6 @@ public class MainActivity extends AppCompatActivity
         BluetoothMgr.refreshPaired(v);
     }
 
-    public static void clickSend(View v) {
-        String text = etTextSend.getText().toString();
-        byte[] bytes;
-        try {
-            bytes = text.getBytes("UTF-8");
-        }
-        catch (UnsupportedEncodingException uee) {
-            String msg = String.format(Locale.US, "Unsupported encoding: %s", uee.getMessage());
-            Support.userMessage(msg);
-            return;
-        }
-
-        if (bytes.length > BluetoothComm.BUFSIZE) {
-            Support.userMessage(String.format(Locale.US,
-                    "Message is too long (%d). Maximum length is %d.",
-                    bytes.length, BluetoothComm.BUFSIZE));
-            return;
-        }
-
-        BluetoothComm.writeChat(bytes);
-    }
-
-    /**
-     * Cancel the connection if it exists.
-     *
-     * @param v the View the user clicked on.
-     */
-    public static void clickDone(View v) {
-        BluetoothComm.closeConnection();
-    }
-
     @Override
     protected void onActivityResult( int requestCode, int resultCode, Intent data) {
         Support.log(String.format(Locale.US, "***** ActivityResult: request=%d result=%d",
@@ -134,7 +103,7 @@ public class MainActivity extends AppCompatActivity
                 Support.log("ActivityResult[RT_BT_ENABLED]");
                 if (resultCode == RESULT_OK) {
                     BluetoothMgr.configureBluetooth(this);
-                    BluetoothMgr.startServer(this);
+                    BluetoothMgr.startServer((ApplicationGlobalState) getApplication());
                     return;
                 }
                 else { Support.fatalError(this, "No Bluetooth available."); }
@@ -145,6 +114,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onDestroy() {
         super.onDestroy();
+        activity = null;
         BluetoothMgr.unregisterMyReceiver(this);
     }
 }

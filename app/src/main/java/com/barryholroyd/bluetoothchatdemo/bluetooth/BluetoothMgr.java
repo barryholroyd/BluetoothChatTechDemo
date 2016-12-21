@@ -4,10 +4,12 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.view.View;
 
+import com.barryholroyd.bluetoothchatdemo.ApplicationGlobalState;
 import com.barryholroyd.bluetoothchatdemo.MainActivity;
 import com.barryholroyd.bluetoothchatdemo.recyclerview.MyAdapter;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
@@ -43,11 +45,11 @@ public class BluetoothMgr {
     /**
      * Ask the user for permission to make this device discoverable.
      */
-    private static void requestDiscoverable(Activity a) {
+    private static void requestDiscoverable(Context c) {
         Intent discoverableIntent = new
                 Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-        a.startActivity(discoverableIntent);
+        c.startActivity(discoverableIntent);
     }
 
     /**
@@ -107,8 +109,8 @@ public class BluetoothMgr {
      *     Must ensure that Bluetooth is enabled first.
      * @param a current Activity.
      */
-    static public void startServer(Activity a) {
-        (new BluetoothServer(a, mBluetoothAdapter)).start();
+    static public void startServer(ApplicationGlobalState ags) {
+        (new BluetoothServer(ags, mBluetoothAdapter)).start();
     }
 
     /**

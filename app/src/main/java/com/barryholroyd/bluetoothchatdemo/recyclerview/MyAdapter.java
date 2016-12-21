@@ -2,6 +2,7 @@ package com.barryholroyd.bluetoothchatdemo.recyclerview;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,9 +10,10 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.barryholroyd.bluetoothchatdemo.ChatActivity;
 import com.barryholroyd.bluetoothchatdemo.R;
-import com.barryholroyd.bluetoothchatdemo.support.Support;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothClient;
+import com.barryholroyd.bluetoothchatdemo.support.Support;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothDevices;
 
 import java.util.Locale;
@@ -74,13 +76,12 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             LinearLayout ll = (LinearLayout) tvText.getParent();
             TextView tvMac = (TextView) ll.findViewById(R.id.row_mac);
             String mac = (String) tvMac.getText();
-            String text = (String) tvText.getText();
-
-            BluetoothDevice bd = bluetoothDevices.getDevice(mac);
-            if (bd == null) {
+            BluetoothDevice btdevice = bluetoothDevices.getDevice(mac);
+            if (btdevice == null) {
                 Support.fatalError(a, String.format(Locale.US, "Device missing: %s", mac));
             }
-            (new BluetoothClient(bd)).start();
+            // Set up a Bluetooth client connection to the remote device.
+            (new BluetoothClient(btdevice)).start();
         }
     }
 }
