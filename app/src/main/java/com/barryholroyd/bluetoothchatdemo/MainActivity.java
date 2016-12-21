@@ -18,11 +18,19 @@ import java.util.Locale;
 
 /*
  * TBD: cancel discovery when not needed.
+ * TBD: Do cancellations where appropriate.
  * TBD: Reformat screen.
  * TBD: Must connect before using buttons.
  * TBD: Do not include devices in Discovered if already paired.
- * TBD: Do cancellations where appropriate.
  * TBD: Clear "received" field before re-filling.
+ *
+ * TBD: when you pair, refresh the pair list (when you connect from discovered list).
+ * TBD: tag text fields so they survive device rotations.
+ * TBD: test with device rotations.
+ * TBD: after killing connections, can't reconnect from the "Cancel"d end. Probably need to set mSoocket to null.
+ * TBD: add Toast at server end for incoming connection.
+ * TBD: add Scrollview (Vertical)
+ *
  * TBD: Finish comments.
  * TBD: clean out TBDs, log()s, etc.
  */
