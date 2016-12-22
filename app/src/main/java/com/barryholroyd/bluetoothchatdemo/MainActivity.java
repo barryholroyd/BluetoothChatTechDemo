@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothComm;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothMgr;
 import com.barryholroyd.bluetoothchatdemo.recyclerview.RecyclerViewManager;
+import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.io.UnsupportedEncodingException;
@@ -40,7 +41,6 @@ public class MainActivity extends AppCompatActivity
 {
     private static RecyclerViewManager rvmDiscovered;
     private static RecyclerViewManager rvmPaired;
-    private static Activity activity = null;
     private static BluetoothAdapter mBluetoothAdapter;
     public static final int RT_BT_ENABLED = 1;
 
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activity = this;
+        ActivityTracker.register(this);
         setContentView(R.layout.activity_main);
         Support.init(this);
 

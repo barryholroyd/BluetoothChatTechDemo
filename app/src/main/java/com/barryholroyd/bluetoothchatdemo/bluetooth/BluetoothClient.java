@@ -9,6 +9,7 @@ import android.content.Intent;
 import com.barryholroyd.bluetoothchatdemo.ApplicationGlobalState;
 import com.barryholroyd.bluetoothchatdemo.ChatActivity;
 import com.barryholroyd.bluetoothchatdemo.MainActivity;
+import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.io.IOException;
@@ -20,10 +21,8 @@ import static com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothServer.MY_UU
 /**
  * Bluetooth "chat" client connection set up.
  * <p>
- *     Runs in a background thread. Since the user doesn't have anything else to do
- *     until this completes, we don't really need to do it in the background, but
- *     for most Bluetooth/networking apps setting up the connection in the background
- *     would probably be a good idea, so it is modelled here.
+ *     Runs in a background thread so that the user can still do other stuff (e.g.,
+ *     adjust settings) even if the write to the network hangs.
  */
 public class BluetoothClient extends Thread
 {
@@ -47,6 +46,9 @@ public class BluetoothClient extends Thread
      * to run the chat session.
      */
     public void run() {
+        // Don't run again if a request is already being processed.
+        if (btdevice != null)
+            return;
         /*
          * Discovery is very intensive -- it can slow down the connection attempt
          * and cause it to fail. To prevent that, if discovery is running we cancel it
@@ -61,7 +63,7 @@ public class BluetoothClient extends Thread
         try{
             mSocket = btdevice.createRfcommSocketToServiceRecord( MY_UUID );
             mSocket.connect( );
-        } catch ( IOException ioe ){
+        } catch ( IOException ioe ) {
             Support.log(String.format(Locale.US, "Client IOException: %s", ioe.getMessage()));
 
             /*
@@ -91,22 +93,31 @@ public class BluetoothClient extends Thread
             }
         }
 
-        // Make the Bluetooth socket available to other components.
-        Activity a = MainActivity.getActivity();
-        ApplicationGlobalState ags = (ApplicationGlobalState) a.getApplication();
-        ags.setBtSocket(mSocket);
-
         // Start communications.
         Support.userMessage("Connected!");
+
+        // Get the currently running Activity.
+        Activity a = ActivityTracker.get(MainActivity.class);
+        if (a == null) {
+            Support.userMessage("Could not start chat -- foreground Activity is gone.");
+            closeSocket(mSocket);
+            return;
+        }
+
+        // Make the Bluetooth socket available to other components.
+        ApplicationGlobalState ags = (ApplicationGlobalState) a.getApplication();
+        ags.setBtSocket(mSocket);
 
         // Pass control to the chat Activity.
         Intent intent = new Intent(a, ChatActivity.class);
         intent.putExtra(Support.BUNDLE_KEY_BTDEVICE, btdevice);
         a.startActivity(intent);
+        btdevice = null;
     }
 
     /** Local method to close the socket if it hasn't been passed to BluetoothComm yet. */
     private void closeSocket(BluetoothSocket socket) {
+        btdevice = null;
         try   {
             if (socket != null) {
                 Support.log("Closing the client socket...");

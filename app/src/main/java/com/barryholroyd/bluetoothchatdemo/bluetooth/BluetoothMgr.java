@@ -107,7 +107,7 @@ public class BluetoothMgr {
      * Fire up a Bluetooth server on this device.
      * <p>
      *     Must ensure that Bluetooth is enabled first.
-     * @param a current Activity.
+     * @param ags the extended Application, created to retain global state.
      */
     static public void startServer(ApplicationGlobalState ags) {
         (new BluetoothServer(ags, mBluetoothAdapter)).start();

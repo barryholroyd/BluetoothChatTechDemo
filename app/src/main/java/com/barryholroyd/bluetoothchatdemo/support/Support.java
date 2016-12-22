@@ -9,7 +9,10 @@ import android.content.pm.PackageManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.barryholroyd.bluetoothchatdemo.MainActivity;
 import com.barryholroyd.bluetoothchatdemo.dialog.ErrorDialog;
+
+import java.lang.ref.WeakReference;
 
 /**
  * General static support methods.
@@ -17,8 +20,13 @@ import com.barryholroyd.bluetoothchatdemo.dialog.ErrorDialog;
 public class Support {
     private static Toaster toaster = null;
     private static String appLabel = null;
+    private WeakReference<Activity> wra;
 
     public static final String BUNDLE_KEY_BTDEVICE = "com.barryholroyd.bluetoothchatdemo.BTDEVICE";
+
+    public Support(WeakReference<Activity> _wra) {
+        wra = _wra;
+    }
 
     /** Initialization */
     public static void init(Context c) {
@@ -32,6 +40,21 @@ public class Support {
             log("Could not get package name.");
             throw new MissingPackageName("Could not get package name.");
         }
+    }
+
+    /** Display a Dialog to the user indicating a fatal error, then exit the app. */
+    public void fatalError(String msg) {
+        // Get the currently running Activity.
+        Activity a = ActivityTracker.get();
+        if (a == null) {
+            Support.userMessage("Could not start chat -- foreground Activity is gone.");
+            closeSocket(mSocket);
+            return;
+        }
+
+        ErrorDialog
+                .newInstance("Fatal Error", msg)
+                .show(a.getFragmentManager(), "error_dialog");
     }
 
     /** Return the app label as defined in the manifest. */
@@ -53,13 +76,6 @@ public class Support {
         }
         Toaster.display(msg);
         log(msg);
-    }
-
-    /** Display a Dialog to the user indicating a fatal error, then exit the app. */
-    public static void fatalError(Activity a, String msg) {
-        ErrorDialog
-                .newInstance("Fatal Error", msg)
-                .show(a.getFragmentManager(), "error_dialog");
     }
 
     /** Utility wrapper for starting an Activity which returns a result. */
