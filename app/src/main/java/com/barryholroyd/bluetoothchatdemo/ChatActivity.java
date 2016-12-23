@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothClient;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothComm;
+import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothMgr;
+import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.io.UnsupportedEncodingException;
@@ -25,7 +27,6 @@ public class ChatActivity extends AppCompatActivity
 {
     private static EditText etTextSend;
     private static TextView tvTextReceive;
-    private static Activity activity = null;
 
     public static EditText            getEditTextSend()     { return etTextSend; }
     public static TextView            getTextViewReceive()  { return tvTextReceive; }
@@ -34,7 +35,7 @@ public class ChatActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        activity = this;
+        ActivityTracker.register(this);
 
         // Start communications.
         Support.userMessage("Starting Chat...");
@@ -51,11 +52,6 @@ public class ChatActivity extends AppCompatActivity
         BluetoothSocket btsocket = ((ApplicationGlobalState) getApplication()).getBtSocket();
         (new BluetoothComm(btsocket)).start();
 
-    }
-
-    /** Getter to return the current activity to a worker thread, to create an Intent. */
-    public static Activity getActivity() {
-        return activity;
     }
 
     private void setTitle(BluetoothDevice btdevice) {
@@ -102,5 +98,11 @@ public class ChatActivity extends AppCompatActivity
      */
     public void clickDone(View v) {
         BluetoothComm.closeConnection(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ActivityTracker.unregister(this);
     }
 }

@@ -2,8 +2,8 @@ package com.barryholroyd.bluetoothchatdemo.support;
 
 import android.app.Activity;
 
-import java.util.HashMap;
 import java.util.Locale;
+import java.util.Stack;
 
 /**
  * Registry to track the creation and destruction of Activities.
@@ -20,7 +20,7 @@ import java.util.Locale;
  *     back stack will cause the Activity to be destroyed but the app to keep running
  *     in the background (without being immediately recreated).
  * <p>
- *     registerActivity() should be called from onCreate().
+ *     register() should be called from onCreate().
  *     unregister() should be called from onDestroy().
  * <p>
  *     It is safe to call unregister() from onDestroy() since the latter will always
@@ -28,10 +28,13 @@ import java.util.Locale;
  * <p>
  *     Note that returning a valid Activity does not mean that it is in the running ("Resumed")
  *     state -- only that it hasn't been destroyed.
+ * <p>
+ *     TBD: Progress this through the other states using the same approach as
+ *     ActivityPrintStates.java. Add a getState() method.
  */
 public class ActivityTracker
 {
-    private static HashMap<Class, Activity> hMap = new HashMap<>();
+    private static Stack<ActivityInfo> stack = new Stack<>();
 
     /**
      * Register an Activity so that it can be used from worker threads.
@@ -39,27 +42,51 @@ public class ActivityTracker
      * @param a     the Activity instance.
      */
     public static void register(Activity a) {
-        Class clazz = a.getClass();
-        if (hMap.containsKey(clazz)) {
-            throw new IllegalStateException(String.format(Locale.US,
-                    "ActivityTracker: attempted to register class %s twice.",
-                    clazz.getName()));
-        }
-        hMap.put(clazz, a);
+        stack.push(new ActivityInfo(a, ActivityState.CREATED));
     }
 
     /**
-     * Get the currently running Activity as specified by "clazz", if there is one.
+     * Get the currently running Activity.
      *
-     * @param clazz the desired Activity class, e.g., MainActivity.class.
-     * @param <T>   the type of the class -- it must be an Activity or an extension of Activity.
-     * @return the valid Activity instance.
+     * @return the current Activity instance, if there is one.
      */
-    public static <T extends Class> Activity get(T clazz) {
-        return hMap.get(clazz);
+    public static Activity get() {
+        ActivityInfo ai = stack.pop();
+        if (ai == null)
+            return null;
+        return ai.getActivity();
     }
 
     /**
-     * Get the currently running Activity
+     * Register an Activity so that it can be used from worker threads.
+     *
+     * This should be called from onDestroy().
+     *
+     * @param a     the Activity instance.
      */
+    public static void unregister(Activity a) {
+        ActivityInfo ai = stack.pop();
+        if (!ai.getActivity().equals(a)) {
+            throw new IllegalStateException(
+                    String.format(Locale.US, "Bad activity popped from the stack: %s",
+                            a.getClass()));
+        }
+    }
+
+}
+
+enum ActivityState { CREATED, STARTED, RESUMED }
+
+class ActivityInfo
+{
+    private Activity a;
+    private ActivityState state;
+
+    ActivityInfo(Activity _a, ActivityState _state) {
+        a = _a;
+        state = _state;
+    }
+
+    Activity getActivity() { return a; }
+    ActivityState getState() { return state; }
 }

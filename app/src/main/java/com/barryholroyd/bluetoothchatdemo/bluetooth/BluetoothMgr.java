@@ -25,11 +25,11 @@ public class BluetoothMgr {
     private static BluetoothAdapter mBluetoothAdapter;
     static BroadcastReceiver mReceiver;
 
-    public static BluetoothAdapter getBluetoothAdapter(MainActivity ma) {
+    public static BluetoothAdapter getBluetoothAdapter() {
         // Get the Bluetooth adapter.
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
-            Support.fatalError(ma, "Device does not support Bluetooth.");
+            Support.fatalError("Device does not support Bluetooth.");
         }
         return mBluetoothAdapter;
     }

@@ -46,8 +46,7 @@ public class BluetoothServer extends Thread
             // MY_UUID is the app's UUID string, also used by the client code
             tmp = mBluetoothAdapter.listenUsingRfcommWithServiceRecord(SERVICE_NAME, MY_UUID);
         } catch (IOException e) {
-            Support.fatalError(MainActivity.getActivity(),
-                    "Failed to get Bluetooth server socket.");
+            Support.fatalError("Failed to get Bluetooth server socket.");
         }
         mServerSocket = tmp;
     }

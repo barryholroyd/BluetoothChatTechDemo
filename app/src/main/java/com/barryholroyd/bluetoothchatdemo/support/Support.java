@@ -43,13 +43,11 @@ public class Support {
     }
 
     /** Display a Dialog to the user indicating a fatal error, then exit the app. */
-    public void fatalError(String msg) {
+    public static void fatalError(String msg) {
         // Get the currently running Activity.
         Activity a = ActivityTracker.get();
         if (a == null) {
-            Support.userMessage("Could not start chat -- foreground Activity is gone.");
-            closeSocket(mSocket);
-            return;
+            throw new FatalErrorException("Fatal Error: " + msg);
         }
 
         ErrorDialog
@@ -89,6 +87,14 @@ public class Support {
 class MissingPackageName extends RuntimeException
 {
     MissingPackageName(String msg) {
+        super(msg);
+    }
+}
+
+/** Exception thrown if we could not get the Activity so we could call finish(). */
+class FatalErrorException extends RuntimeException
+{
+    FatalErrorException(String msg) {
         super(msg);
     }
 }

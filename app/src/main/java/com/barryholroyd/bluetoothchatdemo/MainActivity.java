@@ -19,6 +19,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
 /*
+ * TBD: CHECK FOR ALL USE OF ACTIVITIES IN BACKGROUND.
+ * TBD:   check foreground/background processing.
+ *
  * TBD: cancel discovery when not needed.
  * TBD: Do cancellations where appropriate.
  * TBD: Reformat screen.
@@ -59,7 +62,7 @@ public class MainActivity extends AppCompatActivity
         // These are order-sensitive.
         rvmDiscovered     = new RecyclerViewManager(this, R.id.rv_discovered);
         rvmPaired         = new RecyclerViewManager(this, R.id.rv_paired);
-        mBluetoothAdapter = BluetoothMgr.getBluetoothAdapter(this);
+        mBluetoothAdapter = BluetoothMgr.getBluetoothAdapter();
 
         // Ensure it is enabled; if not, ask the user for permission.
         if (!mBluetoothAdapter.isEnabled()) {
@@ -69,11 +72,6 @@ public class MainActivity extends AppCompatActivity
             BluetoothMgr.configureBluetooth(this);
             BluetoothMgr.startServer((ApplicationGlobalState) getApplication());
         }
-    }
-
-    /** Getter to return the current activity to a worker thread, to create an Intent. */
-    public static Activity getActivity() {
-        return activity;
     }
 
     /**
@@ -106,7 +104,7 @@ public class MainActivity extends AppCompatActivity
                     BluetoothMgr.startServer((ApplicationGlobalState) getApplication());
                     return;
                 }
-                else { Support.fatalError(this, "No Bluetooth available."); }
+                else { Support.fatalError("No Bluetooth available."); }
                 break;
         }
     }
@@ -114,7 +112,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onDestroy() {
         super.onDestroy();
-        activity = null;
+        ActivityTracker.unregister(this);
         BluetoothMgr.unregisterMyReceiver(this);
     }
 }

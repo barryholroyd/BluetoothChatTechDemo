@@ -23,12 +23,7 @@ import java.util.Locale;
  * and the list of paired devices.
  */
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
-    final Activity a;
     final BluetoothDevices bluetoothDevices = new BluetoothDevices();
-
-    MyAdapter(Activity _a) {
-        a = _a;
-    }
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView mTvText;
@@ -78,7 +73,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             String mac = (String) tvMac.getText();
             BluetoothDevice btdevice = bluetoothDevices.getDevice(mac);
             if (btdevice == null) {
-                Support.fatalError(a, String.format(Locale.US, "Device missing: %s", mac));
+                Support.fatalError(String.format(Locale.US, "Device missing: %s", mac));
             }
             // Set up a Bluetooth client connection to the remote device.
             (new BluetoothClient(btdevice)).start();
