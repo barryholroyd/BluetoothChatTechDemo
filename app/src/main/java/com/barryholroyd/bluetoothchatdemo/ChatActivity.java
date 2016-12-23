@@ -23,7 +23,7 @@ import java.util.Locale;
  * TBD: comments.
  */
 
-public class ChatActivity extends AppCompatActivity
+public class ChatActivity extends ActivityTracker
 {
     private static EditText etTextSend;
     private static TextView tvTextReceive;
@@ -34,8 +34,6 @@ public class ChatActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        ActivityTracker.register(this);
 
         // Start communications.
         Support.userMessage("Starting Chat...");
@@ -103,6 +101,5 @@ public class ChatActivity extends AppCompatActivity
     @Override
     public void onDestroy() {
         super.onDestroy();
-        ActivityTracker.unregister(this);
     }
 }

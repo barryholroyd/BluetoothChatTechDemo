@@ -45,7 +45,7 @@ public class Support {
     /** Display a Dialog to the user indicating a fatal error, then exit the app. */
     public static void fatalError(String msg) {
         // Get the currently running Activity.
-        Activity a = ActivityTracker.get();
+        Activity a = ActivityTracker.getActivity(); // TBD: finish this section
         if (a == null) {
             throw new FatalErrorException("Fatal Error: " + msg);
         }

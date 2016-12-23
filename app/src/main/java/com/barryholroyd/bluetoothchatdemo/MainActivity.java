@@ -40,7 +40,7 @@ import java.util.Locale;
  * TBD: clean out TBDs, log()s, etc.
  */
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends ActivityTracker
 {
     private static RecyclerViewManager rvmDiscovered;
     private static RecyclerViewManager rvmPaired;
@@ -55,7 +55,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActivityTracker.register(this);
         setContentView(R.layout.activity_main);
         Support.init(this);
 
@@ -112,7 +111,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onDestroy() {
         super.onDestroy();
-        ActivityTracker.unregister(this);
         BluetoothMgr.unregisterMyReceiver(this);
     }
 }

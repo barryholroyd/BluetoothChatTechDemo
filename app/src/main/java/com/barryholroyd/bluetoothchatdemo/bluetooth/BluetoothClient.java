@@ -97,7 +97,7 @@ public class BluetoothClient extends Thread
         Support.userMessage("Connected!");
 
         // Get the currently running Activity.
-        Activity a = ActivityTracker.get();
+        Activity a = ActivityTracker.getActivity(); // TBD: finish this section
         if (a == null) {
             Support.userMessage("Could not start chat -- foreground Activity is gone.");
             closeSocket(mSocket);

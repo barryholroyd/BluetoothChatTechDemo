@@ -1,6 +1,8 @@
 package com.barryholroyd.bluetoothchatdemo.support;
 
 import android.app.Activity;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import java.util.Locale;
 import java.util.Stack;
@@ -8,41 +10,60 @@ import java.util.Stack;
 /**
  * Registry to track the creation and destruction of Activities.
  * <p>
- *     This is used, for example, by background methods that need an Activity
- *     (e.g., to create DialogFragments).
+ *     References to Activities can't be saved for use by worker threads
+ *     because the Activity could be destroyed without the worker thread
+ *     being aware of it.  The Activity can be destroyed (and recreated) as a
+ *     result of a device rotation, in which case the app is still running,
+ *     or the entire process can be destroyed as a result of low memory, in
+ *     which case both the Activity and the app are destroyed.  Also, hitting
+ *     the Back button when there is only one Activity on the task's back
+ *     stack will cause the Activity to be destroyed but the app to keep
+ *     running in the background (without being immediately recreated).
  * <p>
- *     References to Activities can't be saved for use by worker threads because
- *     the Activity could be destroyed without the worker thread being aware of it.
- *     The Activity can be destroyed (and recreated) as a result of a device rotation, in
- *     which case the app is still running, or the entire process can be destroyed as a
- *     result of low memory, in which case both the Activity and the app are destroyed.
- *     Also, hitting the Back button when there is only one Activity on the task's
- *     back stack will cause the Activity to be destroyed but the app to keep running
- *     in the background (without being immediately recreated).
+ *     This class tracks the lifetime of each Activity instance (mirroring,
+ *     to some degree, the task's back stack). It can be queried to get the
+ *     current Activity as well as the state of the current Activity.  It can
+ *     be used, for example, by background methods that need an Activity to
+ *     create DialogFragments (an Activity instance is needed to get a
+ *     FragmentManager).
  * <p>
- *     register() should be called from onCreate().
- *     unregister() should be called from onDestroy().
+ *     It can also be used by anything that needs a current Context. The best
+ *     approach here is to pass in the Application Context, but that can be
+ *     unwieldy at times. Context Activities should not be relied on in worker
+ *     threads since an Activity's Context is actually just the Activity
+ *     itself.
  * <p>
- *     It is safe to call unregister() from onDestroy() since the latter will always
- *     be called when an Activity is terminated unless the entire process is being killed.
- * <p>
- *     Note that returning a valid Activity does not mean that it is in the running ("Resumed")
- *     state -- only that it hasn't been destroyed.
- * <p>
- *     TBD: Progress this through the other states using the same approach as
- *     ActivityPrintStates.java. Add a getState() method.
+ *     To use this class, simply have each of the app's Activities extend it.
+ *     They will all then automatically be tracked and the static methods can
+ *     be used to access the current Activity.
  */
-public class ActivityTracker
+abstract public class ActivityTracker extends AppCompatActivity
 {
+    /** The four possible states of an Activity. */
+    public enum ActivityState { CREATED, STARTED, RESUMED, DESTROYED }
+
+    /** The stack of Activities. This basically mirrors the task's back stack. */
     private static Stack<ActivityInfo> stack = new Stack<>();
 
     /**
-     * Register an Activity so that it can be used from worker threads.
-     *
-     * @param a     the Activity instance.
+     * Activity instance and state storage.
+     * <p>
+     *    Maintained by Activity life cycle callbacks.
      */
-    public static void register(Activity a) {
-        stack.push(new ActivityInfo(a, ActivityState.CREATED));
+    private class ActivityInfo
+    {
+        private Activity a;
+        private ActivityState state;
+
+        ActivityInfo(Activity _a, ActivityState _state) {
+            a = _a;
+            state = _state;
+        }
+
+	    // Getters and Setters
+        Activity getActivity() { return a; }
+        ActivityState getState() { return state; }
+        void setState(ActivityState _state) { state = _state; }
     }
 
     /**
@@ -50,43 +71,85 @@ public class ActivityTracker
      *
      * @return the current Activity instance, if there is one.
      */
-    public static Activity get() {
-        ActivityInfo ai = stack.pop();
-        if (ai == null)
-            return null;
-        return ai.getActivity();
+    public static Activity getActivity() {
+	if (stack.empty())
+	    return null;
+        return stack.pop().getActivity();
+    }
+
+    /**
+     * Get the state of the currently running Activity.
+     *
+     * @return the current Activity's state, if there is one.
+     */
+    public static ActivityState getState() {
+	if (stack.empty())
+	    return null;
+        return stack.pop().getState();
     }
 
     /**
      * Register an Activity so that it can be used from worker threads.
      *
-     * This should be called from onDestroy().
-     *
-     * @param a     the Activity instance.
+     * @param savedInstanceState standard Bundle argument
      */
-    public static void unregister(Activity a) {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+	trace("onCreate");
+        stack.push(new ActivityInfo(this, ActivityState.CREATED));
+    }
+  
+    @Override
+    protected void onStart(){
+        super.onStart();
+	trace("onStart");
+        stack.peek().setState(ActivityState.STARTED);
+    }
+  
+    @Override
+    protected void onResume(){
+        super.onResume();
+	trace("onResume");
+        stack.peek().setState(ActivityState.RESUMED);
+    }
+  
+    @Override
+    protected void onPause(){
+        super.onPause();
+	trace("onPause");
+        stack.peek().setState(ActivityState.STARTED);
+    }
+  
+    @Override
+    protected void onStop(){
+        super.onStop();
+	trace("onStop");
+        stack.peek().setState(ActivityState.CREATED);
+    }
+  
+    /**
+     * Unregister the Activity just before it is destroyed.
+     */
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+	trace("onDestroy");
+	if (stack.empty()) {
+            throw new IllegalStateException(String.format(Locale.US,
+  	        "Unexpected empty stack when trying to pop Activity: %s",
+                getClass()));
+	}
         ActivityInfo ai = stack.pop();
-        if (!ai.getActivity().equals(a)) {
-            throw new IllegalStateException(
-                    String.format(Locale.US, "Bad activity popped from the stack: %s",
-                            a.getClass()));
+        if (!ai.getActivity().equals(this)) {
+            throw new IllegalStateException(String.format(Locale.US,
+  	        "Bad activity popped from the stack: %s",
+                getClass()));
         }
     }
 
-}
-
-enum ActivityState { CREATED, STARTED, RESUMED }
-
-class ActivityInfo
-{
-    private Activity a;
-    private ActivityState state;
-
-    ActivityInfo(Activity _a, ActivityState _state) {
-        a = _a;
-        state = _state;
+    private void trace(String label) {
+	String s = String.format(Locale.US, "AT [%#x]: %s", this.hashCode(), label);
+        Support.log(s);
     }
-
-    Activity getActivity() { return a; }
-    ActivityState getState() { return state; }
 }
