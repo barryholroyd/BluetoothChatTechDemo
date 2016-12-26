@@ -75,7 +75,7 @@ abstract public class ActivityTracker extends AppCompatActivity
     public static Activity getActivity() {
         if (stack.empty())
             return null;
-        return stack.pop().getActivity();
+        return stack.peek().getActivity();
     }
 
     /**
@@ -86,7 +86,7 @@ abstract public class ActivityTracker extends AppCompatActivity
     public static ActivityState getState() {
         if (stack.empty())
             return null;
-        return stack.pop().getState();
+        return stack.peek().getState();
     }
 
     /**
@@ -99,8 +99,18 @@ abstract public class ActivityTracker extends AppCompatActivity
     public static Context getAppContext() {
         if (stack.empty())
             return null;
-        return stack.pop().getActivity().getApplicationContext();
+        return stack.peek().getActivity().getApplicationContext();
+    }
 
+    /**
+     * The the Activity's Context instance.
+
+     * @return the Activity's Context instance.
+     */
+    public static Context getContext() {
+        if (stack.empty())
+            return null;
+        return stack.peek().getActivity();
     }
 
     /**

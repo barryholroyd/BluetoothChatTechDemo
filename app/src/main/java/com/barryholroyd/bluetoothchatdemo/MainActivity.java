@@ -1,21 +1,15 @@
 package com.barryholroyd.bluetoothchatdemo;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.TextView;
 
-import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothComm;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothMgr;
 import com.barryholroyd.bluetoothchatdemo.recyclerview.RecyclerViewManager;
 import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
 /*

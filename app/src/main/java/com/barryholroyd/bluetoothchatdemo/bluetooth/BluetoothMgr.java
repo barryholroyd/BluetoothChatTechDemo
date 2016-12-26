@@ -48,7 +48,7 @@ public class BluetoothMgr {
         Intent discoverableIntent = new
                 Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-        Context c = ActivityTracker.getAppContext();
+        Context c = ActivityTracker.getContext();
         if (c == null) {
             Support.userMessage("Can't make this device discoverable (no Context available).");
             return;

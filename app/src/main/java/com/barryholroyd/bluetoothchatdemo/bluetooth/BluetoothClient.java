@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.Intent;
 
 import com.barryholroyd.bluetoothchatdemo.ApplicationGlobalState;
@@ -96,22 +97,21 @@ public class BluetoothClient extends Thread
         // Start communications.
         Support.userMessage("Connected!");
 
-        // Get the currently running Activity.
-        Activity a = ActivityTracker.getActivity(); // TBD: finish this section
-        if (a == null) {
+        // Get a valid Context.
+        Context c = ActivityTracker.getAppContext();
+        if (c == null) {
             Support.userMessage("Could not start chat -- foreground Activity is gone.");
             closeSocket(mSocket);
             return;
         }
 
         // Make the Bluetooth socket available to other components.
-        ApplicationGlobalState ags = (ApplicationGlobalState) a.getApplication();
-        ags.setBtSocket(mSocket);
+        ((ApplicationGlobalState)  MainActivity.getActivity().getApplication()).setBtSocket(null);
 
         // Pass control to the chat Activity.
-        Intent intent = new Intent(a, ChatActivity.class);
+        Intent intent = new Intent(c, ChatActivity.class);
         intent.putExtra(Support.BUNDLE_KEY_BTDEVICE, btdevice);
-        a.startActivity(intent);
+        c.startActivity(intent);
         btdevice = null;
     }
 

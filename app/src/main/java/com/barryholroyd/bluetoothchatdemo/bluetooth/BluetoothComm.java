@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.barryholroyd.bluetoothchatdemo.ApplicationGlobalState;
 import com.barryholroyd.bluetoothchatdemo.ChatActivity;
+import com.barryholroyd.bluetoothchatdemo.MainActivity;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.io.IOException;
@@ -18,7 +19,16 @@ import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
 /**
- * Created by Barry on 12/14/2016.
+ * Bluetooth communications.
+ * <p>
+ *     This class is only used by ChatActivity, so any reference to an Activity here is
+ *     always to the ChatActivity. Its constructor accepts and initialized Bluetooth socket,
+ *     creates input and output streams from it, then starts running in the background to
+ *     read incoming data on the input stream; incoming data is then sent to the UI thread
+ *     for display to the user.
+ * <p>
+ *     A static writeChat() method is provided for the UI thread to use to write data out
+ *     to the remote app. *
  */
 
 public class BluetoothComm extends Thread
@@ -111,7 +121,7 @@ public class BluetoothComm extends Thread
             Message m = mHandler.obtainMessage(CHATTEXT, bytes);
             mHandler.sendMessage(m);
         }
-        closeConnection(null);
+        closeConnection();
     }
 
     /**
@@ -139,20 +149,11 @@ public class BluetoothComm extends Thread
      * Close the current open connection if there is one.
      * TBD: does it matter if the connection is open or not?
      */
-    static public void closeConnection(Activity a) {
+    static public void closeConnection() {
         try {
             if (socket != null) {
                 Support.log("Closing the connection...");
                 socket.close();
-                ApplicationGlobalState ags =
-                        (ApplicationGlobalState)  ChatActivity.getActivity().getApplication();
-                ags.setBtSocket(null);
-
-                if (a != null)
-                    a.finish();
-                else
-                    Support.log("TBD: NOT FINISHING ACTIVITY.");
-
             }
         } catch (IOException ioe) {
             Support.log(String.format(Locale.US,

@@ -1,18 +1,14 @@
 package com.barryholroyd.bluetoothchatdemo;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothClient;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothComm;
-import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothMgr;
 import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
@@ -49,7 +45,6 @@ public class ChatActivity extends ActivityTracker
 
         BluetoothSocket btsocket = ((ApplicationGlobalState) getApplication()).getBtSocket();
         (new BluetoothComm(btsocket)).start();
-
     }
 
     private void setTitle(BluetoothDevice btdevice) {
@@ -95,7 +90,8 @@ public class ChatActivity extends ActivityTracker
      * @param v the View the user clicked on.
      */
     public void clickDone(View v) {
-        BluetoothComm.closeConnection(this);
+        BluetoothComm.closeConnection();
+        finish();
     }
 
     @Override
