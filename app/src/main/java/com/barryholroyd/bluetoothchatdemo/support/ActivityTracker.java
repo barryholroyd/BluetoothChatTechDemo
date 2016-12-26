@@ -96,35 +96,35 @@ abstract public class ActivityTracker extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-	trace("onCreate");
+	    trace("onCreate");
         stack.push(new ActivityInfo(this, ActivityState.CREATED));
     }
   
     @Override
     protected void onStart(){
         super.onStart();
-	trace("onStart");
+	    trace("onStart");
         stack.peek().setState(ActivityState.STARTED);
     }
   
     @Override
     protected void onResume(){
         super.onResume();
-	trace("onResume");
+	    trace("onResume");
         stack.peek().setState(ActivityState.RESUMED);
     }
   
     @Override
     protected void onPause(){
         super.onPause();
-	trace("onPause");
+	    trace("onPause");
         stack.peek().setState(ActivityState.STARTED);
     }
   
     @Override
     protected void onStop(){
         super.onStop();
-	trace("onStop");
+	    trace("onStop");
         stack.peek().setState(ActivityState.CREATED);
     }
   
@@ -134,12 +134,12 @@ abstract public class ActivityTracker extends AppCompatActivity
     @Override
     protected void onDestroy(){
         super.onDestroy();
-	trace("onDestroy");
-	if (stack.empty()) {
-            throw new IllegalStateException(String.format(Locale.US,
-  	        "Unexpected empty stack when trying to pop Activity: %s",
-                getClass()));
-	}
+        trace("onDestroy");
+        if (stack.empty()) {
+                throw new IllegalStateException(String.format(Locale.US,
+                "Unexpected empty stack when trying to pop Activity: %s",
+                    getClass()));
+        }
         ActivityInfo ai = stack.pop();
         if (!ai.getActivity().equals(this)) {
             throw new IllegalStateException(String.format(Locale.US,
