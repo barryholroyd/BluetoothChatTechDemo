@@ -1,6 +1,7 @@
 package com.barryholroyd.bluetoothchatdemo.support;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
@@ -72,8 +73,8 @@ abstract public class ActivityTracker extends AppCompatActivity
      * @return the current Activity instance, if there is one.
      */
     public static Activity getActivity() {
-	if (stack.empty())
-	    return null;
+        if (stack.empty())
+            return null;
         return stack.pop().getActivity();
     }
 
@@ -83,9 +84,23 @@ abstract public class ActivityTracker extends AppCompatActivity
      * @return the current Activity's state, if there is one.
      */
     public static ActivityState getState() {
-	if (stack.empty())
-	    return null;
+        if (stack.empty())
+            return null;
         return stack.pop().getState();
+    }
+
+    /**
+     * The the Application's Context instance.
+     * <p>
+     *     This is useful when we want to have a Context which doesn't depend on the
+     *     life cycle of Activities.
+     * @return the Application's Context instance.
+     */
+    public static Context getAppContext() {
+        if (stack.empty())
+            return null;
+        return stack.pop().getActivity().getApplicationContext();
+
     }
 
     /**

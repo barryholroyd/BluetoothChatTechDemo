@@ -1,18 +1,13 @@
 package com.barryholroyd.bluetoothchatdemo.support;
 
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.barryholroyd.bluetoothchatdemo.MainActivity;
 import com.barryholroyd.bluetoothchatdemo.dialog.ErrorDialog;
-
-import java.lang.ref.WeakReference;
 
 /**
  * General static support methods.
@@ -20,25 +15,28 @@ import java.lang.ref.WeakReference;
 public class Support {
     private static Toaster toaster = null;
     private static String appLabel = null;
-    private WeakReference<Activity> wra;
 
     public static final String BUNDLE_KEY_BTDEVICE = "com.barryholroyd.bluetoothchatdemo.BTDEVICE";
 
-    public Support(WeakReference<Activity> _wra) {
-        wra = _wra;
-    }
-
     /** Initialization */
-    public static void init(Context c) {
-        toaster = new Toaster(c);
-        PackageManager pm = c.getPackageManager();
-        try {
-            ApplicationInfo ai = pm.getApplicationInfo(c.getPackageName(), 0);
-            appLabel = (String) pm.getApplicationLabel(ai);
-        }
-        catch (PackageManager.NameNotFoundException nnfe) {
-            log("Could not get package name.");
-            throw new MissingPackageName("Could not get package name.");
+    private static void init() {
+        synchronized (Support.class){
+            Context c = ActivityTracker.getAppContext();
+            if (c == null)
+                throw new SupportException("No Context available.");
+            if (toaster == null) {
+                toaster = new Toaster(c);
+            }
+            if (appLabel == null) {
+                PackageManager pm = c.getPackageManager();
+                try {
+                    ApplicationInfo ai = pm.getApplicationInfo(c.getPackageName(), 0);
+                    appLabel = (String) pm.getApplicationLabel(ai);
+                }
+                catch (PackageManager.NameNotFoundException nnfe) {
+                    throw new SupportException("Could not get package name.");
+                }
+            }
         }
     }
 
@@ -46,17 +44,19 @@ public class Support {
     public static void fatalError(String msg) {
         // Get the currently running Activity.
         Activity a = ActivityTracker.getActivity(); // TBD: finish this section
-        if (a == null) {
-            throw new FatalErrorException("Fatal Error: " + msg);
-        }
-
+        if (a == null)
+            throw new SupportException("Fatal Error: " + msg);
         ErrorDialog
-                .newInstance("Fatal Error", msg)
-                .show(a.getFragmentManager(), "error_dialog");
+            .newInstance("Fatal Error", msg)
+            .show(a.getFragmentManager(), "error_dialog");
     }
 
     /** Return the app label as defined in the manifest. */
-    public static String getAppLabel() { return appLabel; }
+    public static String getAppLabel() {
+        if (appLabel == null)
+            init();
+        return appLabel;
+    }
 
     /** Basic logging for the app. */
     public static void log(String msg) {
@@ -68,10 +68,8 @@ public class Support {
      * and log it.
      */
     public static void userMessage(String msg) {
-        if (toaster == null) {
-            throw new IllegalStateException(
-                    "Support.userMessage() called before Support.init().");
-        }
+        if (toaster == null)
+            init();
         Toaster.display(msg);
         log(msg);
     }
@@ -83,18 +81,10 @@ public class Support {
     }
 }
 
-/** Exception thrown if we could not obtain the package name. */
-class MissingPackageName extends RuntimeException
+/** Support-specific exception. */
+class SupportException extends RuntimeException
 {
-    MissingPackageName(String msg) {
-        super(msg);
-    }
-}
-
-/** Exception thrown if we could not get the Activity so we could call finish(). */
-class FatalErrorException extends RuntimeException
-{
-    FatalErrorException(String msg) {
+    SupportException(String msg) {
         super(msg);
     }
 }

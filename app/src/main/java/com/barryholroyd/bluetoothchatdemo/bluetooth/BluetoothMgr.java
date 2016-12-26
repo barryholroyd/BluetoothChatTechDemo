@@ -9,12 +9,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.view.View;
 
-import com.barryholroyd.bluetoothchatdemo.ApplicationGlobalState;
 import com.barryholroyd.bluetoothchatdemo.MainActivity;
 import com.barryholroyd.bluetoothchatdemo.recyclerview.MyAdapter;
+import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
-import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -34,21 +33,26 @@ public class BluetoothMgr {
         return mBluetoothAdapter;
     }
 
-    public static void configureBluetooth(MainActivity ma) {
+    public static void configureBluetooth() {
         // Register receiver for handling newly discovered devices during a scan.
-        registerBroadcastReceiver(ma);
+        registerBroadcastReceiver();
         refreshPaired(null);
         refreshDiscovered(null);
-        requestDiscoverable(ma);
+        requestDiscoverable();
     }
 
     /**
      * Ask the user for permission to make this device discoverable.
      */
-    private static void requestDiscoverable(Context c) {
+    private static void requestDiscoverable() {
         Intent discoverableIntent = new
                 Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+        Context c = ActivityTracker.getAppContext();
+        if (c == null) {
+            Support.userMessage("Can't make this device discoverable (no Context available).");
+            return;
+        }
         c.startActivity(discoverableIntent);
     }
 
@@ -90,7 +94,7 @@ public class BluetoothMgr {
      * Register the broadcast receiver which will record each device found
      * during a Bluetooth scan.
      */
-    private static void registerBroadcastReceiver(final MainActivity ma) {
+    private static void registerBroadcastReceiver() {
         IntentFilter ifilter = new IntentFilter();
         ifilter.addAction(BluetoothDevice.ACTION_FOUND);
         ifilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
@@ -99,18 +103,23 @@ public class BluetoothMgr {
         ifilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
 
         // Register the receiver.
-        mReceiver = new BluetoothBroadcastReceiver(ma);
-        ma.registerReceiver(mReceiver, ifilter);
+        mReceiver = new BluetoothBroadcastReceiver();
+        Context c = ActivityTracker.getAppContext();
+        if (c == null) {
+            Support.userMessage(
+                    "Can't scan for devices (could not register broadcast receiver");
+            return;
+        }
+        c.registerReceiver(mReceiver, ifilter);
     }
 
     /**
      * Fire up a Bluetooth server on this device.
      * <p>
      *     Must ensure that Bluetooth is enabled first.
-     * @param ags the extended Application, created to retain global state.
      */
-    static public void startServer(ApplicationGlobalState ags) {
-        (new BluetoothServer(ags, mBluetoothAdapter)).start();
+    static public void startServer() {
+        (new BluetoothServer(mBluetoothAdapter)).start();
     }
 
     /**

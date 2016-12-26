@@ -45,18 +45,21 @@ public class MainActivity extends ActivityTracker
     private static RecyclerViewManager rvmDiscovered;
     private static RecyclerViewManager rvmPaired;
     private static BluetoothAdapter mBluetoothAdapter;
+    private static ApplicationGlobalState ags = null;
     public static final int RT_BT_ENABLED = 1;
 
     // Getters
     public static RecyclerViewManager getRvmDiscovered()    { return rvmDiscovered; }
     public static RecyclerViewManager getRvmPaired()        { return rvmPaired; }
     public static BluetoothAdapter    getBluetoothAdapter() { return mBluetoothAdapter; }
+    public static ApplicationGlobalState getApplicationGlobalState() { return ags; }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Support.init(this);
+
+        ags = (ApplicationGlobalState) getApplication();
 
         // These are order-sensitive.
         rvmDiscovered     = new RecyclerViewManager(this, R.id.rv_discovered);
@@ -68,8 +71,8 @@ public class MainActivity extends ActivityTracker
             Support.startAFR(this, BluetoothAdapter.ACTION_REQUEST_ENABLE, RT_BT_ENABLED);
         }
         else {
-            BluetoothMgr.configureBluetooth(this);
-            BluetoothMgr.startServer((ApplicationGlobalState) getApplication());
+            BluetoothMgr.configureBluetooth();
+            BluetoothMgr.startServer();
         }
     }
 
@@ -99,8 +102,8 @@ public class MainActivity extends ActivityTracker
             case RT_BT_ENABLED:
                 Support.log("ActivityResult[RT_BT_ENABLED]");
                 if (resultCode == RESULT_OK) {
-                    BluetoothMgr.configureBluetooth(this);
-                    BluetoothMgr.startServer((ApplicationGlobalState) getApplication());
+                    BluetoothMgr.configureBluetooth();
+                    BluetoothMgr.startServer();
                     return;
                 }
                 else { Support.fatalError("No Bluetooth available."); }

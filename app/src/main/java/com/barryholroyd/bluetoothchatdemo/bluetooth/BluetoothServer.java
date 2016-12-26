@@ -1,6 +1,5 @@
 package com.barryholroyd.bluetoothchatdemo.bluetooth;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
@@ -11,6 +10,7 @@ import android.os.Parcelable;
 import com.barryholroyd.bluetoothchatdemo.ApplicationGlobalState;
 import com.barryholroyd.bluetoothchatdemo.ChatActivity;
 import com.barryholroyd.bluetoothchatdemo.MainActivity;
+import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.io.IOException;
@@ -33,14 +33,10 @@ public class BluetoothServer extends Thread
     public static final UUID MY_UUID = UUID.fromString("bb303707-5a56-4536-8d07-7ead8264f6b9");
     private final BluetoothServerSocket mServerSocket;
 
-    // Application instance for maintaining global state.
-    ApplicationGlobalState ags;
-
-    public BluetoothServer(ApplicationGlobalState _ags, BluetoothAdapter mBluetoothAdapter) {
+    public BluetoothServer(BluetoothAdapter mBluetoothAdapter) {
         // Use a temporary object that is later assigned to mServerSocket,
         // because mServerSocket is final
         // TBD: tmp not needed?
-        ags = _ags;
         BluetoothServerSocket tmp = null;
         try {
             // MY_UUID is the app's UUID string, also used by the client code
@@ -62,13 +58,13 @@ public class BluetoothServer extends Thread
                 mSocket = mServerSocket.accept();
                 if (mSocket != null) {
                     // Make the Bluetooth socket available to other components.
-                    ags.setBtSocket(mSocket);
+                    MainActivity.getApplicationGlobalState().setBtSocket(mSocket);
 
                     // Start communications.
                     Support.userMessage("Connected!");
 
                     // Pass control to the chat Activity.
-                    Context c = ags.getApplicationContext();
+                    Context c = ActivityTracker.getAppContext();
                     Intent intent = new Intent(c, ChatActivity.class);
                     intent.putExtra(Support.BUNDLE_KEY_BTDEVICE, (Parcelable) null);
                     intent.addFlags(FLAG_ACTIVITY_NEW_TASK);

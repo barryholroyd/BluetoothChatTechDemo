@@ -28,8 +28,8 @@ public class BluetoothBroadcastReceiver extends BroadcastReceiver
     MyAdapter myAdapterDiscovered;
 
     /** Constructor needed for setting the RecyclerView adapter instance. */
-    BluetoothBroadcastReceiver(MainActivity ma) {
-        myAdapterDiscovered = ma.getRvmDiscovered().getAdapter();
+    BluetoothBroadcastReceiver() {
+        myAdapterDiscovered = MainActivity.getRvmDiscovered().getAdapter();
     }
 
     /**
