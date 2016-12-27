@@ -16,9 +16,6 @@ import java.util.Locale;
  * TBD: CHECK FOR ALL USE OF ACTIVITIES IN BACKGROUND.
  * TBD:   check foreground/background processing.
  *
- * TBD: cancel discovery when not needed.
- * TBD: Do cancellations where appropriate.
- * TBD: Reformat screen.
  * TBD: Must connect before using buttons.
  * TBD: Do not include devices in Discovered if already paired.
  * TBD: Clear "received" field before re-filling.
@@ -42,7 +39,7 @@ public class MainActivity extends ActivityTracker
     private static ApplicationGlobalState ags = null;
     public static final int RT_BT_ENABLED = 1;
 
-    // Getters
+    // Getters. Static for ease-of-access.
     public static RecyclerViewManager getRvmDiscovered()    { return rvmDiscovered; }
     public static RecyclerViewManager getRvmPaired()        { return rvmPaired; }
     public static BluetoothAdapter    getBluetoothAdapter() { return mBluetoothAdapter; }
@@ -55,7 +52,11 @@ public class MainActivity extends ActivityTracker
 
         ags = (ApplicationGlobalState) getApplication();
 
-        // These are order-sensitive.
+        /*
+         * These are order-sensitive. They are re-created on each device re-configuration.
+         * Retaining the RecyclerViews would cause their associated Activity instance to
+         * be retained, causing a memory leak.
+         */
         rvmDiscovered     = new RecyclerViewManager(this, R.id.rv_discovered);
         rvmPaired         = new RecyclerViewManager(this, R.id.rv_paired);
         mBluetoothAdapter = BluetoothMgr.getBluetoothAdapter();
@@ -65,7 +66,7 @@ public class MainActivity extends ActivityTracker
             Support.startAFR(this, BluetoothAdapter.ACTION_REQUEST_ENABLE, RT_BT_ENABLED);
         }
         else {
-            BluetoothMgr.configureBluetooth();
+            BluetoothMgr.configureBluetooth(this);
             BluetoothMgr.startServer();
         }
     }
@@ -96,7 +97,7 @@ public class MainActivity extends ActivityTracker
             case RT_BT_ENABLED:
                 Support.log("ActivityResult[RT_BT_ENABLED]");
                 if (resultCode == RESULT_OK) {
-                    BluetoothMgr.configureBluetooth();
+                    BluetoothMgr.configureBluetooth(this);
                     BluetoothMgr.startServer();
                     return;
                 }
@@ -108,7 +109,7 @@ public class MainActivity extends ActivityTracker
     @Override
     public void onDestroy() {
         super.onDestroy();
-        BluetoothMgr.unregisterMyReceiver(this);
+        BluetoothMgr.unregisterBroadcastReceiver(this);
     }
 }
 

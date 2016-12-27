@@ -33,9 +33,17 @@ public class BluetoothMgr {
         return mBluetoothAdapter;
     }
 
-    public static void configureBluetooth() {
+    /**
+     * Configure the Bluetooth session (init BroadcastReceiver for discovery, refresh paired
+     * and discovered windows, request that the device be discoverable).
+     * <p>
+     *     Passing in the Activity is appropriate because the BroadcastReceiver must be
+     *     registered and unregistered at the beginning and end of each MainActivity lifecycle.
+     * @param a the current Activity.
+     */
+    public static void configureBluetooth(Activity a) {
         // Register receiver for handling newly discovered devices during a scan.
-        registerBroadcastReceiver();
+        registerBroadcastReceiver(a);
         refreshPaired(null);
         refreshDiscovered(null);
         requestDiscoverable();
@@ -93,8 +101,11 @@ public class BluetoothMgr {
     /**
      * Register the broadcast receiver which will record each device found
      * during a Bluetooth scan.
+     *
+     * @param c current Activity's Context.
      */
-    private static void registerBroadcastReceiver() {
+    private static void registerBroadcastReceiver(Context c) {
+        Support.userMessage("### REGISTERING ###");
         IntentFilter ifilter = new IntentFilter();
         ifilter.addAction(BluetoothDevice.ACTION_FOUND);
         ifilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
@@ -104,12 +115,6 @@ public class BluetoothMgr {
 
         // Register the receiver.
         mReceiver = new BluetoothBroadcastReceiver();
-        Context c = ActivityTracker.getAppContext();
-        if (c == null) {
-            Support.userMessage(
-                    "Can't scan for devices (could not register broadcast receiver");
-            return;
-        }
         c.registerReceiver(mReceiver, ifilter);
     }
 
@@ -125,9 +130,10 @@ public class BluetoothMgr {
     /**
      * Destroy the broadcast receiver; called by main Activity's onDestroy() method.
      *
-     * @param a the current Activity.
+     * @param c the current Activity's Context.
      */
-    static public void unregisterMyReceiver(Activity a) {
-        a.unregisterReceiver(mReceiver);
+    static public void unregisterBroadcastReceiver(Context c) {
+        Support.userMessage("### UNREGISTERING ###");
+        c.unregisterReceiver(mReceiver);
     }
 }
