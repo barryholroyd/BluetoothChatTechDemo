@@ -25,6 +25,13 @@ import java.util.Locale;
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     final BluetoothDevices bluetoothDevices = new BluetoothDevices();
 
+    /**
+     * Standard ViewHolder class.
+     * <p>
+     *     Contains references to fields to be set for a given row instance
+     *     in the RecyclerView and also initializes a listener for clicks
+     *     on that row.
+     */
     class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView mTvText;
         public TextView mTvMac;

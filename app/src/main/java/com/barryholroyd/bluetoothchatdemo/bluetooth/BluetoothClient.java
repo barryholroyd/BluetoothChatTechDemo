@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Locale;
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothServer.MY_UUID;
 
 /**
@@ -47,9 +48,6 @@ public class BluetoothClient extends Thread
      * to run the chat session.
      */
     public void run() {
-        // Don't run again if a request is already being processed.
-        if (btdevice != null)
-            return;
         /*
          * Discovery is very intensive -- it can slow down the connection attempt
          * and cause it to fail. To prevent that, if discovery is running we cancel it
@@ -106,11 +104,12 @@ public class BluetoothClient extends Thread
         }
 
         // Make the Bluetooth socket available to other components.
-        ((ApplicationGlobalState)  MainActivity.getActivity().getApplication()).setBtSocket(null);
+        ((ApplicationGlobalState)  MainActivity.getActivity().getApplication()).setBtSocket(mSocket);
 
         // Pass control to the chat Activity.
         Intent intent = new Intent(c, ChatActivity.class);
         intent.putExtra(Support.BUNDLE_KEY_BTDEVICE, btdevice);
+        intent.addFlags(FLAG_ACTIVITY_NEW_TASK); // required since an App Context is used
         c.startActivity(intent);
         btdevice = null;
     }
