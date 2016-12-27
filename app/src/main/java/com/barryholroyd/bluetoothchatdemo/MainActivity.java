@@ -13,16 +13,16 @@ import com.barryholroyd.bluetoothchatdemo.support.Support;
 import java.util.Locale;
 
 /*
- * TBD: Must connect before using buttons.
+ * TBD: when sending, clear send text field.
+ * TBD: send text field (bytes) needs to be cleared before refilling.
+ *
  * TBD: Do not include devices in Discovered if already paired.
  * TBD: Clear "received" field before re-filling.
  *
- * TBD: when you pair, refresh the pair list (when you connect from discovered list).
- * TBD: tag text fields so they survive device rotations.
- * TBD: test with device rotations.
+ * TBD: when you pair, refresh the pair list (when you connect from discovered list). NOT NEC.
+ * 
  * TBD: after killing connections, can't reconnect from the "Cancel"d end. Probably need to set mSocket to null.
  * TBD: add Toast at server end for incoming connection.
- * TBD: add Scrollview (Vertical)
  *
  * TBD: Finish comments.
  * TBD: clean out TBDs, log()s, etc.

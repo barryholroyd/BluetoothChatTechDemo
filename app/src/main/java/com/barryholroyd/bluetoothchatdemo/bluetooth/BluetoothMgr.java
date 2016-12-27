@@ -91,6 +91,7 @@ public class BluetoothMgr {
      * @param v the View the user clicked on.
      */
     public static void refreshPaired(View v) {
+        Support.log("Refreshing paired list...");
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
         if (pairedDevices.size() > 0) {
             MyAdapter myAdapter = MainActivity.getRvmPaired().getAdapter();

@@ -42,8 +42,10 @@ public class BluetoothBroadcastReceiver extends BroadcastReceiver
         String action = intent.getAction();
         switch (action) {
             case BluetoothDevice.ACTION_FOUND:
-                BrLog.brlog("Device Found");
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+
+                BrLog.brlog(String.format(Locale.US, "Device Found: %s, %s",
+                        device.getName(), device.getAddress()));
 
                 // Do not add to the discovered list if the device has already been paired.
                 String deviceAddress = device.getAddress();

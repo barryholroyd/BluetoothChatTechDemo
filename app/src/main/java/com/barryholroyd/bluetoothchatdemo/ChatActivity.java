@@ -64,6 +64,7 @@ public class ChatActivity extends ActivityTracker
 
     public static void clickSend(View v) {
         String text = etTextSend.getText().toString();
+        Support.log(String.format(Locale.US, "GOT TEXT FROM FIELD: %s", text));
         byte[] bytes;
         try {
             bytes = text.getBytes("UTF-8");

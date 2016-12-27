@@ -42,7 +42,7 @@
 
                 <Button
                     style="@style/ButtonStyle"
-                    android:text="Refresh Discovered"
+                    android:text="Refresh"
                     android:onClick="clickRefreshDiscovered"
                     />
             </LinearLayout>
@@ -61,7 +61,7 @@
                 </android.support.v7.widget.RecyclerView>
                 <Button
                     style="@style/ButtonStyle"
-                    android:text="Refresh Paired"
+                    android:text="Refresh"
                     android:onClick="clickRefreshPaired"
                     />
             </LinearLayout>

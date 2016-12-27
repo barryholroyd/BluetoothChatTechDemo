@@ -114,10 +114,10 @@ public class BluetoothComm extends Thread
     @Override
     public void run() {
         Support.log("Running read loop for input: ");
-        byte[] bytes = new byte[BUFSIZE];
-        int len;
 
         while (true) {
+            byte[] bytes = new byte[BUFSIZE];
+            int len;
             try {
                 Support.log("Waiting to read input...");
                 len = btIn.read(bytes, 0, BUFSIZE);
