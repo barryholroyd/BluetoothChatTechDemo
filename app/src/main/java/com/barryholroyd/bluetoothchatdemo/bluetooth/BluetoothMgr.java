@@ -53,6 +53,11 @@ public class BluetoothMgr {
      * Ask the user for permission to make this device discoverable.
      */
     private static void requestDiscoverable() {
+
+        /** Only make this request once. */
+        if (MainActivity.getApplicationGlobalState().isAppInitialized())
+            return;
+
         Intent discoverableIntent = new
                 Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
@@ -105,7 +110,6 @@ public class BluetoothMgr {
      * @param c current Activity's Context.
      */
     private static void registerBroadcastReceiver(Context c) {
-        Support.userMessage("### REGISTERING ###");
         IntentFilter ifilter = new IntentFilter();
         ifilter.addAction(BluetoothDevice.ACTION_FOUND);
         ifilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
@@ -133,7 +137,6 @@ public class BluetoothMgr {
      * @param c the current Activity's Context.
      */
     static public void unregisterBroadcastReceiver(Context c) {
-        Support.userMessage("### UNREGISTERING ###");
         c.unregisterReceiver(mReceiver);
     }
 }

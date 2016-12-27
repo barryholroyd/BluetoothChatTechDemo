@@ -69,6 +69,8 @@ public class MainActivity extends ActivityTracker
             BluetoothMgr.configureBluetooth(this);
             BluetoothMgr.startServer();
         }
+
+        ags.setAppInitialized();
     }
 
     /**

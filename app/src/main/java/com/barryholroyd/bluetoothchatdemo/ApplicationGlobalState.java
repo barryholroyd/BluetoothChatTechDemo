@@ -16,7 +16,13 @@ public class ApplicationGlobalState extends Application
     /** Bluetooth socket to be passed between Activities. */
     private BluetoothSocket btSocket;
 
+    /** True after the first instance of MainActivity has been created and initialized. */
+    private boolean appInitialized = false;
+
     // Getters and setters.
     public BluetoothSocket getBtSocket() { return btSocket; }
     public void setBtSocket(BluetoothSocket _btSocket) { btSocket = _btSocket; }
+
+    public void setAppInitialized() { appInitialized = true; }
+    public boolean isAppInitialized()  { return appInitialized; }
 }
