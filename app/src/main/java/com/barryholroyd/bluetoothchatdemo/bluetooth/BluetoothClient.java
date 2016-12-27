@@ -44,7 +44,7 @@ public class BluetoothClient extends Thread
     }
 
     /**
-     * Create a connection to a remove Bluetooth server and the pass it to BluetoothComm
+     * Create a connection to a remote Bluetooth server and the pass it to BluetoothComm
      * to run the chat session.
      */
     public void run() {
@@ -59,6 +59,9 @@ public class BluetoothClient extends Thread
             Support.log("Client cancelling discovery...");
         }
 
+        Support.userMessage("Connecting...");
+
+        boolean paired = BluetoothMgr.isPaired(btdevice);
         try{
             mSocket = btdevice.createRfcommSocketToServiceRecord( MY_UUID );
             mSocket.connect( );
@@ -94,6 +97,11 @@ public class BluetoothClient extends Thread
 
         // Start communications.
         Support.userMessage("Connected!");
+
+        // If the two devices have just been paired, refresh the "paired" list.
+        if  (!paired && BluetoothMgr.isPaired(btdevice)) {
+            BluetoothMgr.refreshPaired(null);
+        }
 
         // Get a valid Context.
         Context c = ActivityTracker.getAppContext();

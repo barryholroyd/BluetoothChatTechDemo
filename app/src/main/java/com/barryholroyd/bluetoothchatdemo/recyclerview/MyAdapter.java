@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.barryholroyd.bluetoothchatdemo.ChatActivity;
+import com.barryholroyd.bluetoothchatdemo.MainActivity;
 import com.barryholroyd.bluetoothchatdemo.R;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothClient;
 import com.barryholroyd.bluetoothchatdemo.support.Support;

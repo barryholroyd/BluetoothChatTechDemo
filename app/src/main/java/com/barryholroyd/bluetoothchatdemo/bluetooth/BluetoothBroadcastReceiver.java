@@ -29,14 +29,6 @@ import static android.bluetooth.BluetoothAdapter.EXTRA_STATE;
  */
 public class BluetoothBroadcastReceiver extends BroadcastReceiver
 {
-    /** RecyclerView adapter instance for discovered devices. */
-    MyAdapter myAdapterDiscovered;
-
-    /** Constructor needed for setting the RecyclerView adapter instance. */
-    BluetoothBroadcastReceiver() {
-        myAdapterDiscovered = MainActivity.getRvmDiscovered().getAdapter();
-    }
-
     /**
      * Callback called by the system when a broadcast is received.
      *
@@ -45,11 +37,21 @@ public class BluetoothBroadcastReceiver extends BroadcastReceiver
      */
     @Override
     public void onReceive(Context context, Intent intent) {
+        /** RecyclerView adapter instance for discovered devices. */
+        MyAdapter myAdapterDiscovered = MainActivity.getRvmDiscovered().getAdapter();
         String action = intent.getAction();
         switch (action) {
             case BluetoothDevice.ACTION_FOUND:
                 BrLog.brlog("Device Found");
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+
+                // Do not add to the discovered list if the device has already been paired.
+                String deviceAddress = device.getAddress();
+                BluetoothDevices pairedDevices =
+                        MainActivity.getRvmPaired().getAdapter().getDevices();
+                if (pairedDevices.getDevice(deviceAddress) != null)
+                    break;
+
                 BluetoothDevices btds = myAdapterDiscovered.getDevices();
                 btds.addNoDup(device);
                 myAdapterDiscovered.notifyDataSetChanged();

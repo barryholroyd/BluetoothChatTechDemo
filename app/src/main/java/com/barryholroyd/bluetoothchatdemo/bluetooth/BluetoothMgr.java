@@ -104,6 +104,22 @@ public class BluetoothMgr {
     }
 
     /**
+     * Determine if the remote device has already been paired with the local device.
+     *
+     * @param btdevice the remote device.
+     * @return true if they are already paired; else false.
+     */
+    public static boolean isPaired(BluetoothDevice btdevice) {
+        if (mBluetoothAdapter.getBondedDevices().contains(btdevice)) {
+            Support.log(String.format("PAIRED: %s = true", btdevice.getAddress()));
+            return true;
+        }
+        Support.log(String.format("PAIRED: %s = false", btdevice.getAddress()));
+        return false;
+    }
+
+
+    /**
      * Register the broadcast receiver which will record each device found
      * during a Bluetooth scan.
      *

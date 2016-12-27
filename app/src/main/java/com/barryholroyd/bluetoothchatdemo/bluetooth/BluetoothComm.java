@@ -82,20 +82,32 @@ public class BluetoothComm extends Thread
         };
     }
 
+    /**
+     * Convert the incoming message into a text string and display it.
+     * @param m
+     */
     private void processMessage(Message m) {
         byte[] bytes = (byte[]) m.obj;
         String text;
 
+        // Find the end of the zero-terminated text string.
+        int len = 0;
+        while (len < bytes.length) {
+            if (bytes[len] == 0)
+                break;
+            len++;
+        }
+
         TextView tv = ChatActivity.getTextViewReceive();
         try {
-            text = new String(bytes, "UTF-8");
+            text = new String(bytes, 0, len, "UTF-8");
         }
         catch (UnsupportedEncodingException uee) {
             String msg = String.format(Locale.US, "Unsupported encoding: %s", uee.getMessage());
             Support.userMessage(msg);
             return;
         }
-        Support.log(String.format(Locale.US, "SETTING TEXT: [%s]", text));
+        Support.log(String.format(Locale.US, "SETTING TEXT: [%s][len=%d]", text, len));
         tv.setText(text);
     }
 
@@ -103,10 +115,11 @@ public class BluetoothComm extends Thread
     public void run() {
         Support.log("Running read loop for input: ");
         byte[] bytes = new byte[BUFSIZE];
-        int len = 0;
+        int len;
 
         while (true) {
             try {
+                Support.log("Waiting to read input...");
                 len = btIn.read(bytes, 0, BUFSIZE);
                 if (len == -1) {
                     Support.userMessage("Connection closed.");

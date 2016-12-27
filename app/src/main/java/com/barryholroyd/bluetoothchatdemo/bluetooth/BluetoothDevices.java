@@ -2,6 +2,8 @@ package com.barryholroyd.bluetoothchatdemo.bluetooth;
 
 import android.bluetooth.BluetoothDevice;
 
+import com.barryholroyd.bluetoothchatdemo.MainActivity;
+import com.barryholroyd.bluetoothchatdemo.recyclerview.MyAdapter;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.util.ArrayList;
@@ -24,12 +26,8 @@ public class BluetoothDevices extends ArrayList<BluetoothDevice>
      *         </a>}.
      */
     public void addNoDup(BluetoothDevice device) {
-        String deviceAddress = device.getAddress();
-        for (BluetoothDevice bd : this) {
-            if (deviceAddress.equals(bd.getAddress())) {
-                return;
-            }
-        }
+        if (getDevice(device.getAddress()) != null)
+            return;
         add(device);
     }
     /**
