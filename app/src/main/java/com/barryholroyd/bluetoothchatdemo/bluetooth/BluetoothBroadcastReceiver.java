@@ -51,8 +51,10 @@ public class BluetoothBroadcastReceiver extends BroadcastReceiver
                 String deviceAddress = device.getAddress();
                 BluetoothDevices pairedDevices =
                         MainActivity.getRvmPaired().getAdapter().getDevices();
-                if (pairedDevices.getDevice(deviceAddress) != null)
+                if (pairedDevices.getDevice(deviceAddress) != null) {
+                    Support.log(String.format(Locale.US, "SKIPPING FOUND DEVICE: %s", deviceAddress));
                     break;
+                }
 
                 BluetoothDevices btds = myAdapterDiscovered.getDevices();
                 btds.addNoDup(device);

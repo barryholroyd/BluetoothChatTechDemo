@@ -14,6 +14,7 @@ import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.UUID;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -52,10 +53,12 @@ public class BluetoothServer extends Thread
      * to run the chat session.
      */
     public void run() {
-        BluetoothSocket mSocket;
+        BluetoothSocket mSocket = null;
         while (true) {
             try {
                 mSocket = mServerSocket.accept();
+                Support.log(String.format(Locale.US,
+                        "Server connection ready: %#x", mSocket.hashCode()));
                 if (mSocket != null) {
                     // Make the Bluetooth socket available to other components.
                     MainActivity.getApplicationGlobalState().setBtSocket(mSocket);
@@ -72,6 +75,13 @@ public class BluetoothServer extends Thread
                     break;
                 }
             } catch (IOException e) {
+                if (mSocket == null) {
+                    Support.log("Server connection exception: <null>");
+                }
+                else {
+                    Support.log(String.format(Locale.US,
+                            "Server connection exception: %0#x", mSocket.hashCode()));
+                }
                 break;
             }
         }

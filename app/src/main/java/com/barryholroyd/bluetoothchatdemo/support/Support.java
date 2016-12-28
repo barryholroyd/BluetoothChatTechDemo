@@ -68,10 +68,10 @@ public class Support {
      * and log it.
      */
     public static void userMessage(String msg) {
+        log(msg);
         if (toaster == null)
             init();
         Toaster.display(msg);
-        log(msg);
     }
 
     /** Utility wrapper for starting an Activity which returns a result. */

@@ -13,16 +13,12 @@ import com.barryholroyd.bluetoothchatdemo.support.Support;
 import java.util.Locale;
 
 /*
- * TBD: when sending, clear send text field.
  * TBD: send text field (bytes) needs to be cleared before refilling.
  *
- * TBD: Do not include devices in Discovered if already paired.
- * TBD: Clear "received" field before re-filling.
- *
- * TBD: when you pair, refresh the pair list (when you connect from discovered list). NOT NEC.
- * 
  * TBD: after killing connections, can't reconnect from the "Cancel"d end. Probably need to set mSocket to null.
- * TBD: add Toast at server end for incoming connection.
+ *
+ * TBD: Try server-only version: exit MainActivity immediately after initialization (finish()),
+ * TBD: or provide a finish() button.
  *
  * TBD: Finish comments.
  * TBD: clean out TBDs, log()s, etc.

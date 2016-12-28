@@ -1,15 +1,12 @@
 package com.barryholroyd.bluetoothchatdemo.bluetooth;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.widget.TextView;
 
-import com.barryholroyd.bluetoothchatdemo.ApplicationGlobalState;
 import com.barryholroyd.bluetoothchatdemo.ChatActivity;
-import com.barryholroyd.bluetoothchatdemo.MainActivity;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.io.IOException;
@@ -36,7 +33,7 @@ public class BluetoothComm extends Thread
     private static BluetoothSocket socket;
     private static boolean connected = false;
 
-    /** Message command: TOAST */
+    /** Handler message: display incoming chat text. */
     private static final int CHATTEXT = 1;
 
     /** Buffer size for both input and output. */
@@ -51,8 +48,12 @@ public class BluetoothComm extends Thread
     /** Bluetooth output stream. */
     private static OutputStream btOut;
 
-    public BluetoothComm(BluetoothSocket _socket) {
+    /** Handler to cause the calling ChatActivity to exit. */
+    private Handler caHandler;
+
+    public BluetoothComm(BluetoothSocket _socket, Handler handler) {
         socket = _socket;
+        caHandler = handler;
 
         try {
             btIn = socket.getInputStream();
@@ -117,24 +118,20 @@ public class BluetoothComm extends Thread
 
         while (true) {
             byte[] bytes = new byte[BUFSIZE];
-            int len;
             try {
                 Support.log("Waiting to read input...");
-                len = btIn.read(bytes, 0, BUFSIZE);
-                if (len == -1) {
-                    Support.userMessage("Connection closed.");
-                    break;
-                }
+                btIn.read(bytes, 0, BUFSIZE);
             }
             catch (IOException ioe) {
-                Support.userMessage(String.format(Locale.US,
-                        "Could not read message: %s", ioe.getMessage()));
+                Support.userMessage("Connection closed.");
                 break;
             }
             Message m = mHandler.obtainMessage(CHATTEXT, bytes);
             mHandler.sendMessage(m);
         }
         closeConnection();
+        Message m = caHandler.obtainMessage(ChatActivity.FINISH);
+        caHandler.sendMessage(m);
     }
 
     /**

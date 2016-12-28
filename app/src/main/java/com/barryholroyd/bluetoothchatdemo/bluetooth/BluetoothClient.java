@@ -61,7 +61,6 @@ public class BluetoothClient extends Thread
 
         Support.userMessage("Connecting...");
 
-        boolean paired = BluetoothMgr.isPaired(btdevice);
         try{
             mSocket = btdevice.createRfcommSocketToServiceRecord( MY_UUID );
             mSocket.connect( );
@@ -79,7 +78,17 @@ public class BluetoothClient extends Thread
                         new Class[] {int.class});
                 mSocket = (BluetoothSocket) m.invoke(btdevice, 1);
                 mSocket.connect();
+                Support.log(String.format(Locale.US,
+                        "Client connection ready: %0#x", mSocket.hashCode()));
+
             } catch (IOException ioe2) {
+                if (mSocket == null) {
+                    Support.log("Client connection exception: <null>");
+                }
+                else {
+                    Support.log(String.format(Locale.US,
+                            "Client connection exception: %0#x", mSocket.hashCode()));
+                }
                 String msg = String.format(Locale.US,
                         "Could not connect to remote device %s:%s. Is %s running on it?",
                         btdevice.getName(), btdevice.getAddress(), Support.getAppLabel());
@@ -97,11 +106,6 @@ public class BluetoothClient extends Thread
 
         // Start communications.
         Support.userMessage("Connected!");
-
-        // If the two devices have just been paired, refresh the "paired" list.
-        if  (!paired && BluetoothMgr.isPaired(btdevice)) {
-            BluetoothMgr.refreshPaired(null);
-        }
 
         // Get a valid Context.
         Context c = ActivityTracker.getAppContext();
