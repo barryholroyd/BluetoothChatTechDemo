@@ -1,6 +1,5 @@
 package com.barryholroyd.bluetoothchatdemo.bluetooth;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -63,6 +62,7 @@ public class BluetoothClient extends Thread
 
         try{
             mSocket = btdevice.createRfcommSocketToServiceRecord( MY_UUID );
+            Support.log("*** Attempting main approach to connect...");
             mSocket.connect( );
         } catch ( IOException ioe ) {
             Support.log(String.format(Locale.US, "Client IOException: %s", ioe.getMessage()));
@@ -79,7 +79,7 @@ public class BluetoothClient extends Thread
                 mSocket = (BluetoothSocket) m.invoke(btdevice, 1);
                 mSocket.connect();
                 Support.log(String.format(Locale.US,
-                        "Client connection ready: %0#x", mSocket.hashCode()));
+                        "Client connection ready: %#x", mSocket.hashCode()));
 
             } catch (IOException ioe2) {
                 if (mSocket == null) {
@@ -87,7 +87,7 @@ public class BluetoothClient extends Thread
                 }
                 else {
                     Support.log(String.format(Locale.US,
-                            "Client connection exception: %0#x", mSocket.hashCode()));
+                            "Client connection exception: %#x", mSocket.hashCode()));
                 }
                 String msg = String.format(Locale.US,
                         "Could not connect to remote device %s:%s. Is %s running on it?",
@@ -129,6 +129,7 @@ public class BluetoothClient extends Thread
     /** Local method to close the socket if it hasn't been passed to BluetoothComm yet. */
     private void closeSocket(BluetoothSocket socket) {
         btdevice = null;
+        Support.log("Attempting to close the client socket...");
         try   {
             if (socket != null) {
                 Support.log("Closing the client socket...");

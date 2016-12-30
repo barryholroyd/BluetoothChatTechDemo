@@ -17,6 +17,8 @@ import com.barryholroyd.bluetoothchatdemo.support.Support;
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
+import static com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothServer.serverLock;
+
 /**
  * TBD: comments.
  */
@@ -47,10 +49,16 @@ public class ChatActivity extends ActivityTracker
 
         BluetoothSocket btsocket = ((ApplicationGlobalState) getApplication()).getBtSocket();
 
+        // Call back to exit this activity.
         Handler handler = new Handler() {
             @Override
             public void handleMessage(Message message) {
                 if (message.what == FINISH) {
+                    Support.log("Exiting ChatActivity...");
+                    synchronized (serverLock) {
+                        serverLock.setCondition(true);
+                        serverLock.notifyAll();
+                    }
                     finish();
                 }
                 else {

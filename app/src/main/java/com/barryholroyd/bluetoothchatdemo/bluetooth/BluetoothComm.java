@@ -19,7 +19,7 @@ import java.util.Locale;
  * Bluetooth communications.
  * <p>
  *     This class is only used by ChatActivity, so any reference to an Activity here is
- *     always to the ChatActivity. Its constructor accepts and initialized Bluetooth socket,
+ *     always to the ChatActivity. Its constructor accepts and initialized Bluetooth btSocket,
  *     creates input and output streams from it, then starts running in the background to
  *     read incoming data on the input stream; incoming data is then sent to the UI thread
  *     for display to the user.
@@ -30,8 +30,10 @@ import java.util.Locale;
 
 public class BluetoothComm extends Thread
 {
-    private static BluetoothSocket socket;
-    private static boolean connected = false;
+    private static BluetoothSocket btSocket;
+
+    /** running is "true" when initialization is successful. */
+    private static boolean running;
 
     /** Handler message: display incoming chat text. */
     private static final int CHATTEXT = 1;
@@ -51,22 +53,23 @@ public class BluetoothComm extends Thread
     /** Handler to cause the calling ChatActivity to exit. */
     private Handler caHandler;
 
-    public BluetoothComm(BluetoothSocket _socket, Handler handler) {
-        socket = _socket;
+    public BluetoothComm(BluetoothSocket _btSocket, Handler handler) {
+        btSocket = _btSocket;
         caHandler = handler;
+        running = false;
 
         try {
-            btIn = socket.getInputStream();
-            btOut = socket.getOutputStream();
+            btIn = btSocket.getInputStream();
+            btOut = btSocket.getOutputStream();
         }
         catch (IOException ioe) {
             String msg = String.format(Locale.US,
-                    "Could not get input or output stream: %s",
+                    "Error: could not get input or output stream: %s",
                     ioe.getMessage());
             Support.userMessage(msg);
+            return;
         }
 
-        connected = true;
         mHandler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(Message message) {
@@ -81,6 +84,7 @@ public class BluetoothComm extends Thread
                 }
             }
         };
+        running = true;
     }
 
     /**
@@ -114,6 +118,12 @@ public class BluetoothComm extends Thread
 
     @Override
     public void run() {
+        if (!running) {
+            String msg = String.format(Locale.US, "Server not initialized... exiting.");
+            Support.userMessage(msg);
+            return;
+        }
+
         Support.log("Running read loop for input: ");
 
         while (true) {
@@ -123,12 +133,14 @@ public class BluetoothComm extends Thread
                 btIn.read(bytes, 0, BUFSIZE);
             }
             catch (IOException ioe) {
-                Support.userMessage("Connection closed.");
+                String msg = String.format(Locale.US, "Connection closed: %s", ioe.getMessage());
+                Support.userMessage(msg);
                 break;
             }
             Message m = mHandler.obtainMessage(CHATTEXT, bytes);
             mHandler.sendMessage(m);
         }
+        Support.userMessage("Exited run() loop.");
         closeConnection();
         Message m = caHandler.obtainMessage(ChatActivity.FINISH);
         caHandler.sendMessage(m);
@@ -142,11 +154,6 @@ public class BluetoothComm extends Thread
      * @param bytes the buffer of bytes to write out.
      */
     static public void writeChat(byte[] bytes) {
-        if (!connected) {
-            Support.userMessage("Please connect first by clicking on a device in the\n" +
-                                "\"Discovered\" or \"Paired\" panel.");
-            return;
-        }
         try {
             btOut.write(bytes, 0, bytes.length);
         }
@@ -157,17 +164,17 @@ public class BluetoothComm extends Thread
     }
     /**
      * Close the current open connection if there is one.
-     * TBD: does it matter if the connection is open or not?
      */
     static public void closeConnection() {
         try {
-            if (socket != null) {
-                Support.log("Closing the connection...");
-                socket.close();
+            if (btSocket != null) {
+                Support.log("*** Closing the connection...");
+                btSocket.close();
             }
         } catch (IOException ioe) {
             Support.log(String.format(Locale.US,
                     "*** Failed to close the connection: %s", ioe.getMessage()));
         }
+        btSocket = null;
     }
 }

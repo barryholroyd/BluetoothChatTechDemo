@@ -30,7 +30,7 @@ public class ErrorDialog extends DialogFragment {
                 .setMessage(msg)
                 .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        getActivity().finish();
+                        System.exit(1); // exit the app TBD: test this
                     }
                 });
         return builder.create();

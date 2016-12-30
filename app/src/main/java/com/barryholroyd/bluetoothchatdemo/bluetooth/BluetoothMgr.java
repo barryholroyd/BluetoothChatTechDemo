@@ -17,12 +17,13 @@ import com.barryholroyd.bluetoothchatdemo.support.Support;
 import java.util.Set;
 
 /**
- * Created by Barry on 12/14/2016.
+ * Static methods for managing Bluetooth activities.
  */
 
 public class BluetoothMgr {
     private static BluetoothAdapter mBluetoothAdapter;
     static BroadcastReceiver mReceiver;
+    static boolean serverRunning = false;
 
     public static BluetoothAdapter getBluetoothAdapter() {
         // Get the Bluetooth adapter.
@@ -105,7 +106,7 @@ public class BluetoothMgr {
     }
 
     /**
-     * Register the broadcast receiver which will record each device found
+     * Register the broadcast receiver that records each device found
      * during a Bluetooth scan.
      *
      * @param c current Activity's Context.
@@ -126,10 +127,15 @@ public class BluetoothMgr {
     /**
      * Fire up a Bluetooth server on this device.
      * <p>
-     *     Must ensure that Bluetooth is enabled first.
+     *     Must ensure that Bluetooth is enabled first. Only a single server should be
+     *     run during the lifetime of the application.
      */
-    static public void startServer() {
-        (new BluetoothServer(mBluetoothAdapter)).start();
+    static public synchronized void startServer() {
+        if (!serverRunning) {
+            Support.log("Starting server...");
+            (new BluetoothServer(mBluetoothAdapter)).start();
+            serverRunning = true;
+        }
     }
 
     /**
