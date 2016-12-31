@@ -20,6 +20,7 @@ import java.util.Locale;
 Test:
   o Cancelling discovery (connect to a device in less than 12 seconds);
     watch logs
+ * Test for memory leaks.
  *
  * TBD: Finish comments.
  * TBD: clean out TBDs, log()s, etc.
@@ -33,6 +34,8 @@ public class MainActivity extends ActivityTracker
     private static ApplicationGlobalState ags = null;
     public static final int RT_BT_ENABLED = 1;
 
+    public static final boolean SERVER_ONLY = false; // TBD: test
+
     // Getters. Static for ease-of-access.
     public static RecyclerViewManager getRvmDiscovered()    { return rvmDiscovered; }
     public static RecyclerViewManager getRvmPaired()        { return rvmPaired; }
@@ -44,6 +47,13 @@ public class MainActivity extends ActivityTracker
         super.onCreate(savedInstanceState);
 
         ags = (ApplicationGlobalState) getApplication();
+
+        if (SERVER_ONLY) {
+            Support.log("Entering server-only mode.");
+            BluetoothMgr.startServer();
+            ags.setAppInitialized();
+            finish();
+        }
 
         setContentView(R.layout.activity_main);
         /*
