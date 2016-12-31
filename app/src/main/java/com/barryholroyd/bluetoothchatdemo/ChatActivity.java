@@ -122,8 +122,13 @@ public class ChatActivity extends ActivityTracker
         finish();
     }
 
+    //DEL:
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void finalize() throws Throwable {
+        super.finalize();
+        Support.log(String.format(Locale.US,
+                "ChatActivity.finalize() called: %s - %#x",
+                this.getClass().getSimpleName(),
+                this.hashCode()));
     }
 }

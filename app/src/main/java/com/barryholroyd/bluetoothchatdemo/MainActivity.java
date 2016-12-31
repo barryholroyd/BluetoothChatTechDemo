@@ -13,12 +13,13 @@ import com.barryholroyd.bluetoothchatdemo.support.Support;
 import java.util.Locale;
 
 /*
- * TBD: send text field (bytes) needs to be cleared before refilling.
- *
- * TBD: after killing connections, can't reconnect from the "Cancel"d end. Probably need to set mSocket to null.
  *
  * TBD: Try server-only version: exit MainActivity immediately after initialization (finish()),
  * TBD: or provide a finish() button.
+ *
+Test:
+  o Cancelling discovery (connect to a device in less than 12 seconds);
+    watch logs
  *
  * TBD: Finish comments.
  * TBD: clean out TBDs, log()s, etc.
@@ -26,8 +27,8 @@ import java.util.Locale;
 
 public class MainActivity extends ActivityTracker
 {
-    private static RecyclerViewManager rvmDiscovered;
-    private static RecyclerViewManager rvmPaired;
+    private static RecyclerViewManager rvmDiscovered; // TBD: memory leak
+    private static RecyclerViewManager rvmPaired;     // TBD: memory leak
     private static BluetoothAdapter mBluetoothAdapter;
     private static ApplicationGlobalState ags = null;
     public static final int RT_BT_ENABLED = 1;
@@ -41,10 +42,10 @@ public class MainActivity extends ActivityTracker
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
         ags = (ApplicationGlobalState) getApplication();
 
+        setContentView(R.layout.activity_main);
         /*
          * These are order-sensitive. They are re-created on each device re-configuration.
          * Retaining the RecyclerViews would cause their associated Activity instance to
@@ -105,6 +106,16 @@ public class MainActivity extends ActivityTracker
     public void onDestroy() {
         super.onDestroy();
         BluetoothMgr.unregisterBroadcastReceiver(this);
+    }
+
+    //DEL:
+    @Override
+    public void finalize() throws Throwable {
+        super.finalize();
+        Support.log(String.format(Locale.US,
+                "MainActivity.finalize() called: %s - %#x",
+                this.getClass().getSimpleName(),
+                this.hashCode()));
     }
 }
 
