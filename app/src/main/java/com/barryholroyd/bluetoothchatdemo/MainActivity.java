@@ -14,13 +14,8 @@ import com.barryholroyd.bluetoothchatdemo.support.Support;
 import java.util.Locale;
 
 /*
- *
- * TBD: Try server-only version: exit MainActivity immediately after initialization (finish()),
- * TBD: or provide a finish() button.
- *
 Test:
- * Test for memory leaks.
- * TBD: document process and worker threads.
+ * Fix for memory leaks.
  *
  * TBD: Finish comments.
  * TBD: clean out TBDs, log()s, etc.
