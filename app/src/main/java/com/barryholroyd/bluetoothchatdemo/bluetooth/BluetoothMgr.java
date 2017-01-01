@@ -54,7 +54,6 @@ public class BluetoothMgr {
      * Ask the user for permission to make this device discoverable.
      */
     private static void requestDiscoverable() {
-
         /** Only make this request once. */
         if (MainActivity.getApplicationGlobalState().isAppInitialized())
             return;

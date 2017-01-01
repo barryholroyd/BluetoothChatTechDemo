@@ -59,7 +59,9 @@ public class MainActivity extends ActivityTracker
     private BluetoothAdapter mBluetoothAdapter;
 
     /** Get the device's Bluetooth adapter. */
-    public static BluetoothAdapter getBluetoothAdapter() { return getMainActivity().mBluetoothAdapter; }
+    public static BluetoothAdapter getBluetoothAdapter() {
+        return getMainActivity().mBluetoothAdapter;
+    }
 
     /** Get the "Discovered" RecyclerViewManager. */
     public static RecyclerViewManager  getRvmDiscovered(){ return getMainActivity().rvmDiscovered; }
@@ -67,7 +69,9 @@ public class MainActivity extends ActivityTracker
     /** Get the "Paired" RecyclerViewManager. */
     public static RecyclerViewManager  getRvmPaired()    { return getMainActivity().rvmPaired; }
 
-    /** Standard onCreate() method. */
+    /**
+     * Display client interface, initialize Bluetooth, start server worker thread.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,10 +81,9 @@ public class MainActivity extends ActivityTracker
 
         // Display the "client" interface.
         setContentView(R.layout.activity_main);
+
         /*
-         * These are order-sensitive. They are re-created on each device re-configuration.
-         * Retaining the RecyclerViews would cause their associated Activity instance to
-         * be retained, causing a memory leak.
+         * These are order-sensitive.
          */
         rvmDiscovered     = new RecyclerViewManager(this, R.id.rv_discovered);
         rvmPaired         = new RecyclerViewManager(this, R.id.rv_paired);
@@ -94,7 +97,8 @@ public class MainActivity extends ActivityTracker
          * allows Bluetooth to be enabled.
          */
         if (!mBluetoothAdapter.isEnabled()) {
-            Support.startAFR(this, BluetoothAdapter.ACTION_REQUEST_ENABLE, RT_BT_ENABLED);
+            Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(intent, RT_BT_ENABLED);
         }
         else {
             BluetoothMgr.configureBluetooth(this);
@@ -122,13 +126,11 @@ public class MainActivity extends ActivityTracker
         BluetoothMgr.refreshPaired(v);
     }
 
+    /** Handle result of request to user to enable Bluetooth. */
     @Override
     protected void onActivityResult( int requestCode, int resultCode, Intent data) {
-        Support.log(String.format(Locale.US, "***** ActivityResult: request=%d result=%d",
-                requestCode, resultCode));
         switch (requestCode) {
             case RT_BT_ENABLED:
-                Support.log("ActivityResult[RT_BT_ENABLED]");
                 if (resultCode == RESULT_OK) {
                     BluetoothMgr.configureBluetooth(this);
                     BluetoothMgr.startServer();
@@ -139,6 +141,7 @@ public class MainActivity extends ActivityTracker
         }
     }
 
+    /** Unregister the BroadcastReceiver which handles device discovery results. */
     @Override
     public void onDestroy() {
         super.onDestroy();

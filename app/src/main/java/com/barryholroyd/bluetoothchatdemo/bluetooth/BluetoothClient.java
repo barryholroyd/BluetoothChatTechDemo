@@ -43,7 +43,7 @@ public class BluetoothClient extends Thread
     }
 
     /**
-     * Create a connection to a remote Bluetooth server and the pass it to BluetoothComm
+     * Create a connection to a remote Bluetooth server and then pass it to BluetoothComm
      * to run the chat session.
      */
     public void run() {

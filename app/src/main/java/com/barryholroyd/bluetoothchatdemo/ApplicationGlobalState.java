@@ -13,7 +13,7 @@ import android.bluetooth.BluetoothSocket;
 
 public class ApplicationGlobalState extends Application
 {
-    /** Bluetooth socket to be passed between Activities. */
+    /** Bluetooth socket to be passed from MainActivity to ChatActivity. */
     private BluetoothSocket btSocket;
 
     /** True after the first instance of MainActivity has been created and initialized. */

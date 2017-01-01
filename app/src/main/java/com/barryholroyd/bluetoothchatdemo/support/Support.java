@@ -71,12 +71,6 @@ public class Support {
             init();
         Toaster.display(msg);
     }
-
-    /** Utility wrapper for starting an Activity which returns a result. */
-    public static void startAFR(Activity a, String action, int requestCode) {
-        Intent intent = new Intent(action);
-        a.startActivityForResult(intent, requestCode);
-    }
 }
 
 /** Support-specific exception. */
