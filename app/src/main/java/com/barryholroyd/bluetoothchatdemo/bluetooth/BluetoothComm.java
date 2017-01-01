@@ -16,7 +16,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
 /**
- * Bluetooth communications.
+ * Bluetooth communications: send and receive text over a Bluetooth connection.
  * <p>
  *     This class is only used by ChatActivity, so any reference to an Activity here is
  *     always to the ChatActivity. Its constructor accepts and initialized Bluetooth btSocket,

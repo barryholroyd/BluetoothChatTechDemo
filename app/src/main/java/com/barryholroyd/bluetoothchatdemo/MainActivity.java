@@ -21,7 +21,11 @@ Test:
  */
 
 /**
- *
+ * Display client UI to initiate connection requests and fork off a worker
+ * thread to listen for incoming connection requests. Use BluetoothClient
+ * and BluetoothServer, respectively, to perform the actual connect, then
+ * instantiate ChatActivity to manage the chat session. ChatActivity uses
+ * BluetoothComm to send and receive text over the Bluetooth connection.
  */
 public class MainActivity extends ActivityTracker
 {
@@ -30,7 +34,7 @@ public class MainActivity extends ActivityTracker
     public  static ApplicationGlobalState getApplicationGlobalState() { return ags; }
 
     /**
-     * Hook for the current MainActivity instance. This is used so that we can
+     * Hook for the current MainActivity instance. This approach allows ut to
      * avoid the usual memory- and thread-leak issues that can be caused by storing
      * references on static hooks.
      * <br>
