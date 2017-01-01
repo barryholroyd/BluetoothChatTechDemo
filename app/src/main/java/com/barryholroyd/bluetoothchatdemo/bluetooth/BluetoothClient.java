@@ -52,7 +52,7 @@ public class BluetoothClient extends Thread
          * and cause it to fail. To prevent that, if discovery is running we cancel it
          * before attempting to make a connection.
          */
-        final BluetoothAdapter mBluetoothAdapter = MainActivity.getBluetoothAdapter();
+        final BluetoothAdapter mBluetoothAdapter = BluetoothMgr.getBluetoothAdapter();
         if (mBluetoothAdapter.isDiscovering()) {
             mBluetoothAdapter.cancelDiscovery();
             Support.log("Client cancelling discovery...");

@@ -46,6 +46,9 @@ abstract public class ActivityTracker extends AppCompatActivity
     /** The stack of Activities. This basically mirrors the task's back stack. */
     private static Stack<ActivityInfo> stack = new Stack<>();
 
+    /** Application Context instance. */
+    private static Context appContext = null;
+
     /**
      * Activity instance and state storage.
      * <p>
@@ -94,17 +97,14 @@ abstract public class ActivityTracker extends AppCompatActivity
      * <p>
      *     This is useful when we want to have a Context which doesn't depend on the
      *     life cycle of Activities.
+     *
      * @return the Application's Context instance.
      */
-    public static Context getAppContext() {
-        if (stack.empty())
-            return null;
-        return stack.peek().getActivity().getApplicationContext();
-    }
+    public static Context getAppContext() { return appContext; }
 
     /**
      * The the Activity's Context instance.
-
+     *
      * @return the Activity's Context instance.
      */
     public static Context getContext() {
@@ -122,6 +122,8 @@ abstract public class ActivityTracker extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 	    trace("onCreate");
+        if (appContext == null)
+            appContext = getApplicationContext();
         stack.push(new ActivityInfo(this, ActivityState.CREATED));
     }
   

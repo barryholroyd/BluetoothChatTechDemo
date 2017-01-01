@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothMgr;
+import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothServer;
 import com.barryholroyd.bluetoothchatdemo.recyclerview.RecyclerViewManager;
 import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
@@ -66,12 +67,6 @@ public class MainActivity extends ActivityTracker
     // Private non-static fields.
     private RecyclerViewManager rvmDiscovered;
     private RecyclerViewManager rvmPaired;
-    private BluetoothAdapter mBluetoothAdapter;
-
-    /** Get the device's Bluetooth adapter. */
-    public static BluetoothAdapter getBluetoothAdapter() {
-        return getMainActivity().mBluetoothAdapter;
-    }
 
     /** Get the "Discovered" RecyclerViewManager. */
     public static RecyclerViewManager  getRvmDiscovered(){ return getMainActivity().rvmDiscovered; }
@@ -96,7 +91,6 @@ public class MainActivity extends ActivityTracker
          */
         rvmDiscovered     = new RecyclerViewManager(this, R.id.rv_discovered);
         rvmPaired         = new RecyclerViewManager(this, R.id.rv_paired);
-        mBluetoothAdapter = BluetoothMgr.getBluetoothAdapter();
 
         /*
          * Ensure Bluetooth is enabled; if not, ask the user for permission.
@@ -105,13 +99,13 @@ public class MainActivity extends ActivityTracker
          * they are started in onActivityResult() if and only if the user
          * allows Bluetooth to be enabled.
          */
-        if (!mBluetoothAdapter.isEnabled()) {
+        if (!BluetoothMgr.getBluetoothAdapter().isEnabled()) {
             Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(intent, RT_BT_ENABLED);
         }
         else {
             BluetoothMgr.configureBluetooth(this);
-            BluetoothMgr.startServer();
+            startServer();
         }
 
         ags.setAppInitialized();
@@ -142,7 +136,7 @@ public class MainActivity extends ActivityTracker
             case RT_BT_ENABLED:
                 if (resultCode == RESULT_OK) {
                     BluetoothMgr.configureBluetooth(this);
-                    BluetoothMgr.startServer();
+                    startServer();
                     return;
                 }
                 else { Support.fatalError("No Bluetooth available."); }
@@ -155,5 +149,19 @@ public class MainActivity extends ActivityTracker
     public void onDestroy() {
         super.onDestroy();
         BluetoothMgr.unregisterBroadcastReceiver(this);
+    }
+
+    /**
+     * Fire up a Bluetooth server on this device.
+     * <p>
+     *     Must ensure that Bluetooth is enabled first. Only a single server should be
+     *     run during the lifetime of the application.
+     */
+    public static synchronized void startServer() {
+        if (!MainActivity.getApplicationGlobalState().isServerRunning()) {
+            Support.log("Starting server...");
+            (new BluetoothServer()).start();
+            MainActivity.getApplicationGlobalState().setServerRunning(true);
+        }
     }
 }

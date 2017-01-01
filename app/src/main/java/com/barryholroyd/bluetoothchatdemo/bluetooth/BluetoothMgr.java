@@ -22,8 +22,7 @@ import java.util.Set;
 
 public class BluetoothMgr {
     private static BluetoothAdapter mBluetoothAdapter;
-    static BroadcastReceiver mReceiver = null;
-    static boolean serverRunning = false;
+    private static BroadcastReceiver mReceiver = null;
 
     public static BluetoothAdapter getBluetoothAdapter() {
         // Get the Bluetooth adapter.
@@ -51,25 +50,6 @@ public class BluetoothMgr {
     }
 
     /**
-     * Ask the user for permission to make this device discoverable.
-     */
-    private static void requestDiscoverable() {
-        /** Only make this request once. */
-        if (MainActivity.getApplicationGlobalState().isAppInitialized())
-            return;
-
-        Intent discoverableIntent = new
-                Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-        Context c = ActivityTracker.getContext();
-        if (c == null) {
-            Support.userMessage("Can't make this device discoverable (no Context available).");
-            return;
-        }
-        c.startActivity(discoverableIntent);
-    }
-
-    /**
      * Do a device scan.
      * <p>
      *     This will automatically refresh the "Discovered" RecyclerView.
@@ -91,7 +71,6 @@ public class BluetoothMgr {
      * @param v the View the user clicked on.
      */
     public static void refreshPaired(View v) {
-        Support.log("Refreshing paired list...");
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
         if (pairedDevices.size() > 0) {
             MyAdapter myAdapter = MainActivity.getRvmPaired().getAdapter();
@@ -102,6 +81,25 @@ public class BluetoothMgr {
             }
             myAdapter.notifyDataSetChanged();
         }
+    }
+
+    /**
+     * Ask the user for permission to make this device discoverable.
+     */
+    private static void requestDiscoverable() {
+        /** Only make this request once. */
+        if (MainActivity.getApplicationGlobalState().isAppInitialized())
+            return;
+
+        Intent discoverableIntent = new
+                Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+        Context c = ActivityTracker.getContext();
+        if (c == null) {
+            Support.userMessage("Can't make this device discoverable (no Context available).");
+            return;
+        }
+        c.startActivity(discoverableIntent);
     }
 
     /**
@@ -121,20 +119,6 @@ public class BluetoothMgr {
         // Register the receiver.
         mReceiver = new BluetoothBroadcastReceiver();
         c.registerReceiver(mReceiver, ifilter);
-    }
-
-    /**
-     * Fire up a Bluetooth server on this device.
-     * <p>
-     *     Must ensure that Bluetooth is enabled first. Only a single server should be
-     *     run during the lifetime of the application.
-     */
-    static public synchronized void startServer() {
-        if (!serverRunning) {
-            Support.log("Starting server...");
-            (new BluetoothServer(getBluetoothAdapter())).start();
-            serverRunning = true;
-        }
     }
 
     /**

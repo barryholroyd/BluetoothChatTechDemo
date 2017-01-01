@@ -19,12 +19,18 @@ public class ApplicationGlobalState extends Application
     /** True after the first instance of MainActivity has been created and initialized. */
     private boolean appInitialized = false;
 
+    /** True when the app "server" is listening for incoming connections. */
+    static boolean serverRunning = false;
+
     /*
      * Getters and setters.
      */
     public BluetoothSocket getBtSocket() { return btSocket; }
     public void setBtSocket(BluetoothSocket _btSocket) { btSocket = _btSocket; }
 
-    public void setAppInitialized() { appInitialized = true; }
     public boolean isAppInitialized()  { return appInitialized; }
+    public void setAppInitialized() { appInitialized = true; }
+
+    public boolean isServerRunning() { return serverRunning; }
+    public void setServerRunning(boolean b) { serverRunning = b; }
 }

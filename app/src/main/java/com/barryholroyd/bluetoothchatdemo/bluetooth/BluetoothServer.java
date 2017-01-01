@@ -19,21 +19,17 @@ import java.util.UUID;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 /**
- * Bluetooth "chat" server implementation.
+ * Bluetooth "server": listens for incoming connection, then starts a chat session.
  * <p>
  *     Runs in a background thread.
  */
-
 public class BluetoothServer extends Thread
 {
     /** app name used to connect */
-    public static final String SERVICE_NAME = "BluetoothChatDemo";
+    static private final String SERVICE_NAME = "BluetoothChatDemo";
 
-    /** UUID generated at: https://www.uuidgenerator.net/ */
-    public static final UUID MY_UUID = UUID.fromString("bb303707-5a56-4536-8d07-7ead8264f6b9");
-
-    /** Object to create Bluetooth sockets. */
-    private BluetoothServerSocket btServerSocket = null;
+    /** UUID generated at: https://www.uuidgenerator.net/. Used by both client and server code. */
+    static final UUID MY_UUID = UUID.fromString("bb303707-5a56-4536-8d07-7ead8264f6b9");
 
     /**
      * Class used for coordinating server worker thread with foreground ChatActivity thread.
@@ -46,39 +42,39 @@ public class BluetoothServer extends Thread
     static public class Lock
     {
         private boolean condition = false;
-        public boolean conditionMet() { return condition; }
+        boolean conditionMet() { return condition; }
         public void setCondition(boolean _condition) { condition = _condition; }
     }
     public static final Lock serverLock = new Lock();
-
-    /** Constructor */
-    public BluetoothServer(BluetoothAdapter mBluetoothAdapter) {
-        try {
-            Support.log("Creating new server socket...");
-            // MY_UUID is the app's UUID string, also used by the client code
-            btServerSocket = mBluetoothAdapter.listenUsingRfcommWithServiceRecord(
-                    SERVICE_NAME, MY_UUID);
-        } catch (IOException e) {
-            Support.fatalError("Failed to get Bluetooth server socket.");
-        }
-    }
 
     /**
      * Accept a connection from a remote Bluetooth client and then pass it to ChatActivity
      * to run the chat session.
      */
     public void run() {
-        BluetoothSocket btSocket = null;
+        BluetoothServerSocket btServerSocket = null;
+
+        try {
+            Support.log("Creating new server socket...");
+            btServerSocket = BluetoothMgr.getBluetoothAdapter().
+                    listenUsingRfcommWithServiceRecord(SERVICE_NAME, MY_UUID);
+        } catch (IOException e) {
+            Support.fatalError("Failed to get Bluetooth server socket.");
+        }
+
+        //noinspection InfiniteLoopStatement
         while (true) {
             try {
                 Support.log("Server: waiting for a new connection to accept...");
-                btSocket = btServerSocket.accept(); // never returns null
 
-                TBD: accept can throw an exception
+                @SuppressWarnings("ConstantConditions")
+                BluetoothSocket btSocket = btServerSocket.accept();
 
-                Support.log(String.format(Locale.US,
-                        "Server connection ready: %#x", btSocket.hashCode()));
-                // Make the Bluetooth socket available to other components.
+                if (btSocket == null) {
+                    Support.fatalError("Failed to get Bluetooth socket.");
+                }
+
+                // Make the Bluetooth socket available to ChatActivity.
                 MainActivity.getApplicationGlobalState().setBtSocket(btSocket);
 
                 // Start communications.
@@ -90,6 +86,7 @@ public class BluetoothServer extends Thread
                 intent.putExtra(Support.BUNDLE_KEY_BTDEVICE, (Parcelable) null);
                 intent.addFlags(FLAG_ACTIVITY_NEW_TASK); // required since an App Context is used
                 c.startActivity(intent);
+
                 synchronized (serverLock) {
                     while (!serverLock.conditionMet()) {
                         try {
@@ -104,14 +101,10 @@ public class BluetoothServer extends Thread
                     }
                     serverLock.setCondition(false);
                 }
-            } catch (IOException e) {
-                if (btSocket == null) {
-                    Support.log("Server connection exception: <null>");
-                }
-                else {
-                    Support.log(String.format(Locale.US,
-                            "Server connection exception: %#x", btSocket.hashCode()));
-                }
+            } catch (IOException ioe) {
+                String msg = String.format(Locale.US,
+                        "Server connection IO exception: %s", ioe.getMessage());
+                Support.fatalError(msg);
             }
         }
     }

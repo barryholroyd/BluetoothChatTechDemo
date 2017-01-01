@@ -2,7 +2,6 @@ package com.barryholroyd.bluetoothchatdemo.support;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
@@ -47,6 +46,16 @@ public class Support {
         ErrorDialog
             .newInstance("Fatal Error", msg)
             .show(a.getFragmentManager(), "error_dialog");
+
+        // Wait forever; ErrorDialog will force the user to exit the app.
+        Object o = new Object();
+        synchronized (o) {
+            try { o.wait(); }
+            catch ( InterruptedException ie ) {
+                Support.log("Interrupted exception.");
+                System.exit(2);
+            }
+        }
     }
 
     /** Return the app label as defined in the manifest. */
