@@ -11,22 +11,16 @@ import java.util.Stack;
 /**
  * Registry to track the creation and destruction of Activities.
  * <p>
- *     References to Activities can't be saved for use by worker threads
- *     because the Activity could be destroyed without the worker thread
- *     being aware of it.  The Activity can be destroyed (and recreated) as a
- *     result of a device rotation, in which case the app is still running,
- *     or the entire process can be destroyed as a result of low memory, in
- *     which case both the Activity and the app are destroyed.  Also, hitting
- *     the Back button when there is only one Activity on the task's back
- *     stack will cause the Activity to be destroyed but the app to keep
- *     running in the background (without being immediately recreated).
- * <p>
- *     This class tracks the lifetime of each Activity instance (mirroring,
+ *     ActivityTracker tracks the lifetime of each Activity instance (mirroring,
  *     to some degree, the task's back stack). It can be queried to get the
- *     current Activity as well as the state of the current Activity.  It can
- *     be used, for example, by background methods that need an Activity to
- *     create DialogFragments (an Activity instance is needed to get a
- *     FragmentManager).
+ *     current Activity as well as the state of the current Activity.
+ * <p>
+ *    It is particularly useful for support methods which need an Activity or
+ *    Activity context but which don't care about the specific Activity
+ *    subclass currently running.  BluetoothChatDemo uses it in a Support
+ *    method which creates and displays DialogFragments (they need a
+ *    FragmentManager and that can only be obtained from an Activity
+ *    instance). The method can be safely called from worker threads.
  * <p>
  *     It can also be used by anything that needs a current Context. The best
  *     approach here is to pass in the Application Context, but that can be
@@ -37,11 +31,17 @@ import java.util.Stack;
  *     To use this class, simply have each of the app's Activities extend it.
  *     They will all then automatically be tracked and the static methods can
  *     be used to access the current Activity.
+ * <p>
+ *     Note: BluetoothChatDemo uses this primarily in support of Support.fatalError(),
+ *     to provide a current Activity instance so that DialogFragments can be
+ *     created and displayed. It is a more powerful system than this app probably needs,
+ *     but is it a good demonstration of how Activity instance management can be
+ *     thoroughly and cleanly handled.
  */
 abstract public class ActivityTracker extends AppCompatActivity
 {
     /** The four possible states of an Activity. */
-    public enum ActivityState { CREATED, STARTED, RESUMED, DESTROYED }
+    public enum ActivityState { CREATED, STARTED, RESUMED }
 
     /** The stack of Activities. This basically mirrors the task's back stack. */
     private static Stack<ActivityInfo> stack = new Stack<>();

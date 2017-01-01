@@ -1,5 +1,6 @@
 package com.barryholroyd.bluetoothchatdemo;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
@@ -34,20 +35,29 @@ public class MainActivity extends ActivityTracker
     public  static ApplicationGlobalState getApplicationGlobalState() { return ags; }
 
     /**
-     * Hook for the current MainActivity instance. This approach allows ut to
-     * avoid the usual memory- and thread-leak issues that can be caused by storing
-     * references on static hooks.
-     * <br>
-     * Any references to objects which exist in the context of this Activity (e.g.,
-     * RecyclerViews) are accessed via getters which call getMainActivity().
+     * All code in this app, except for code in ChatActivity and BluetoothComm (which is
+     * only called by ChatActivity) executes while MainActivity should be present and
+     * available, with one caveat: BluetoothClient and BluetoothServer classes are both
+     * extensions of Thread so that they can set up connections in the background. In both
+     * the cases it is possible (although not likely) that the MainActivity instance will
+     * be gone by the time they need it. For that reason, we route requests for the MainActivity
+     * instance through ActivityTracker, which tracks the creation and destruction of
+     * Activities in this app.
+     *
+     * @return the current MainActivity instance.
      */
-    private static MainActivity ma = null;
-    /** Method to validate and return the current MainActivity instance. */
     public  static MainActivity  getMainActivity() {
-        if (ma == null)
+        Activity a = getActivity(); // from ActivityTracker
+        if (a == null) {
             throw new IllegalStateException(
                     "Attempt to access uninitialized MainActivity instance");
-        return ma;
+        }
+        if (! (a instanceof MainActivity)) {
+            throw new IllegalStateException(String.format(Locale.US,
+                    "getMainActivity returned Activity of the wrong class: %s",
+                    a.getClass().getSimpleName()));
+        }
+        return (MainActivity) a;
     }
 
     /** Request codes for onActivityResult(). */
@@ -77,7 +87,6 @@ public class MainActivity extends ActivityTracker
         super.onCreate(savedInstanceState);
 
         ags = (ApplicationGlobalState) getApplication();
-        ma = this;
 
         // Display the "client" interface.
         setContentView(R.layout.activity_main);

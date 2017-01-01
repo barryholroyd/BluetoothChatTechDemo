@@ -73,6 +73,9 @@ public class BluetoothServer extends Thread
             try {
                 Support.log("Server: waiting for a new connection to accept...");
                 btSocket = btServerSocket.accept(); // never returns null
+
+                TBD: accept can throw an exception
+
                 Support.log(String.format(Locale.US,
                         "Server connection ready: %#x", btSocket.hashCode()));
                 // Make the Bluetooth socket available to other components.
