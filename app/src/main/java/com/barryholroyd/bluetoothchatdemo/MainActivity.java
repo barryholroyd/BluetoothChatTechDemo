@@ -1,5 +1,6 @@
 package com.barryholroyd.bluetoothchatdemo;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,9 +19,8 @@ import java.util.Locale;
  * TBD: or provide a finish() button.
  *
 Test:
-  o Cancelling discovery (connect to a device in less than 12 seconds);
-    watch logs
  * Test for memory leaks.
+ * TBD: document process and worker threads.
  *
  * TBD: Finish comments.
  * TBD: clean out TBDs, log()s, etc.
@@ -46,6 +46,8 @@ public class MainActivity extends ActivityTracker
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        new MemoryLeak(this); // DEL:
+
         ags = (ApplicationGlobalState) getApplication();
 
         if (SERVER_ONLY) {
@@ -53,7 +55,10 @@ public class MainActivity extends ActivityTracker
             BluetoothMgr.startServer();
             ags.setAppInitialized();
             finish();
+            return;
         }
+
+        Support.log("HERE");
 
         setContentView(R.layout.activity_main);
         /*
@@ -117,15 +122,20 @@ public class MainActivity extends ActivityTracker
         super.onDestroy();
         BluetoothMgr.unregisterBroadcastReceiver(this);
     }
-
-    //DEL:
-    @Override
-    public void finalize() throws Throwable {
-        super.finalize();
-        Support.log(String.format(Locale.US,
-                "MainActivity.finalize() called: %s - %#x",
-                this.getClass().getSimpleName(),
-                this.hashCode()));
-    }
 }
 
+class MemoryLeak
+{
+    static Activity a1 = null;
+    static Activity a2 = null;
+    static Activity a3 = null;
+
+    public MemoryLeak(Activity _a) {
+        Support.log(String.format(Locale.US, "MemoryLeak.a = %s", a1));
+        if (a1 == null) {
+            a1 = _a;
+            a2 = _a;
+            a3 = _a;
+        }
+    }
+}

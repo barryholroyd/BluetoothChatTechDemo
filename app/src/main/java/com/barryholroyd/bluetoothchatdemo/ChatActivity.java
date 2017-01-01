@@ -121,14 +121,4 @@ public class ChatActivity extends ActivityTracker
         BluetoothComm.closeConnection();
         finish();
     }
-
-    //DEL:
-    @Override
-    public void finalize() throws Throwable {
-        super.finalize();
-        Support.log(String.format(Locale.US,
-                "ChatActivity.finalize() called: %s - %#x",
-                this.getClass().getSimpleName(),
-                this.hashCode()));
-    }
 }

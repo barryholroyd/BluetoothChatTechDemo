@@ -173,6 +173,15 @@ abstract public class ActivityTracker extends AppCompatActivity
         }
     }
 
+    @Override
+    public void finalize() throws Throwable {
+        super.finalize();
+        Support.log(String.format(Locale.US,
+                "%s.finalize() called: - %#x",
+                this.getClass().getSimpleName(),
+                this.hashCode()));
+    }
+
     private void trace(String label) {
 	String s = String.format(Locale.US, "AT [%#x]: %s", this.hashCode(), label);
         Support.log(s);

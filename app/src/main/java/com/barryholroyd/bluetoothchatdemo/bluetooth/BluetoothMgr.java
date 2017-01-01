@@ -22,7 +22,7 @@ import java.util.Set;
 
 public class BluetoothMgr {
     private static BluetoothAdapter mBluetoothAdapter;
-    static BroadcastReceiver mReceiver;
+    static BroadcastReceiver mReceiver = null;
     static boolean serverRunning = false;
 
     public static BluetoothAdapter getBluetoothAdapter() {
@@ -133,7 +133,7 @@ public class BluetoothMgr {
     static public synchronized void startServer() {
         if (!serverRunning) {
             Support.log("Starting server...");
-            (new BluetoothServer(mBluetoothAdapter)).start();
+            (new BluetoothServer(getBluetoothAdapter())).start();
             serverRunning = true;
         }
     }
@@ -144,6 +144,9 @@ public class BluetoothMgr {
      * @param c the current Activity's Context.
      */
     static public void unregisterBroadcastReceiver(Context c) {
-        c.unregisterReceiver(mReceiver);
+        if (mReceiver != null) {
+            c.unregisterReceiver(mReceiver);
+            mReceiver = null;
+        }
     }
 }

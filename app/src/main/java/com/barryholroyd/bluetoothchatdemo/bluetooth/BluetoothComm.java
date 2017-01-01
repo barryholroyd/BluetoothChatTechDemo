@@ -133,14 +133,12 @@ public class BluetoothComm extends Thread
                 btIn.read(bytes, 0, BUFSIZE);
             }
             catch (IOException ioe) {
-                String msg = String.format(Locale.US, "Connection closed: %s", ioe.getMessage());
-                Support.userMessage(msg);
+                Support.userMessage("Connection closed.");
                 break;
             }
             Message m = mHandler.obtainMessage(CHATTEXT, bytes);
             mHandler.sendMessage(m);
         }
-        Support.userMessage("Exited run() loop.");
         closeConnection();
         Message m = caHandler.obtainMessage(ChatActivity.FINISH);
         caHandler.sendMessage(m);
