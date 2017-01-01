@@ -19,7 +19,9 @@ public class ApplicationGlobalState extends Application
     /** True after the first instance of MainActivity has been created and initialized. */
     private boolean appInitialized = false;
 
-    // Getters and setters.
+    /*
+     * Getters and setters.
+     */
     public BluetoothSocket getBtSocket() { return btSocket; }
     public void setBtSocket(BluetoothSocket _btSocket) { btSocket = _btSocket; }
 

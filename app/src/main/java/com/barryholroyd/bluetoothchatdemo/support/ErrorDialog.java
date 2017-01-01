@@ -1,4 +1,4 @@
-package com.barryholroyd.bluetoothchatdemo.dialog;
+package com.barryholroyd.bluetoothchatdemo.support;
 
 import android.app.Dialog;
 import android.app.DialogFragment;

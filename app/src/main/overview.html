@@ -1,0 +1,41 @@
+<html>
+  <body>
+    <h1>Description</h1>
+    Bluetooth chat application.
+
+    <h1>Summary</h1>
+    This app demonstrates Bluetooth functionality in the form of a basic
+    chat application. The app should be run on two separate devices. When
+    started, it will display two lists: one for discovered devices and
+    one for paired devices. Clicking on an entry in either list will cause
+    the app to attemp to connect to that remote device. If the remote
+    device is running this app, the connection will succeed and both devices
+    will then display the chat UI and text can be sent and received. Clicking
+    on "Done" on either device will terminate the session and both devices
+    will return to the original screen.
+
+    <h1>Implementation</h1>
+    This implementation follows the Bluetooth Classic (3.0) API.
+    <p>
+    Two Activities are defined: MainActivity and ChatActivity.
+    <ul>
+      <li>MainActivity is the initial Activity. It is used to create a
+          connection.
+      <li>ChatActivity displays the chat UI and is used to run the chat
+          session.
+    </ul>
+    MainActivity displays the "client" UI, i.e., two lists of devices
+    (discovered and paired) used to initiate a connection as a "client".
+    It then creates a background thread to become the "server" which
+    listens for incoming connection requests.
+    <ul>
+      <li>BluetoothClient is used to initiate a connection as a client.
+      <li>BluetoothServer is used to accept a connection as a server.
+    </ul>
+    <p>
+    In both cases, when a connection is made, ChatActivity is fired up
+    to run the actual chat session, sending and receiving text messages.
+
+    @author Barry Holroyd
+  </body>
+</html>

@@ -7,8 +7,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
-import com.barryholroyd.bluetoothchatdemo.dialog.ErrorDialog;
-
 /**
  * General static support methods.
  */

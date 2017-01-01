@@ -1,6 +1,5 @@
 package com.barryholroyd.bluetoothchatdemo;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,40 +20,58 @@ Test:
  * TBD: clean out TBDs, log()s, etc.
  */
 
+/**
+ *
+ */
 public class MainActivity extends ActivityTracker
 {
-    private static RecyclerViewManager rvmDiscovered; // TBD: memory leak
-    private static RecyclerViewManager rvmPaired;     // TBD: memory leak
-    private static BluetoothAdapter mBluetoothAdapter;
-    private static ApplicationGlobalState ags = null;
+    // Global state is stored at the app level.
+    private static ApplicationGlobalState ags;
+    public  static ApplicationGlobalState getApplicationGlobalState() { return ags; }
+
+    /**
+     * Hook for the current MainActivity instance. This is used so that we can
+     * avoid the usual memory- and thread-leak issues that can be caused by storing
+     * references on static hooks.
+     * <br>
+     * Any references to objects which exist in the context of this Activity (e.g.,
+     * RecyclerViews) are accessed via getters which call getMainActivity().
+     */
+    private static MainActivity ma = null;
+    /** Method to validate and return the current MainActivity instance. */
+    public  static MainActivity  getMainActivity() {
+        if (ma == null)
+            throw new IllegalStateException(
+                    "Attempt to access uninitialized MainActivity instance");
+        return ma;
+    }
+
+    /** Request codes for onActivityResult(). */
     public static final int RT_BT_ENABLED = 1;
 
-    public static final boolean SERVER_ONLY = false; // TBD: test
+    // Private non-static fields.
+    private RecyclerViewManager rvmDiscovered;
+    private RecyclerViewManager rvmPaired;
+    private BluetoothAdapter mBluetoothAdapter;
 
-    // Getters. Static for ease-of-access.
-    public static RecyclerViewManager getRvmDiscovered()    { return rvmDiscovered; }
-    public static RecyclerViewManager getRvmPaired()        { return rvmPaired; }
-    public static BluetoothAdapter    getBluetoothAdapter() { return mBluetoothAdapter; }
-    public static ApplicationGlobalState getApplicationGlobalState() { return ags; }
+    /** Get the device's Bluetooth adapter. */
+    public static BluetoothAdapter getBluetoothAdapter() { return getMainActivity().mBluetoothAdapter; }
 
+    /** Get the "Discovered" RecyclerViewManager. */
+    public static RecyclerViewManager  getRvmDiscovered(){ return getMainActivity().rvmDiscovered; }
+
+    /** Get the "Paired" RecyclerViewManager. */
+    public static RecyclerViewManager  getRvmPaired()    { return getMainActivity().rvmPaired; }
+
+    /** Standard onCreate() method. */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        new MemoryLeak(this); // DEL:
-
         ags = (ApplicationGlobalState) getApplication();
+        ma = this;
 
-        if (SERVER_ONLY) {
-            Support.log("Entering server-only mode.");
-            BluetoothMgr.startServer();
-            ags.setAppInitialized();
-            finish();
-            return;
-        }
-
-        Support.log("HERE");
-
+        // Display the "client" interface.
         setContentView(R.layout.activity_main);
         /*
          * These are order-sensitive. They are re-created on each device re-configuration.
@@ -65,7 +82,13 @@ public class MainActivity extends ActivityTracker
         rvmPaired         = new RecyclerViewManager(this, R.id.rv_paired);
         mBluetoothAdapter = BluetoothMgr.getBluetoothAdapter();
 
-        // Ensure it is enabled; if not, ask the user for permission.
+        /*
+         * Ensure Bluetooth is enabled; if not, ask the user for permission.
+         * Bluetooth configuration and starting the "server" worker thread
+         * both occur here if Bluetooth is already enabled; if it isn't,
+         * they are started in onActivityResult() if and only if the user
+         * allows Bluetooth to be enabled.
+         */
         if (!mBluetoothAdapter.isEnabled()) {
             Support.startAFR(this, BluetoothAdapter.ACTION_REQUEST_ENABLE, RT_BT_ENABLED);
         }
@@ -116,21 +139,5 @@ public class MainActivity extends ActivityTracker
     public void onDestroy() {
         super.onDestroy();
         BluetoothMgr.unregisterBroadcastReceiver(this);
-    }
-}
-
-class MemoryLeak
-{
-    static Activity a1 = null;
-    static Activity a2 = null;
-    static Activity a3 = null;
-
-    public MemoryLeak(Activity _a) {
-        Support.log(String.format(Locale.US, "MemoryLeak.a = %s", a1));
-        if (a1 == null) {
-            a1 = _a;
-            a2 = _a;
-            a3 = _a;
-        }
     }
 }
