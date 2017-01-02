@@ -35,6 +35,13 @@ public class MainActivity extends ActivityTracker
     private static ApplicationGlobalState ags;
     public  static ApplicationGlobalState getApplicationGlobalState() { return ags; }
 
+    /** Request codes for onActivityResult(). */
+    public static final int RT_BT_ENABLED = 1;
+
+    // Private non-static fields.
+    private RecyclerViewManager rvmDiscovered;
+    private RecyclerViewManager rvmPaired;
+
     /**
      * All code in this app, except for code in ChatActivity and BluetoothComm (which is
      * only called by ChatActivity) executes while MainActivity should be present and
@@ -61,13 +68,6 @@ public class MainActivity extends ActivityTracker
         return (MainActivity) a;
     }
 
-    /** Request codes for onActivityResult(). */
-    public static final int RT_BT_ENABLED = 1;
-
-    // Private non-static fields.
-    private RecyclerViewManager rvmDiscovered;
-    private RecyclerViewManager rvmPaired;
-
     /** Get the "Discovered" RecyclerViewManager. */
     public static RecyclerViewManager  getRvmDiscovered(){ return getMainActivity().rvmDiscovered; }
 
@@ -87,10 +87,10 @@ public class MainActivity extends ActivityTracker
         setContentView(R.layout.activity_main);
 
         /*
-         * These are order-sensitive.
+         * DEL: These are order-sensitive.
          */
-        rvmDiscovered     = new RecyclerViewManager(this, R.id.rv_discovered);
         rvmPaired         = new RecyclerViewManager(this, R.id.rv_paired);
+        rvmDiscovered     = new RecyclerViewManager(this, R.id.rv_discovered);
 
         /*
          * Ensure Bluetooth is enabled; if not, ask the user for permission.
@@ -104,7 +104,7 @@ public class MainActivity extends ActivityTracker
             startActivityForResult(intent, RT_BT_ENABLED);
         }
         else {
-            BluetoothMgr.configureBluetooth(this);
+            configureBluetooth();
             startServer();
         }
 
@@ -125,9 +125,7 @@ public class MainActivity extends ActivityTracker
      *
      * @param v the View the user clicked on.
      */
-    public static void clickRefreshPaired(View v) {
-        BluetoothMgr.refreshPaired(v);
-    }
+    public static void clickRefreshPaired(View v) { BluetoothMgr.refreshPaired(v); }
 
     /** Handle result of request to user to enable Bluetooth. */
     @Override
@@ -135,7 +133,7 @@ public class MainActivity extends ActivityTracker
         switch (requestCode) {
             case RT_BT_ENABLED:
                 if (resultCode == RESULT_OK) {
-                    BluetoothMgr.configureBluetooth(this);
+                    configureBluetooth();
                     startServer();
                     return;
                 }
@@ -152,12 +150,27 @@ public class MainActivity extends ActivityTracker
     }
 
     /**
+     * Configure the Bluetooth session (init BroadcastReceiver for discovery, refresh paired
+     * and discovered windows, request that the device be discoverable).
+     * <p>
+     *     Passing in the Activity is appropriate because the BroadcastReceiver must be
+     *     registered and unregistered at the beginning and end of each MainActivity lifecycle.
+     */
+    private void configureBluetooth() {
+        // Register receiver for handling newly discovered devices during a scan.
+        BluetoothMgr.registerBroadcastReceiver(this);
+        BluetoothMgr.refreshPaired(null);
+        BluetoothMgr.refreshDiscovered(null);
+        BluetoothMgr.requestDiscoverable();
+    }
+
+    /**
      * Fire up a Bluetooth server on this device.
      * <p>
      *     Must ensure that Bluetooth is enabled first. Only a single server should be
      *     run during the lifetime of the application.
      */
-    public static synchronized void startServer() {
+    private static synchronized void startServer() {
         if (!MainActivity.getApplicationGlobalState().isServerRunning()) {
             Support.log("Starting server...");
             (new BluetoothServer()).start();

@@ -34,22 +34,6 @@ public class BluetoothMgr {
     }
 
     /**
-     * Configure the Bluetooth session (init BroadcastReceiver for discovery, refresh paired
-     * and discovered windows, request that the device be discoverable).
-     * <p>
-     *     Passing in the Activity is appropriate because the BroadcastReceiver must be
-     *     registered and unregistered at the beginning and end of each MainActivity lifecycle.
-     * @param a the current Activity.
-     */
-    public static void configureBluetooth(Activity a) {
-        // Register receiver for handling newly discovered devices during a scan.
-        registerBroadcastReceiver(a);
-        refreshPaired(null);
-        refreshDiscovered(null);
-        requestDiscoverable();
-    }
-
-    /**
      * Do a device scan.
      * <p>
      *     This will automatically refresh the "Discovered" RecyclerView.
@@ -86,7 +70,7 @@ public class BluetoothMgr {
     /**
      * Ask the user for permission to make this device discoverable.
      */
-    private static void requestDiscoverable() {
+    public static void requestDiscoverable() {
         /** Only make this request once. */
         if (MainActivity.getApplicationGlobalState().isAppInitialized())
             return;
@@ -108,7 +92,7 @@ public class BluetoothMgr {
      *
      * @param c current Activity's Context.
      */
-    private static void registerBroadcastReceiver(Context c) {
+    public static void registerBroadcastReceiver(Context c) {
         IntentFilter ifilter = new IntentFilter();
         ifilter.addAction(BluetoothDevice.ACTION_FOUND);
         ifilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
