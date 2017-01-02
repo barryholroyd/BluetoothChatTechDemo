@@ -5,9 +5,10 @@ import android.bluetooth.BluetoothDevice;
 import java.util.ArrayList;
 
 /**
- * Class created primarily to assist with type safety.
+ * Class which provides access to a list of Bluetooth devices.
  * <p>
- *     Also facilitates device lookup by MAC address.
+ *     This class exists primarily to assist with type safety and code readability.
+ *     It also facilitates device lookup by MAC address.
  */
 public class BluetoothDevices extends ArrayList<BluetoothDevice>
 {

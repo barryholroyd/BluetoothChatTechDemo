@@ -26,11 +26,12 @@ import java.util.Locale;
  *     for display to the user.
  * <p>
  *     A static writeChat() method is provided for the UI thread to use to write data out
- *     to the remote app. *
+ *     to the remote app.
  */
 
 public class BluetoothComm extends Thread
 {
+    /** Bluetooth socket to be read and written. */
     private static BluetoothSocket btSocket;
 
     /** running is "true" when initialization is successful. */
@@ -43,7 +44,10 @@ public class BluetoothComm extends Thread
     public static final int BUFSIZE = 1024;
 
     /** Handler for the UI thread. */
-    private static Handler mHandler = null;
+    private static Handler uiHandler = null;
+
+    /** Handler to cause the calling ChatActivity to exit. */
+    private Handler caHandler;
 
     /** Bluetooth input stream. */
     private static InputStream btIn;
@@ -51,9 +55,12 @@ public class BluetoothComm extends Thread
     /** Bluetooth output stream. */
     private static OutputStream btOut;
 
-    /** Handler to cause the calling ChatActivity to exit. */
-    private Handler caHandler;
-
+    /**
+     * Constructor -- set up IO and UI handler.
+     *
+     * @param _btSocket Bluetooth socket to be read and written.
+     * @param handler   Handler to cause the calling ChatActivity to exit.
+     */
     public BluetoothComm(BluetoothSocket _btSocket, Handler handler) {
         btSocket = _btSocket;
         caHandler = handler;
@@ -71,8 +78,11 @@ public class BluetoothComm extends Thread
             return;
         }
 
-        // ChatActivity should be running; processMessage() will check to make sure.
-        mHandler = new Handler(Looper.getMainLooper()) {
+        /*
+         * Create the UI handler responsible for displaying the text on the UI thread.
+         * ChatActivity should be running; processMessage() will check to make sure.
+         */
+        uiHandler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(Message message) {
                 if (message.what == CHATTEXT) {
@@ -91,7 +101,9 @@ public class BluetoothComm extends Thread
 
     /**
      * Convert the incoming message into a text string and display it.
-     * @param m
+     * Called by the UI handler.
+     *
+     * @param m the Message containing the text to be displayed.
      */
     private void processMessage(Message m) {
         byte[] bytes = (byte[]) m.obj;
@@ -114,6 +126,7 @@ public class BluetoothComm extends Thread
             return;
         }
 
+        // The current Activity should be an instance of ChatActivity.
         ChatActivity ca = (ChatActivity) ActivityTracker.getActivity();
         if (ca == null) {
             String msg = String.format(Locale.US,
@@ -126,6 +139,10 @@ public class BluetoothComm extends Thread
         tv.setText(text);
     }
 
+    /*
+     * Run read/display loop. When the connection is closed, exit the loop and tell the
+     * running ChatActivity to exit, returning control to the original MainActivity.
+     */
     @Override
     public void run() {
         if (!running) {
@@ -144,8 +161,8 @@ public class BluetoothComm extends Thread
                 Support.userMessage("Connection closed.");
                 break;
             }
-            Message m = mHandler.obtainMessage(CHATTEXT, bytes);
-            mHandler.sendMessage(m);
+            Message m = uiHandler.obtainMessage(CHATTEXT, bytes);
+            uiHandler.sendMessage(m);
         }
         closeConnection();
         Message m = caHandler.obtainMessage(ChatActivity.FINISH);
@@ -155,6 +172,7 @@ public class BluetoothComm extends Thread
     /**
      * Send the chat message.
      * <p>
+     *     This is called directly by ChatActivity.
      *     The message is limited to BUFSIZE bytes.
      *
      * @param bytes the buffer of bytes to write out.

@@ -12,6 +12,7 @@ import com.barryholroyd.bluetoothchatdemo.MainActivity;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 import com.barryholroyd.bluetoothchatdemo.recyclerview.MyAdapter;
 
+import java.util.HashMap;
 import java.util.Locale;
 
 import static android.bluetooth.BluetoothAdapter.EXTRA_PREVIOUS_SCAN_MODE;
@@ -78,13 +79,31 @@ class BtBrLog {
     /** Flag to enable/disable Bluetooth broadcast receiver logging. */
     static final boolean btBrLog = false;
 
+    static final HashMap<Integer,String> BtState = new HashMap<Integer,String>() {
+        {
+            put(BluetoothAdapter.STATE_OFF, "STATE_OFF");
+            put(BluetoothAdapter.STATE_ON, "STATE_ON");
+            put(BluetoothAdapter.STATE_TURNING_OFF, "STATE_TURNING_OFF");
+            put(BluetoothAdapter.STATE_TURNING_ON, "STATE_TURNING_ON");
+        }
+    };
+
+    static final HashMap<Integer,String> BtScanMode = new HashMap<Integer,String>() {
+        {
+            put(BluetoothAdapter.SCAN_MODE_NONE, "SCAN_MODE_NONE");
+            put(BluetoothAdapter.SCAN_MODE_CONNECTABLE, "SCAN_MODE_CONNECTABLE");
+            put(BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE,
+                    "SCAN_MODE_CONNECTABLE_DISCOVERABLE");
+        }
+    };
+
     /** Log changes to the Bluetooth state. */
     static void logActionStateChanged(Intent intent) {
         Bundle extras = intent.getExtras();
         brlog(String.format(Locale.US,
                 "State Changed: Old=%s New=%s",
-                BluetoothMaps.BtState.get(extras.getInt(EXTRA_PREVIOUS_STATE)),
-                BluetoothMaps.BtState.get(extras.getInt(EXTRA_STATE))));
+                BtState.get(extras.getInt(EXTRA_PREVIOUS_STATE)),
+                BtState.get(extras.getInt(EXTRA_STATE))));
     }
 
     /** Log changes when the Bluetooth scanning mode changes. */
@@ -92,8 +111,8 @@ class BtBrLog {
         Bundle extras = intent.getExtras();
         brlog(String.format(Locale.US,
                 "Scan Mode Changed: Old=%s New=%s",
-                BluetoothMaps.BtScanMode.get(extras.getInt(EXTRA_PREVIOUS_SCAN_MODE)),
-                BluetoothMaps.BtScanMode.get(extras.getInt(EXTRA_SCAN_MODE))));
+                BtScanMode.get(extras.getInt(EXTRA_PREVIOUS_SCAN_MODE)),
+                BtScanMode.get(extras.getInt(EXTRA_SCAN_MODE))));
     }
 
     /** Wrapper for Bluetooth Broad Receiver log messages. */

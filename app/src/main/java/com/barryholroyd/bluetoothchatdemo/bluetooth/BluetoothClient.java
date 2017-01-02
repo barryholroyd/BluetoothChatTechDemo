@@ -22,7 +22,10 @@ import static com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothServer.MY_UU
 /**
  * Bluetooth "chat" client connection set up.
  * <p>
- *     Runs in a background thread so that the user can still do other stuff (e.g.,
+ *     Given a remote device, create a connection to it and then call start
+ *     ChatActivity to run a chat session.
+ * <p>
+ *     Runs as a background thread so that the user can still do other stuff (e.g.,
  *     adjust settings) even if the write to the network hangs.
  */
 public class BluetoothClient extends Thread
@@ -52,7 +55,7 @@ public class BluetoothClient extends Thread
          * and cause it to fail. To prevent that, if discovery is running we cancel it
          * before attempting to make a connection.
          */
-        final BluetoothAdapter mBluetoothAdapter = BluetoothMgr.getBluetoothAdapter();
+        final BluetoothAdapter mBluetoothAdapter = BluetoothUtils.getBluetoothAdapter();
         if (mBluetoothAdapter.isDiscovering()) {
             mBluetoothAdapter.cancelDiscovery();
             Support.log("Client cancelling discovery...");

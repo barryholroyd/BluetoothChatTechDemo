@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothDevices;
-import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothMgr;
+import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothUtils;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothServer;
 import com.barryholroyd.bluetoothchatdemo.recyclerview.MyAdapter;
 import com.barryholroyd.bluetoothchatdemo.recyclerview.RecyclerViewManager;
@@ -107,7 +107,7 @@ public class MainActivity extends ActivityTracker
          * they are started in onActivityResult() if and only if the user
          * allows Bluetooth to be enabled.
          */
-        if (!BluetoothMgr.getBluetoothAdapter().isEnabled()) {
+        if (!BluetoothUtils.getBluetoothAdapter().isEnabled()) {
             Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(intent, RT_BT_ENABLED);
         }
@@ -158,7 +158,7 @@ public class MainActivity extends ActivityTracker
     @Override
     public void onDestroy() {
         super.onDestroy();
-        BluetoothMgr.unregisterBroadcastReceiver(this);
+        BluetoothUtils.unregisterBroadcastReceiver(this);
     }
 
     /**
@@ -170,10 +170,10 @@ public class MainActivity extends ActivityTracker
      */
     private void configureBluetooth() {
         // Register receiver for handling newly discovered devices during a scan.
-        BluetoothMgr.registerBroadcastReceiver(this);
+        BluetoothUtils.registerBroadcastReceiver(this);
         refreshPaired();
         refreshDiscovered();
-        BluetoothMgr.requestDiscoverable();
+        BluetoothUtils.requestDiscoverable();
     }
 
     /**
@@ -201,14 +201,14 @@ public class MainActivity extends ActivityTracker
         MyAdapter myAdapter = MainActivity.getRvmDiscovered().getAdapter();
         BluetoothDevices btds = myAdapter.getDevices();
         btds.clear();
-        BluetoothMgr.startDiscovery();
+        BluetoothUtils.startDiscovery();
     }
 
     /**
      * Find and display devices which are already paired with this one.
      */
     public static void refreshPaired() {
-        Set<BluetoothDevice> pairedDevices = BluetoothMgr.getPairedDevices();
+        Set<BluetoothDevice> pairedDevices = BluetoothUtils.getPairedDevices();
         if (pairedDevices.size() > 0) {
             MyAdapter myAdapter = MainActivity.getRvmPaired().getAdapter();
             BluetoothDevices btds = myAdapter.getDevices();

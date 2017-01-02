@@ -1,6 +1,5 @@
 package com.barryholroyd.bluetoothchatdemo.bluetooth;
 
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
@@ -19,9 +18,12 @@ import java.util.UUID;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 /**
- * Bluetooth "server": listens for incoming connection, then starts a chat session.
+ *  * Bluetooth "chat" server connection set up.
  * <p>
- *     Runs in a background thread.
+ *     Listen for an incoming connection request, accept it and then call start
+ *     ChatActivity to run a chat session.
+ * <p>
+ *     Runs as a background thread.
  */
 public class BluetoothServer extends Thread
 {
@@ -56,7 +58,7 @@ public class BluetoothServer extends Thread
 
         try {
             Support.log("Creating new server socket...");
-            btServerSocket = BluetoothMgr.getBluetoothAdapter().
+            btServerSocket = BluetoothUtils.getBluetoothAdapter().
                     listenUsingRfcommWithServiceRecord(SERVICE_NAME, MY_UUID);
         } catch (IOException e) {
             Support.fatalError("Failed to get Bluetooth server socket.");

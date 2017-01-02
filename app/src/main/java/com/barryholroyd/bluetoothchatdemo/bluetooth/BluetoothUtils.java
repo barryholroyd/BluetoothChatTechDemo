@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Static methods for managing Bluetooth activities.
  */
-public class BluetoothMgr {
+public class BluetoothUtils {
     private static BroadcastReceiver mReceiver = null;
 
     /** Get the Bluetooth adapter; includes check for lack of Bluetooth support. */
