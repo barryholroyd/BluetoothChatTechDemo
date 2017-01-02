@@ -19,6 +19,7 @@ import java.util.Locale;
 import java.util.Set;
 
 /*
+ * TBD: UI: adjust text fields left; ScrollView for full screen (?); colors, text view sizes.
  * TBD: Test -- is alternate connect approach ever used by either device?
  * TBD: Test -- try killing server (pull USB cable?)
  * TBD: if already running, don't ask for Bluetooth enabled again.

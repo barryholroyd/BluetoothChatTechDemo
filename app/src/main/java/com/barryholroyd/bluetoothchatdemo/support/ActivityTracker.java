@@ -39,7 +39,7 @@ import java.util.Stack;
 abstract public class ActivityTracker extends AppCompatActivity
 {
     /** Flag to enable/disable ActivityTracker logging. */
-    static final private boolean atTraceEnabled = true; // TBD: set to false
+    static final private boolean atTraceEnabled = false;
 
     /** The four possible states of an Activity. */
     public enum ActivityState { CREATED, STARTED, RESUMED }
