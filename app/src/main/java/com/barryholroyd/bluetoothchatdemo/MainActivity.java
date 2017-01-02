@@ -19,13 +19,9 @@ import java.util.Locale;
 import java.util.Set;
 
 /*
-Test:
- * TBD: Fix memory leaks.
- *
  * TBD: Test -- is alternate connect approach ever used by either device?
  * TBD: Test -- try killing server (pull USB cable?)
  *
- * TBD: Finish comments.
  * TBD: clean out TBDs, log()s, etc.
  */
 
