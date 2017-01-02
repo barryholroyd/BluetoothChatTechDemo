@@ -15,15 +15,16 @@ import com.barryholroyd.bluetoothchatdemo.recyclerview.RecyclerViewManager;
 import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
-import java.util.Locale;
 import java.util.Set;
 
 /*
+ * TBD: Run code analyzer (e.g., Handlers should be static?)
  * TBD: UI: adjust text fields left; ScrollView for full screen (?); colors, text view sizes.
  * TBD: Test -- is alternate connect approach ever used by either device?
  * TBD: Test -- try killing server (pull USB cable?)
  * TBD: if already running, don't ask for Bluetooth enabled again.
  * TBD: clean out TBDs, log()s, etc.
+ * TBD: move to apps
  */
 
 /**
@@ -184,7 +185,7 @@ public class MainActivity extends ActivityTracker
      */
     private static synchronized void startServer() {
         if (!MainActivity.getApplicationGlobalState().isServerRunning()) {
-            Support.log("Starting server...");
+            Support.trace("Starting server...");
             (new BluetoothServer()).start();
             MainActivity.getApplicationGlobalState().setServerRunning(true);
         }

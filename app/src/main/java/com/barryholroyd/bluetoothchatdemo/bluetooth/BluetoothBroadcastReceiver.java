@@ -122,7 +122,7 @@ class BtBrLog {
     /** Wrapper for Bluetooth Broad Receiver log messages. */
     static void brlog(String s) {
         if (btBrLog) {
-            Support.log(String.format(Locale.US, "> Broadcast received: [%s]", s));
+            Support.trace(String.format(Locale.US, "> Broadcast received: [%s]", s));
         }
     }
 }

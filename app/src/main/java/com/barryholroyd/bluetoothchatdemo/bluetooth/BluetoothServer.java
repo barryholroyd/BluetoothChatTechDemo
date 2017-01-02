@@ -57,7 +57,7 @@ public class BluetoothServer extends Thread
         BluetoothServerSocket btServerSocket = null;
 
         try {
-            Support.log("Creating new server socket...");
+            Support.trace("Creating new server socket...");
             btServerSocket = BluetoothUtils.getBluetoothAdapter().
                     listenUsingRfcommWithServiceRecord(SERVICE_NAME, MY_UUID);
         } catch (IOException e) {
@@ -67,7 +67,7 @@ public class BluetoothServer extends Thread
         //noinspection InfiniteLoopStatement
         while (true) {
             try {
-                Support.log("Server: waiting for a new connection to accept...");
+                Support.trace("Server: waiting for a new connection to accept...");
 
                 @SuppressWarnings("ConstantConditions")
                 BluetoothSocket btSocket = btServerSocket.accept();
@@ -93,12 +93,12 @@ public class BluetoothServer extends Thread
                     while (!serverLock.conditionMet()) {
                         try {
                             serverLock.wait();
-                            Support.log("Resuming in server after wait()...");
+                            Support.trace("Resuming in server after wait()...");
                         } catch (InterruptedException ioe) {
                             String msg = String.format(Locale.US,
                                     "Spurious interrupt exception while waiting on server lock: %s",
                                     ioe.getMessage());
-                            Support.log(msg);
+                            Support.error(msg);
                         }
                     }
                     serverLock.setCondition(false);

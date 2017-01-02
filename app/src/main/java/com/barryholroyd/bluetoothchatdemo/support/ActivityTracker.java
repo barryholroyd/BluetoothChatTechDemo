@@ -38,9 +38,6 @@ import java.util.Stack;
  */
 abstract public class ActivityTracker extends AppCompatActivity
 {
-    /** Flag to enable/disable ActivityTracker logging. */
-    static final private boolean atTraceEnabled = false;
-
     /** The four possible states of an Activity. */
     public enum ActivityState { CREATED, STARTED, RESUMED }
 
@@ -179,18 +176,13 @@ abstract public class ActivityTracker extends AppCompatActivity
     @Override
     public void finalize() throws Throwable {
         super.finalize();
-        Support.log(String.format(Locale.US,
-                "%s.finalize() called: - %#x",
-                this.getClass().getSimpleName(),
-                this.hashCode()));
+        trace("finalize");
     }
 
     private void trace(String label) {
-        if (atTraceEnabled) {
-            String s = String.format(Locale.US, "ActivityTrace [%s:%#x]: %s",
-                    this.getClass().getSimpleName(),
-                    this.hashCode(), label);
-            Support.log(s);
-        }
+        String s = String.format(Locale.US, "ActivityTrace [%s:%#x]: %s",
+                this.getClass().getSimpleName(),
+                this.hashCode(), label);
+        Support.trace(s);
     }
 }

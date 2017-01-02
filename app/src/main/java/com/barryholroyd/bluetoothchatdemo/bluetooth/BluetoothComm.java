@@ -90,9 +90,9 @@ public class BluetoothComm extends Thread
                 }
                 else {
                     String msg = String.format(Locale.US,
-                            "TBD: ***** Unexpected message type in BluetoothComm: %d.",
+                            "Unexpected message type in BluetoothComm: %d.",
                             message.what);
-                    Support.log(msg);
+                    throw new IllegalStateException(msg);
                 }
             }
         };
@@ -154,7 +154,7 @@ public class BluetoothComm extends Thread
         while (true) {
             byte[] bytes = new byte[BUFSIZE];
             try {
-                Support.log("Waiting to read input...");
+                Support.trace("Waiting to read input...");
                 btIn.read(bytes, 0, BUFSIZE);
             }
             catch (IOException ioe) {
@@ -192,12 +192,12 @@ public class BluetoothComm extends Thread
     static public void closeConnection() {
         try {
             if (btSocket != null) {
-                Support.log("*** Closing the connection...");
+                Support.trace("Closing the connection...");
                 btSocket.close();
             }
         } catch (IOException ioe) {
-            Support.log(String.format(Locale.US,
-                    "*** Failed to close the connection: %s", ioe.getMessage()));
+            Support.error(String.format(Locale.US,
+                    "Failed to close the connection: %s", ioe.getMessage()));
         }
         btSocket = null;
     }

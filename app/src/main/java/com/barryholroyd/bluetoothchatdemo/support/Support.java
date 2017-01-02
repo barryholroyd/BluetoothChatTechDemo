@@ -14,6 +14,7 @@ import java.util.Locale;
 public class Support {
     private static Toaster toaster = null;
     private static String appLabel = null;
+    private static final boolean traceEnabled = false;
 
     /** Initialization */
     private static void init() {
@@ -52,7 +53,7 @@ public class Support {
         synchronized (o) {
             try { o.wait(); }
             catch ( InterruptedException ie ) {
-                Support.log("Interrupted exception.");
+                Support.error("Interrupted exception.");
                 System.exit(2);
             }
         }
@@ -65,8 +66,19 @@ public class Support {
         return appLabel;
     }
 
+    /** External access to logging -- turn off in production. */
+    public static void trace(String msg) {
+        if (traceEnabled)
+            log(msg);
+    }
+
+    /** External access to logging -- leave on in production. */
+    public static void error(String msg) {
+        log(msg);
+    }
+
     /** Basic logging for the app. */
-    public static void log(String msg) {
+    private static void log(String msg) {
         Log.d("BLUETOOTH_CHAT_DEMO", msg);
     }
 
@@ -87,6 +99,6 @@ class SupportException extends RuntimeException
 {
     SupportException(String msg) {
         super(msg);
-        Support.log(String.format(Locale.US, "*** Support Exception: %s", msg));
+        Support.error(String.format(Locale.US, "Support Exception: %s", msg));
     }
 }

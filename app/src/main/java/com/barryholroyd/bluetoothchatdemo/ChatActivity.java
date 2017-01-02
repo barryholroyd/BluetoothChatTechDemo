@@ -70,7 +70,7 @@ public class ChatActivity extends ActivityTracker
             @Override
             public void handleMessage(Message message) {
                 if (message.what == FINISH) {
-                    Support.log("Exiting ChatActivity...");
+                    Support.trace("Exiting ChatActivity...");
                     synchronized (serverLock) {
                         serverLock.setCondition(true);
                         serverLock.notifyAll();
@@ -79,9 +79,9 @@ public class ChatActivity extends ActivityTracker
                 }
                 else {
                     String msg = String.format(Locale.US,
-                            "TBD: ***** Unexpected message type in ChatActivity: %d.",
+                            "Unexpected message type in ChatActivity: %d.",
                             message.what);
-                    Support.log(msg);
+                    throw new IllegalStateException(msg);
                 }
             }
         };

@@ -58,38 +58,38 @@ public class BluetoothClient extends Thread
         final BluetoothAdapter mBluetoothAdapter = BluetoothUtils.getBluetoothAdapter();
         if (mBluetoothAdapter.isDiscovering()) {
             mBluetoothAdapter.cancelDiscovery();
-            Support.log("Client cancelling discovery...");
+            Support.trace("Client cancelling discovery...");
         }
 
         Support.userMessage("Connecting...");
 
         try{
             mSocket = btdevice.createRfcommSocketToServiceRecord( MY_UUID );
-            Support.log("*** Attempting main approach to connect...");
+            Support.trace("Attempting main approach to connect...");
             mSocket.connect( );
         } catch ( IOException ioe ) {
-            Support.log(String.format(Locale.US, "Client IOException: %s", ioe.getMessage()));
+            Support.trace(String.format(Locale.US, "Client IOException: %s", ioe.getMessage()));
 
             /*
              * This is a workaround for a bug in Google's Bluetooth library implementation.
              * See: https://code.google.com/p/android/issues/detail?id=41415.
              */
-            Support.log("*** Attempting alternate approach to connect...");
+            Support.trace("Attempting alternate approach to connect...");
             // TBD: understand this.
             try {
                 Method m = btdevice.getClass().getMethod("createRfcommSocket",
                         new Class[] {int.class});
                 mSocket = (BluetoothSocket) m.invoke(btdevice, 1);
                 mSocket.connect();
-                Support.log(String.format(Locale.US,
+                Support.trace(String.format(Locale.US,
                         "Client connection ready: %#x", mSocket.hashCode()));
 
             } catch (IOException ioe2) {
                 if (mSocket == null) {
-                    Support.log("Client connection exception: <null>");
+                    Support.error("Client connection exception: <null>");
                 }
                 else {
-                    Support.log(String.format(Locale.US,
+                    Support.error(String.format(Locale.US,
                             "Client connection exception: %#x", mSocket.hashCode()));
                 }
                 String msg = String.format(Locale.US,
@@ -132,16 +132,15 @@ public class BluetoothClient extends Thread
     /** Local method to close the socket if it hasn't been passed to BluetoothComm yet. */
     private void closeSocket(BluetoothSocket socket) {
         btdevice = null;
-        Support.log("Attempting to close the client socket...");
         try   {
             if (socket != null) {
-                Support.log("Closing the client socket...");
+                Support.trace("Closing the client socket...");
                 socket.close();
             }
         }
         catch (IOException ioe) {
-            Support.log(String.format(Locale.US,
-                    "*** Failed to close the client connection: %s", ioe.getMessage()));
+            Support.error(String.format(Locale.US,
+                    "Failed to close the client connection: %s", ioe.getMessage()));
         }
     }
 }
