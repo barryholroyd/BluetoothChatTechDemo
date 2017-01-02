@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.barryholroyd.bluetoothchatdemo.MainActivity;
+import com.barryholroyd.bluetoothchatdemo.recyclerview.RecyclerViewManager;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 import com.barryholroyd.bluetoothchatdemo.recyclerview.MyAdapter;
 
@@ -39,18 +40,21 @@ public class BluetoothBroadcastReceiver extends BroadcastReceiver
     @Override
     public void onReceive(Context context, Intent intent) {
         /** RecyclerView adapter instance for discovered devices. */
-        MyAdapter myAdapterDiscovered = MainActivity.getRvmDiscovered().getAdapter();
+        RecyclerViewManager rvmd = MainActivity.getRvmDiscovered();
+        if (rvmd == null) // if MainActivity isn't currently running, then ignore this call
+            return;
+        MyAdapter myAdapterDiscovered = rvmd.getAdapter();
+
         String action = intent.getAction();
         switch (action) {
             case BluetoothDevice.ACTION_FOUND:
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-
                 // Do not add to the discovered list if the device has already been paired.
-                String deviceAddress = device.getAddress();
-                BluetoothDevices pairedDevices =
-                        MainActivity.getRvmPaired().getAdapter().getDevices();
-                if (pairedDevices.getDevice(deviceAddress) != null) {
-                    break;
+                RecyclerViewManager rvmp = MainActivity.getRvmPaired();
+                if (rvmp != null) {
+                    if (rvmp.getAdapter().getDevices().getDevice(device.getAddress()) != null) {
+                        break;
+                    }
                 }
                 BluetoothDevices btds = myAdapterDiscovered.getDevices();
                 btds.addNoDup(device);

@@ -21,7 +21,7 @@ import java.util.Set;
 /*
  * TBD: Test -- is alternate connect approach ever used by either device?
  * TBD: Test -- try killing server (pull USB cable?)
- *
+ * TBD: if already running, don't ask for Bluetooth enabled again.
  * TBD: clean out TBDs, log()s, etc.
  */
 
@@ -55,7 +55,7 @@ public class MainActivity extends ActivityTracker
      * instance through ActivityTracker, which tracks the creation and destruction of
      * Activities in this app.
      *
-     * @return the current MainActivity instance.
+     * @return the current MainActivity instance if it exists; else null.
      */
     public  static MainActivity  getMainActivity() {
         Activity a = getActivity(); // from ActivityTracker
@@ -65,18 +65,24 @@ public class MainActivity extends ActivityTracker
             Support.fatalError("Attempt to access uninitialized MainActivity instance.");
         }
         if (! (a instanceof MainActivity)) {
-            throw new IllegalStateException(String.format(Locale.US,
-                    "getMainActivity returned Activity of the wrong class: %s",
-                    a.getClass().getSimpleName()));
+            return null;
         }
         return (MainActivity) a;
     }
 
     /** Get the "Discovered" RecyclerViewManager. */
-    public static RecyclerViewManager  getRvmDiscovered(){ return getMainActivity().rvmDiscovered; }
+    public static RecyclerViewManager  getRvmDiscovered(){
+        MainActivity ma = getMainActivity();
+        if (ma != null) return ma.rvmDiscovered;
+        else            return null;
+    }
 
     /** Get the "Paired" RecyclerViewManager. */
-    public static RecyclerViewManager  getRvmPaired()    { return getMainActivity().rvmPaired; }
+    public static RecyclerViewManager  getRvmPaired()    {
+        MainActivity ma = getMainActivity();
+        if (ma != null) return ma.rvmPaired;
+        else            return null;
+    }
 
     /**
      * Display client interface, initialize Bluetooth, start server worker thread.
@@ -90,9 +96,6 @@ public class MainActivity extends ActivityTracker
         // Display the "client" interface.
         setContentView(R.layout.activity_main);
 
-        /*
-         * DEL: These are order-sensitive.
-         */
         rvmPaired         = new RecyclerViewManager(this, R.id.rv_paired);
         rvmDiscovered     = new RecyclerViewManager(this, R.id.rv_discovered);
 
@@ -194,7 +197,7 @@ public class MainActivity extends ActivityTracker
      *     See {@link com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothBroadcastReceiver#onReceive}.
      */
     public void refreshDiscovered() {
-        MyAdapter myAdapter = MainActivity.getRvmDiscovered().getAdapter();
+        MyAdapter myAdapter = rvmDiscovered.getAdapter();
         BluetoothDevices btds = myAdapter.getDevices();
         btds.clear();
         BluetoothUtils.startDiscovery();
@@ -203,10 +206,10 @@ public class MainActivity extends ActivityTracker
     /**
      * Find and display devices which are already paired with this one.
      */
-    public static void refreshPaired() {
+    public void refreshPaired() {
         Set<BluetoothDevice> pairedDevices = BluetoothUtils.getPairedDevices();
         if (pairedDevices.size() > 0) {
-            MyAdapter myAdapter = MainActivity.getRvmPaired().getAdapter();
+            MyAdapter myAdapter = rvmPaired.getAdapter();
             BluetoothDevices btds = myAdapter.getDevices();
             btds.clear();
             for (BluetoothDevice device : pairedDevices) {
