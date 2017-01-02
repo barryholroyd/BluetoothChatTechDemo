@@ -15,31 +15,32 @@ import java.util.Stack;
  *     to some degree, the task's back stack). It can be queried to get the
  *     current Activity as well as the state of the current Activity.
  * <p>
- *    It is particularly useful for support methods which need an Activity or
- *    Activity context but which don't care about the specific Activity
- *    subclass currently running.  BluetoothChatDemo uses it in a Support
- *    method which creates and displays DialogFragments (they need a
+ *    It is particularly useful for support methods which need an Activity instance
+ *    or Context instance but which don't care about which specific Activity
+ *    subclass currently running.  BluetoothChatDemo's Support class' fatalError()
+ *    method uses it to create and display DialogFragments (they need a
  *    FragmentManager and that can only be obtained from an Activity
  *    instance). The method can be safely called from worker threads.
  * <p>
- *     It can also be used by anything that needs a current Context. The best
- *     approach here is to pass in the Application Context, but that can be
- *     unwieldy at times. Context Activities should not be relied on in worker
- *     threads since an Activity's Context is actually just the Activity
- *     itself.
+ *     ActivityTracker can also be used by anything that needs a current Context.
+ *     Access to both the current Activity's Context as well as the Application's
+ *     Context is provided. Context Activities should not be relied on in worker
+ *     threads since an Activity's Context is actually just the Activity itself.
  * <p>
  *     To use this class, simply have each of the app's Activities extend it.
- *     They will all then automatically be tracked and the static methods can
- *     be used to access the current Activity.
+ *     The creation and destruction of each Activity instance, as well as its
+ *     state transitions, will all automatically be tracked and made available
+ *     to other classes.
  * <p>
- *     Note: BluetoothChatDemo uses this primarily in support of Support.fatalError(),
- *     to provide a current Activity instance so that DialogFragments can be
- *     created and displayed. It is a more powerful system than this app probably needs,
+ *     Note: This is a more powerful system than BluetoothChatDemo probably needs,
  *     but is it a good demonstration of how Activity instance management can be
  *     thoroughly and cleanly handled.
  */
 abstract public class ActivityTracker extends AppCompatActivity
 {
+    /** Flag to enable/disable ActivityTracker logging. */
+    static final private boolean atTraceEnabled = true; // TBD: set to false
+
     /** The four possible states of an Activity. */
     public enum ActivityState { CREATED, STARTED, RESUMED }
 
@@ -185,7 +186,11 @@ abstract public class ActivityTracker extends AppCompatActivity
     }
 
     private void trace(String label) {
-	String s = String.format(Locale.US, "AT [%#x]: %s", this.hashCode(), label);
-        Support.log(s);
+        if (atTraceEnabled) {
+            String s = String.format(Locale.US, "ActivityTrace [%s:%#x]: %s",
+                    this.getClass().getSimpleName(),
+                    this.hashCode(), label);
+            Support.log(s);
+        }
     }
 }

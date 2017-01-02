@@ -36,6 +36,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             super(ll);
             mTvMac  = (TextView) ll.findViewById(R.id.row_mac);
             mTvText = (TextView) ll.findViewById(R.id.row_text);
+            mTvMac.setOnClickListener(new OnClickListenerConnectDevice());
             mTvText.setOnClickListener(new OnClickListenerConnectDevice());
         }
     }
@@ -68,6 +69,12 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         return bluetoothDevices.size();
     }
 
+    /**
+     * Callback to handle clicks on a row in either the "discovered" or "paired"
+     * list. Rows in both lists have the MAC address of a remote device; that is
+     * used by the onClick() method to create a Bluetooth connection. This effectively
+     * makes this end the "client" (initiator) of the Bluetooth chat session.
+     */
     class OnClickListenerConnectDevice implements View.OnClickListener {
         @Override
         public void onClick(View v) {

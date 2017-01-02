@@ -7,12 +7,12 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 
 /**
- * Created by Barry on 12/13/2016.
+ * Dialog that informs the user of a fatal error. The only option the user has
+ * at this point is to exit the application by pressing the "Exit" button.
  */
-
-public class ErrorDialog extends DialogFragment {
-    public static ErrorDialog newInstance(String title, String msg) {
-        ErrorDialog frag = new ErrorDialog();
+public class FatalErrorDialog extends DialogFragment {
+    public static FatalErrorDialog newInstance(String title, String msg) {
+        FatalErrorDialog frag = new FatalErrorDialog();
         Bundle args = new Bundle();
         args.putString("title", title);
         args.putString("msg", msg);
@@ -20,6 +20,7 @@ public class ErrorDialog extends DialogFragment {
         return frag;
     }
 
+    /** Create the dialog. */
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         String title = getArguments().getString("title");
@@ -30,7 +31,7 @@ public class ErrorDialog extends DialogFragment {
                 .setMessage(msg)
                 .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        System.exit(1); // exit the app TBD: test this
+                        System.exit(1);
                     }
                 });
         return builder.create();

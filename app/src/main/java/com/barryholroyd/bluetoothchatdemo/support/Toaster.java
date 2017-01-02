@@ -7,8 +7,6 @@ import android.os.Message;
 import android.view.Gravity;
 import android.widget.Toast;
 
-import java.util.Locale;
-
 import static android.widget.Toast.LENGTH_LONG;
 
 /**
@@ -24,29 +22,20 @@ public class Toaster {
     /**
      * Toaster constructor.
      * <p>
-     *     We get the application Context here (as opposed to passing it in) so that
-     *     we are sure we have a Context instance not bound by the lifecycle of a
-     *     particular Activity instance.
-     * <p>
-     *     We also create a Handler to tbe main thread so that we can use the
+     *     Create a Handler to tbe main thread so that we can use the
      *     Toaster from background threads.
      */
     Toaster() {
         mHandler = new Handler(Looper.getMainLooper()) {
+            /**
+             * Create and show a toast (on the main thread).
+             * @param message
+             */
             @Override
             public void handleMessage(Message message) {
                 Context ac = ActivityTracker.getAppContext();
                 if (message.what == TOAST) {
                     String msg = (String) message.obj;
-                    final Toast toast = Toast.makeText(ac, msg, LENGTH_LONG);
-                    toast.setGravity(Gravity.CENTER, 0, 0);
-                    toast.show();
-                }
-                else {
-                    String msg = String.format(Locale.US,
-                            "TBD: ***** Unexpected message type in Toaster: %d.",
-                            message.what);
-                    Support.log(msg);
                     final Toast toast = Toast.makeText(ac, msg, LENGTH_LONG);
                     toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();

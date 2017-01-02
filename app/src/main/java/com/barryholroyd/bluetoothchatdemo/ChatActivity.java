@@ -20,13 +20,13 @@ import java.util.Locale;
 import static com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothServer.serverLock;
 
 /**
- * TBD: comments.
+ * Display the Chat view for the user and manage the sending/receiving of text.
  */
 
 public class ChatActivity extends ActivityTracker
 {
-    private static EditText etTextSend;
-    private static TextView tvTextReceive;
+    static private EditText etTextSend;
+    static private TextView tvTextReceive;
 
     /** Handler message: call ChatActivity's finish() to exit. */
     public static final int FINISH = 1;

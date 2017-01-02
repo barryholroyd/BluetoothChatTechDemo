@@ -42,11 +42,11 @@ public class Support {
         if (a == null)
             throw new SupportException("Fatal Error: " + msg);
 
-        ErrorDialog
+        FatalErrorDialog
             .newInstance("Fatal Error", msg)
             .show(a.getFragmentManager(), "error_dialog");
 
-        // Wait forever; ErrorDialog will force the user to exit the app.
+        // Wait forever; FatalErrorDialog will force the user to exit the app.
         Object o = new Object();
         //noinspection SynchronizationOnLocalVariableOrMethodParameter
         synchronized (o) {
