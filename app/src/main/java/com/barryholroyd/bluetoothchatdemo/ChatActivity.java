@@ -31,6 +31,9 @@ public class ChatActivity extends ActivityTracker
     /** Handler message: call ChatActivity's finish() to exit. */
     public static final int FINISH = 1;
 
+    /** Bundle keys for incoming Intents. */
+    public static final String BUNDLE_KEY_BTDEVICE = "com.barryholroyd.bluetoothchatdemo.BTDEVICE";
+
     public static EditText            getEditTextSend()     { return etTextSend; }
     public static TextView            getTextViewReceive()  { return tvTextReceive; }
 
@@ -39,7 +42,7 @@ public class ChatActivity extends ActivityTracker
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
-        BluetoothDevice btdevice = intent.getParcelableExtra(Support.BUNDLE_KEY_BTDEVICE);
+        BluetoothDevice btdevice = intent.getParcelableExtra(BUNDLE_KEY_BTDEVICE);
 
         setContentView(R.layout.activity_choose);
         setTitle(btdevice);

@@ -1,16 +1,13 @@
 package com.barryholroyd.bluetoothchatdemo.bluetooth;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.view.View;
 
 import com.barryholroyd.bluetoothchatdemo.MainActivity;
-import com.barryholroyd.bluetoothchatdemo.recyclerview.MyAdapter;
 import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
@@ -19,14 +16,12 @@ import java.util.Set;
 /**
  * Static methods for managing Bluetooth activities.
  */
-
 public class BluetoothMgr {
-    private static BluetoothAdapter mBluetoothAdapter;
     private static BroadcastReceiver mReceiver = null;
 
+    /** Get the Bluetooth adapter; includes check for lack of Bluetooth support. */
     public static BluetoothAdapter getBluetoothAdapter() {
-        // Get the Bluetooth adapter.
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             Support.fatalError("Device does not support Bluetooth.");
         }
@@ -36,35 +31,18 @@ public class BluetoothMgr {
     /**
      * Do a device scan.
      * <p>
-     *     This will automatically refresh the "Discovered" RecyclerView.
      *     When new devices are discovered, a broadcast is sent.
      *     See {@link BluetoothBroadcastReceiver#onReceive}.
-     *
-     * @param v the View which the user clicked on.
      */
-    public static void refreshDiscovered(View v) {
-        MyAdapter myAdapter = MainActivity.getRvmDiscovered().getAdapter();
-        BluetoothDevices btds = myAdapter.getDevices();
-        btds.clear();
-        mBluetoothAdapter.startDiscovery();
+    public static void startDiscovery() {
+        getBluetoothAdapter().startDiscovery();
     }
 
     /**
-     * Find and display devices which are already paired with this one.
-     *
-     * @param v the View the user clicked on.
+     * Return the list of devices which are already paired with this one.
      */
-    public static void refreshPaired(View v) {
-        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-        if (pairedDevices.size() > 0) {
-            MyAdapter myAdapter = MainActivity.getRvmPaired().getAdapter();
-            BluetoothDevices btds = myAdapter.getDevices();
-            btds.clear();
-            for (BluetoothDevice device : pairedDevices) {
-                btds.add(device);
-            }
-            myAdapter.notifyDataSetChanged();
-        }
+    public static Set<BluetoothDevice> getPairedDevices() {
+        return getBluetoothAdapter().getBondedDevices();
     }
 
     /**

@@ -2,21 +2,28 @@ package com.barryholroyd.bluetoothchatdemo;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothDevices;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothMgr;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothServer;
+import com.barryholroyd.bluetoothchatdemo.recyclerview.MyAdapter;
 import com.barryholroyd.bluetoothchatdemo.recyclerview.RecyclerViewManager;
 import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.util.Locale;
+import java.util.Set;
 
 /*
 Test:
- * Fix for memory leaks.
+ * TBD: Fix memory leaks.
+ *
+ * TBD: Test -- is alternate connect approach ever used by either device?
+ * TBD: Test -- try killing server (pull USB cable?)
  *
  * TBD: Finish comments.
  * TBD: clean out TBDs, log()s, etc.
@@ -56,9 +63,10 @@ public class MainActivity extends ActivityTracker
      */
     public  static MainActivity  getMainActivity() {
         Activity a = getActivity(); // from ActivityTracker
+
+        // This should only happen if this method is called from MainActivity's onCreate() method.
         if (a == null) {
-            throw new IllegalStateException(
-                    "Attempt to access uninitialized MainActivity instance");
+            Support.fatalError("Attempt to access uninitialized MainActivity instance.");
         }
         if (! (a instanceof MainActivity)) {
             throw new IllegalStateException(String.format(Locale.US,
@@ -116,8 +124,9 @@ public class MainActivity extends ActivityTracker
      *
      * @param v the View which the user clicked on.
      */
-    public static void clickRefreshDiscovered(View v) {
-        BluetoothMgr.refreshDiscovered(v);
+    public void clickRefreshDiscovered(View v) {
+        Support.userMessage("Refreshing list of discovered devices...");
+        refreshDiscovered();
     }
 
     /**
@@ -125,7 +134,10 @@ public class MainActivity extends ActivityTracker
      *
      * @param v the View the user clicked on.
      */
-    public static void clickRefreshPaired(View v) { BluetoothMgr.refreshPaired(v); }
+    public void clickRefreshPaired(View v) {
+        Support.userMessage("Refreshing list of paired devices...");
+        refreshPaired();
+    }
 
     /** Handle result of request to user to enable Bluetooth. */
     @Override
@@ -159,8 +171,8 @@ public class MainActivity extends ActivityTracker
     private void configureBluetooth() {
         // Register receiver for handling newly discovered devices during a scan.
         BluetoothMgr.registerBroadcastReceiver(this);
-        BluetoothMgr.refreshPaired(null);
-        BluetoothMgr.refreshDiscovered(null);
+        refreshPaired();
+        refreshDiscovered();
         BluetoothMgr.requestDiscoverable();
     }
 
@@ -175,6 +187,36 @@ public class MainActivity extends ActivityTracker
             Support.log("Starting server...");
             (new BluetoothServer()).start();
             MainActivity.getApplicationGlobalState().setServerRunning(true);
+        }
+    }
+
+    /**
+     * Refresh the list of "discovered" devices.
+     * <p>
+     *     When new devices are discovered, a broadcast is sent out. The "Discovered" RecyclerView
+     *     is updated by the BroadcastReceiver.
+     *     See {@link com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothBroadcastReceiver#onReceive}.
+     */
+    public void refreshDiscovered() {
+        MyAdapter myAdapter = MainActivity.getRvmDiscovered().getAdapter();
+        BluetoothDevices btds = myAdapter.getDevices();
+        btds.clear();
+        BluetoothMgr.startDiscovery();
+    }
+
+    /**
+     * Find and display devices which are already paired with this one.
+     */
+    public static void refreshPaired() {
+        Set<BluetoothDevice> pairedDevices = BluetoothMgr.getPairedDevices();
+        if (pairedDevices.size() > 0) {
+            MyAdapter myAdapter = MainActivity.getRvmPaired().getAdapter();
+            BluetoothDevices btds = myAdapter.getDevices();
+            btds.clear();
+            for (BluetoothDevice device : pairedDevices) {
+                btds.add(device);
+            }
+            myAdapter.notifyDataSetChanged();
         }
     }
 }

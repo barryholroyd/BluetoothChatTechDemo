@@ -1,17 +1,13 @@
 package com.barryholroyd.bluetoothchatdemo.recyclerview;
 
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-
-import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 
 /**
  * A generalized manager for RecyclerViews, to handle both the "discovered"
  * and "paired" RecyclerViews.
  */
-
 public class RecyclerViewManager
 {
     private RecyclerView mRecyclerView;

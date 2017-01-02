@@ -6,6 +6,8 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
+import java.util.Locale;
+
 /**
  * General static support methods.
  */
@@ -13,21 +15,17 @@ public class Support {
     private static Toaster toaster = null;
     private static String appLabel = null;
 
-    public static final String BUNDLE_KEY_BTDEVICE = "com.barryholroyd.bluetoothchatdemo.BTDEVICE";
-
     /** Initialization */
     private static void init() {
         synchronized (Support.class){
-            Context c = ActivityTracker.getAppContext();
-            if (c == null)
-                throw new SupportException("No Context available.");
             if (toaster == null) {
-                toaster = new Toaster(c);
+                toaster = new Toaster();
             }
+            Context ac = ActivityTracker.getAppContext();
             if (appLabel == null) {
-                PackageManager pm = c.getPackageManager();
+                PackageManager pm = ac.getPackageManager();
                 try {
-                    ApplicationInfo ai = pm.getApplicationInfo(c.getPackageName(), 0);
+                    ApplicationInfo ai = pm.getApplicationInfo(ac.getPackageName(), 0);
                     appLabel = (String) pm.getApplicationLabel(ai);
                 }
                 catch (PackageManager.NameNotFoundException nnfe) {
@@ -40,15 +38,17 @@ public class Support {
     /** Display a Dialog to the user indicating a fatal error, then exit the app. */
     public static void fatalError(String msg) {
         // Get the currently running Activity.
-        Activity a = ActivityTracker.getActivity(); // TBD: finish this section
+        Activity a = ActivityTracker.getActivity();
         if (a == null)
             throw new SupportException("Fatal Error: " + msg);
+
         ErrorDialog
             .newInstance("Fatal Error", msg)
             .show(a.getFragmentManager(), "error_dialog");
 
         // Wait forever; ErrorDialog will force the user to exit the app.
         Object o = new Object();
+        //noinspection SynchronizationOnLocalVariableOrMethodParameter
         synchronized (o) {
             try { o.wait(); }
             catch ( InterruptedException ie ) {
@@ -87,5 +87,6 @@ class SupportException extends RuntimeException
 {
     SupportException(String msg) {
         super(msg);
+        Support.log(String.format(Locale.US, "*** Support Exception: %s", msg));
     }
 }

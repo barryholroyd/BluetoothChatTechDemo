@@ -83,7 +83,7 @@ public class BluetoothServer extends Thread
                 // Pass control to the chat Activity.
                 Context c = ActivityTracker.getAppContext();
                 Intent intent = new Intent(c, ChatActivity.class);
-                intent.putExtra(Support.BUNDLE_KEY_BTDEVICE, (Parcelable) null);
+                intent.putExtra(ChatActivity.BUNDLE_KEY_BTDEVICE, (Parcelable) null);
                 intent.addFlags(FLAG_ACTIVITY_NEW_TASK); // required since an App Context is used
                 c.startActivity(intent);
 

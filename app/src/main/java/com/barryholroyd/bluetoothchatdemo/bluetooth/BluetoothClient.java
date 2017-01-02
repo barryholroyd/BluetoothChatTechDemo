@@ -120,7 +120,7 @@ public class BluetoothClient extends Thread
 
         // Pass control to the chat Activity.
         Intent intent = new Intent(c, ChatActivity.class);
-        intent.putExtra(Support.BUNDLE_KEY_BTDEVICE, btdevice);
+        intent.putExtra(ChatActivity.BUNDLE_KEY_BTDEVICE, btdevice);
         intent.addFlags(FLAG_ACTIVITY_NEW_TASK); // required since an App Context is used
         c.startActivity(intent);
         btdevice = null;

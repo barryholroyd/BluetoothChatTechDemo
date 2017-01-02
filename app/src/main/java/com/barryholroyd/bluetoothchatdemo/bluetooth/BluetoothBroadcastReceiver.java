@@ -44,33 +44,28 @@ public class BluetoothBroadcastReceiver extends BroadcastReceiver
             case BluetoothDevice.ACTION_FOUND:
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
-                BrLog.brlog(String.format(Locale.US, "Device Found: %s, %s",
-                        device.getName(), device.getAddress()));
-
                 // Do not add to the discovered list if the device has already been paired.
                 String deviceAddress = device.getAddress();
                 BluetoothDevices pairedDevices =
                         MainActivity.getRvmPaired().getAdapter().getDevices();
                 if (pairedDevices.getDevice(deviceAddress) != null) {
-                    Support.log(String.format(Locale.US, "SKIPPING FOUND DEVICE: %s", deviceAddress));
                     break;
                 }
-
                 BluetoothDevices btds = myAdapterDiscovered.getDevices();
                 btds.addNoDup(device);
                 myAdapterDiscovered.notifyDataSetChanged();
                 break;
             case BluetoothAdapter.ACTION_DISCOVERY_STARTED:
-                BrLog.brlog("Discovery Started");
+                BtBrLog.brlog("Discovery Started");
                 break;
             case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
-                BrLog.brlog("Discovery Finished");
+                BtBrLog.brlog("Discovery Finished");
                 break;
             case BluetoothAdapter.ACTION_STATE_CHANGED:
-                BrLog.logActionStateChanged(intent);
+                BtBrLog.logActionStateChanged(intent);
                 break;
             case BluetoothAdapter.ACTION_SCAN_MODE_CHANGED:
-                BrLog.logScanModeChanged(intent);
+                BtBrLog.logScanModeChanged(intent);
                 break;
         }
     }
@@ -79,7 +74,10 @@ public class BluetoothBroadcastReceiver extends BroadcastReceiver
 /**
  * Bluetooth Broadcast Receiver logging.
  */
-class BrLog {
+class BtBrLog {
+    /** Flag to enable/disable Bluetooth broadcast receiver logging. */
+    static final boolean btBrLog = false;
+
     /** Log changes to the Bluetooth state. */
     static void logActionStateChanged(Intent intent) {
         Bundle extras = intent.getExtras();
@@ -100,6 +98,8 @@ class BrLog {
 
     /** Wrapper for Bluetooth Broad Receiver log messages. */
     static void brlog(String s) {
-        Support.log(String.format(Locale.US, "> Broadcast received: [%s]", s));
+        if (btBrLog) {
+            Support.log(String.format(Locale.US, "> Broadcast received: [%s]", s));
+        }
     }
 }
