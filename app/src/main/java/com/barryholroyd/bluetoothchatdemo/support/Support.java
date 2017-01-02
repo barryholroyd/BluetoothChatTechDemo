@@ -14,7 +14,7 @@ import java.util.Locale;
 public class Support {
     private static Toaster toaster = null;
     private static String appLabel = null;
-    private static final boolean traceEnabled = false;
+    private static final boolean traceEnabled = true;
 
     /** Initialization */
     private static void init() {

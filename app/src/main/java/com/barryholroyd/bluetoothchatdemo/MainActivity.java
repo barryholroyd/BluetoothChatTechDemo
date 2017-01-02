@@ -25,6 +25,8 @@ import java.util.Set;
  * TBD: if already running, don't ask for Bluetooth enabled again.
  * TBD: clean out TBDs, log()s, etc.
  * TBD: move to apps
+ *
+ * TBD: turn off tracing.
  */
 
 /**
