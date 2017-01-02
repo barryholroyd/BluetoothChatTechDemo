@@ -7,6 +7,7 @@ import android.os.Message;
 import android.widget.TextView;
 
 import com.barryholroyd.bluetoothchatdemo.ChatActivity;
+import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.io.IOException;
@@ -19,7 +20,7 @@ import java.util.Locale;
  * Bluetooth communications: send and receive text over a Bluetooth connection.
  * <p>
  *     This class is only used by ChatActivity, so any reference to an Activity here is
- *     always to the ChatActivity. Its constructor accepts and initialized Bluetooth btSocket,
+ *     always to the ChatActivity. Its constructor accepts an initialized Bluetooth btSocket,
  *     creates input and output streams from it, then starts running in the background to
  *     read incoming data on the input stream; incoming data is then sent to the UI thread
  *     for display to the user.
@@ -70,6 +71,7 @@ public class BluetoothComm extends Thread
             return;
         }
 
+        // ChatActivity should be running; processMessage() will check to make sure.
         mHandler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(Message message) {
@@ -103,7 +105,6 @@ public class BluetoothComm extends Thread
             len++;
         }
 
-        TextView tv = ChatActivity.getTextViewReceive();
         try {
             text = new String(bytes, 0, len, "UTF-8");
         }
@@ -112,7 +113,16 @@ public class BluetoothComm extends Thread
             Support.userMessage(msg);
             return;
         }
-        Support.log(String.format(Locale.US, "SETTING TEXT: [%s][len=%d]", text, len));
+
+        ChatActivity ca = (ChatActivity) ActivityTracker.getActivity();
+        if (ca == null) {
+            String msg = String.format(Locale.US,
+                    "Internal error -- could not display incoming chat message: %s", text);
+            Support.userMessage(msg);
+            return;
+        }
+        TextView tv = ca.getTextViewReceive();
+
         tv.setText(text);
     }
 
@@ -123,8 +133,6 @@ public class BluetoothComm extends Thread
             Support.userMessage(msg);
             return;
         }
-
-        Support.log("Running read loop for input: ");
 
         while (true) {
             byte[] bytes = new byte[BUFSIZE];

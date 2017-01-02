@@ -2,12 +2,7 @@ package com.barryholroyd.bluetoothchatdemo.bluetooth;
 
 import android.bluetooth.BluetoothDevice;
 
-import com.barryholroyd.bluetoothchatdemo.MainActivity;
-import com.barryholroyd.bluetoothchatdemo.recyclerview.MyAdapter;
-import com.barryholroyd.bluetoothchatdemo.support.Support;
-
 import java.util.ArrayList;
-import java.util.Locale;
 
 /**
  * Class created primarily to assist with type safety.

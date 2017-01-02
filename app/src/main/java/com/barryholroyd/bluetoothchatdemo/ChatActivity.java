@@ -21,12 +21,16 @@ import static com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothServer.serve
 
 /**
  * Display the Chat view for the user and manage the sending/receiving of text.
+ * <p>
+ *     Write requests are handled in this class. Incoming text is read by BluetoothComm --
+ *     it uses the main UI's Handler to get the ChatActivity instance and fill in the
+ *     "received" text field. This works cleanly because BluetoothComm is only used by
+ *     ChatActivity.
  */
-
 public class ChatActivity extends ActivityTracker
 {
-    static private EditText etTextSend;
-    static private TextView tvTextReceive;
+    private EditText etTextSend;
+    private TextView tvTextReceive;
 
     /** Handler message: call ChatActivity's finish() to exit. */
     public static final int FINISH = 1;
@@ -34,9 +38,18 @@ public class ChatActivity extends ActivityTracker
     /** Bundle keys for incoming Intents. */
     public static final String BUNDLE_KEY_BTDEVICE = "com.barryholroyd.bluetoothchatdemo.BTDEVICE";
 
-    public static EditText            getEditTextSend()     { return etTextSend; }
-    public static TextView            getTextViewReceive()  { return tvTextReceive; }
+    /** Getter for "receive" TextView in ChatActivity. */
+    public TextView getTextViewReceive()  { return tvTextReceive; }
 
+    /**
+     * Display the chat window for the user, get the BluetoothSocket stored in
+     * ApplicationGlobalState by BluetoothClient or BluetoothServer, configure a
+     * callback Handler to exit the Activity is requested by the worker thread and
+     * then start the BluetoothComm worker thread to handle the actual reads and writes
+     * from the connection.
+     *
+     * @param savedInstanceState standard Bundle argument.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +65,7 @@ public class ChatActivity extends ActivityTracker
 
         BluetoothSocket btsocket = ((ApplicationGlobalState) getApplication()).getBtSocket();
 
-        // Call back to exit this activity.
+        // Callback to exit this activity.
         Handler handler = new Handler() {
             @Override
             public void handleMessage(Message message) {
@@ -73,9 +86,11 @@ public class ChatActivity extends ActivityTracker
             }
         };
 
+        // Create a worker thread to handle the reads and writes from the Bluetooth connection.
         (new BluetoothComm(btsocket, handler)).start();
     }
 
+    /** Set the title of the chat window to reflect the name and MAC address of the remote device. */
     private void setTitle(BluetoothDevice btdevice) {
         TextView tvConnectedTo = (TextView) findViewById(R.id.connected_to);
         String name = "<unknown>";
@@ -91,10 +106,10 @@ public class ChatActivity extends ActivityTracker
         tvConnectedTo.setText(title);
     }
 
-    public static void clickSend(View v) {
+    /** Handle write requests from the user. */
+    public void clickSend(View v) {
         String text = etTextSend.getText().toString();
         etTextSend.setText("");
-        Support.log(String.format(Locale.US, "GOT TEXT FROM FIELD: %s", text));
         byte[] bytes;
         try {
             bytes = text.getBytes("UTF-8");
@@ -116,7 +131,8 @@ public class ChatActivity extends ActivityTracker
     }
 
     /**
-     * Cancel the connection if it exists.
+     * Cancel the connection if it exists, then exit the ChatActivity. The original MainActivity
+     * will then be brought into the foreground from the back stack.
      *
      * @param v the View the user clicked on.
      */
