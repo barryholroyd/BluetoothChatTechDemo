@@ -11,6 +11,7 @@ import com.barryholroyd.bluetoothchatdemo.ChatActivity;
 import com.barryholroyd.bluetoothchatdemo.MainActivity;
 import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
+import com.barryholroyd.lib.ClassExplorer2;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -63,6 +64,8 @@ public class BluetoothClient extends Thread
 
         Support.userMessage("Connecting...");
 
+
+
         try{
             mSocket = btdevice.createRfcommSocketToServiceRecord( MY_UUID );
             Support.trace("Attempting main approach to connect...");
@@ -72,13 +75,21 @@ public class BluetoothClient extends Thread
 
             /*
              * This is a workaround for a bug in Google's Bluetooth library implementation.
-             * See: https://code.google.com/p/android/issues/detail?id=41415.
+             *   See: https://code.google.com/p/android/issues/detail?id=41415.
+             *
+             * I'm not sure why this works, but from a look at the source code for
+             * BluetoothDevice, the direct call to createRfcommSocket() effectively bypasses
+             * the use of the UUID to select a channel -- createRfcommSocket() simply uses
+             * the channel number passed in, in this case, '1'.
              */
             Support.trace("Attempting alternate approach to connect...");
-            // TBD: understand this.
+
+            ClassExplorer2.logBluetoothDevice(btdevice);
+
+            // TBD: TEST this.
             try {
                 Method m = btdevice.getClass().getMethod("createRfcommSocket",
-                        new Class[] {int.class});
+                        int.class);
                 mSocket = (BluetoothSocket) m.invoke(btdevice, 1);
                 mSocket.connect();
                 Support.trace(String.format(Locale.US,
@@ -144,3 +155,4 @@ public class BluetoothClient extends Thread
         }
     }
 }
+

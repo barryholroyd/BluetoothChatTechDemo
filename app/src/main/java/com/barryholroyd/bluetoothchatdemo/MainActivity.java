@@ -14,7 +14,10 @@ import com.barryholroyd.bluetoothchatdemo.recyclerview.MyAdapter;
 import com.barryholroyd.bluetoothchatdemo.recyclerview.RecyclerViewManager;
 import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
+import com.barryholroyd.lib.ClassExplorer2;
 
+import java.lang.reflect.Method;
+import java.util.Locale;
 import java.util.Set;
 
 /*
