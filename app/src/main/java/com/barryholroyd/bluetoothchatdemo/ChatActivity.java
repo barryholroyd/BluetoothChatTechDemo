@@ -57,7 +57,7 @@ public class ChatActivity extends ActivityTracker
         Intent intent = getIntent();
         BluetoothDevice btdevice = intent.getParcelableExtra(BUNDLE_KEY_BTDEVICE);
 
-        setContentView(R.layout.activity_choose);
+        setContentView(R.layout.activity_chat);
         setTitle(btdevice);
 
         etTextSend = (EditText) findViewById(R.id.text_send);
