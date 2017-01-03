@@ -46,17 +46,6 @@ public class Support {
         FatalErrorDialog
             .newInstance("Fatal Error", msg)
             .show(a.getFragmentManager(), "error_dialog");
-
-        // Wait forever; FatalErrorDialog will force the user to exit the app.
-        Object o = new Object();
-        //noinspection SynchronizationOnLocalVariableOrMethodParameter
-        synchronized (o) {
-            try { o.wait(); }
-            catch ( InterruptedException ie ) {
-                Support.error("Interrupted exception.");
-                System.exit(2);
-            }
-        }
     }
 
     /** Return the app label as defined in the manifest. */

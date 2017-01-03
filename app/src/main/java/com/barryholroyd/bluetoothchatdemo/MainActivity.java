@@ -20,12 +20,11 @@ import java.util.Set;
 /*
  * TBD: Run code analyzer (e.g., Handlers should be static?)
  * TBD: UI: adjust text fields left; ScrollView for full screen (?); colors, text view sizes.
+ * TBD: Clean up Chat screen.
  * TBD: Test -- is alternate connect approach ever used by either device?
  * TBD: Test -- try killing server (pull USB cable?)
- * TBD: if already running, don't ask for Bluetooth enabled again.
- * TBD: clean out TBDs, log()s, etc.
+ * TBD: clean out TBDs, etc.
  * TBD: move to apps
- *
  * TBD: turn off tracing.
  */
 
@@ -152,7 +151,9 @@ public class MainActivity extends ActivityTracker
                     startServer();
                     return;
                 }
-                else { Support.fatalError("No Bluetooth available."); }
+                else {
+                    Support.fatalError("No Bluetooth available.");
+                }
                 break;
         }
     }
