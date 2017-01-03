@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">BluetoothChatDemo</string>
+    <string name="bluetooth_devices">Bluetooth Devices</string>
+    <string name="send">Send</string>
+    <string name="discovered">Discovered</string>
+    <string name="text_to_send">text to send</string>
+    <string name="refresh">Refresh</string>
+    <string name="paired">Paired</string>
+    <string name="refresh_button_label">Refresh</string>
+    <string name="click_to_initiate_connection">Click on an entry in either list to initiate a connection.</string>
+    <string name="done">Done</string>
+    <string name="received">RECEIVED</string>
 </resources>

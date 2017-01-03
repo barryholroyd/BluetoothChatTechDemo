@@ -4,14 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
-    >
+    tools:ignore="Overdraw">
     <LinearLayout
-        android:id="@+id/ll_top"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
-        tools:background="@color/color_background2">
+        tools:background="@color/color_background2"
+        tools:ignore="Overdraw">
         <TextView
             style="@style/TextLabel"
             android:layout_height="wrap_content"
@@ -24,16 +24,14 @@
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/ll_send"
-                >
+                android:layout_height="wrap_content">
                 <FrameLayout
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="match_parent">
                     <Button
                         style="@style/ButtonStyle"
-                        android:text="Send"
+                        android:text="@string/send"
                         android:onClick="clickSend"
                         />
                 </FrameLayout>
@@ -42,7 +40,7 @@
                     android:layout_width="0dp"
                     android:layout_weight="3"
                     android:id="@+id/text_send"
-                    android:hint="text to send"
+                    android:hint="@string/text_to_send"
                     android:background="@color/color_interactive" />
             </LinearLayout>
         </FrameLayout>
@@ -53,9 +51,7 @@
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/ll_receive"
-                >
+                android:layout_height="wrap_content">
                 <FrameLayout
                     android:layout_width="0dp"
                     android:layout_weight="1"
@@ -64,7 +60,7 @@
                         style="@style/TextLabel"
                         android:minWidth="150sp"
                         android:textSize="15sp"
-                        android:text="RECEIVED"
+                        android:text="@string/received"
                         />
                 </FrameLayout>
                 <TextView
@@ -83,7 +79,7 @@
             >
             <Button
                 style="@style/ButtonStyle"
-                android:text="Done"
+                android:text="@string/done"
                 android:onClick="clickDone"
                 />
         </FrameLayout>

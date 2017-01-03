@@ -20,7 +20,7 @@ public class ApplicationGlobalState extends Application
     private boolean appInitialized = false;
 
     /** True when the app "server" is listening for incoming connections. */
-    static boolean serverRunning = false;
+    private static boolean serverRunning = false;
 
     /*
      * Getters and setters.
@@ -32,5 +32,5 @@ public class ApplicationGlobalState extends Application
     public void setAppInitialized() { appInitialized = true; }
 
     public boolean isServerRunning() { return serverRunning; }
-    public void setServerRunning(boolean b) { serverRunning = b; }
+    public void setServerRunning(@SuppressWarnings("SameParameterValue") boolean b) { serverRunning = b; }
 }

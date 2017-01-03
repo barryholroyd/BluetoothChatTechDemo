@@ -44,7 +44,7 @@ public class Support {
             throw new SupportException("Fatal Error: " + msg);
 
         FatalErrorDialog
-            .newInstance("Fatal Error", msg)
+            .newInstance(msg)
             .show(a.getFragmentManager(), "error_dialog");
     }
 

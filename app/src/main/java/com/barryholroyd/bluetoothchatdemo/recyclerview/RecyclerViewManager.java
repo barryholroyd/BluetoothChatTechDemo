@@ -10,8 +10,7 @@ import android.support.v7.widget.RecyclerView;
  */
 public class RecyclerViewManager
 {
-    private RecyclerView mRecyclerView;
-    private MyAdapter mAdapter;
+    private final MyAdapter mAdapter;
 
     /**
      * Constructor that provides standard RecyclerView initialization.
@@ -21,7 +20,7 @@ public class RecyclerViewManager
      */
     public RecyclerViewManager(Activity a, int id) {
         // Get the desired RecyclerView.
-        mRecyclerView = (RecyclerView) a.findViewById(id);
+        RecyclerView mRecyclerView = (RecyclerView) a.findViewById(id);
         mRecyclerView.setHasFixedSize(true);
 
         // Use a LinearLayout for the RecyclerView.

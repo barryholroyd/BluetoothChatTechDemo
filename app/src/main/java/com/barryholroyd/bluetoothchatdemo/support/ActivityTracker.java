@@ -1,5 +1,6 @@
 package com.barryholroyd.bluetoothchatdemo.support;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -42,9 +43,10 @@ abstract public class ActivityTracker extends AppCompatActivity
     public enum ActivityState { CREATED, STARTED, RESUMED }
 
     /** The stack of Activities. This basically mirrors the task's back stack. */
-    private static Stack<ActivityInfo> stack = new Stack<>();
+    private static final Stack<ActivityInfo> stack = new Stack<>();
 
     /** Application Context instance. */
+    @SuppressLint("StaticFieldLeak") // not a leak -- this is the app's context
     private static Context appContext = null;
 
     /**
@@ -54,9 +56,10 @@ abstract public class ActivityTracker extends AppCompatActivity
      */
     private class ActivityInfo
     {
-        private Activity a;
+        private final Activity a;
         private ActivityState state;
 
+        @SuppressWarnings("SameParameterValue")
         ActivityInfo(Activity _a, ActivityState _state) {
             a = _a;
             state = _state;
@@ -84,6 +87,7 @@ abstract public class ActivityTracker extends AppCompatActivity
      *
      * @return the current Activity's state, if there is one.
      */
+    @SuppressWarnings("unused")
     public static ActivityState getState() {
         if (stack.empty())
             return null;

@@ -51,7 +51,7 @@ public class MainActivity extends ActivityTracker
     public  static ApplicationGlobalState getApplicationGlobalState() { return ags; }
 
     /** Request codes for onActivityResult(). */
-    public static final int RT_BT_ENABLED = 1;
+    private static final int RT_BT_ENABLED = 1;
 
     // Private non-static fields.
     private RecyclerViewManager rvmDiscovered;
@@ -69,7 +69,7 @@ public class MainActivity extends ActivityTracker
      *
      * @return the current MainActivity instance if it exists; else null.
      */
-    public  static MainActivity  getMainActivity() {
+    private static MainActivity  getMainActivity() {
         Activity a = getActivity(); // from ActivityTracker
 
         // This should only happen if this method is called from MainActivity's onCreate() method.
@@ -135,6 +135,7 @@ public class MainActivity extends ActivityTracker
      *
      * @param v the View which the user clicked on.
      */
+    @SuppressWarnings("UnusedParameters")
     public void clickRefreshDiscovered(View v) {
         Support.userMessage("Refreshing list of discovered devices...");
         refreshDiscovered();
@@ -145,6 +146,7 @@ public class MainActivity extends ActivityTracker
      *
      * @param v the View the user clicked on.
      */
+    @SuppressWarnings("UnusedParameters")
     public void clickRefreshPaired(View v) {
         Support.userMessage("Refreshing list of paired devices...");
         refreshPaired();
@@ -210,7 +212,7 @@ public class MainActivity extends ActivityTracker
      *     is updated by the BroadcastReceiver.
      *     See {@link com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothBroadcastReceiver#onReceive}.
      */
-    public void refreshDiscovered() {
+    private void refreshDiscovered() {
         MyAdapter myAdapter = rvmDiscovered.getAdapter();
         BluetoothDevices btds = myAdapter.getDevices();
         btds.clear();
@@ -220,7 +222,7 @@ public class MainActivity extends ActivityTracker
     /**
      * Find and display devices which are already paired with this one.
      */
-    public void refreshPaired() {
+    private void refreshPaired() {
         Set<BluetoothDevice> pairedDevices = BluetoothUtils.getPairedDevices();
         if (pairedDevices.size() > 0) {
             MyAdapter myAdapter = rvmPaired.getAdapter();

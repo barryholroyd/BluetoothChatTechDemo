@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.barryholroyd.bluetoothchatdemo">
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -8,11 +9,12 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/btcd_icon_launcher2"
+        android:icon="@mipmap/btcd_icon_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name="ApplicationGlobalState">
+        android:name="ApplicationGlobalState"
+        tools:ignore="GoogleAppIndexingWarning">
         <activity android:name="com.barryholroyd.bluetoothchatdemo.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

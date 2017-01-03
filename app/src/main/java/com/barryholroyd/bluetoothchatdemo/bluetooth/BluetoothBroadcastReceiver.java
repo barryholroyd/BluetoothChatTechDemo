@@ -81,9 +81,9 @@ public class BluetoothBroadcastReceiver extends BroadcastReceiver
  */
 class BtBrLog {
     /** Flag to enable/disable Bluetooth broadcast receiver logging. */
-    static final boolean btBrLog = false;
+    private static final boolean btBrLog = false;
 
-    static final HashMap<Integer,String> BtState = new HashMap<Integer,String>() {
+    private static final HashMap<Integer,String> BtState = new HashMap<Integer,String>() {
         {
             put(BluetoothAdapter.STATE_OFF, "STATE_OFF");
             put(BluetoothAdapter.STATE_ON, "STATE_ON");
@@ -92,7 +92,7 @@ class BtBrLog {
         }
     };
 
-    static final HashMap<Integer,String> BtScanMode = new HashMap<Integer,String>() {
+    private static final HashMap<Integer,String> BtScanMode = new HashMap<Integer,String>() {
         {
             put(BluetoothAdapter.SCAN_MODE_NONE, "SCAN_MODE_NONE");
             put(BluetoothAdapter.SCAN_MODE_CONNECTABLE, "SCAN_MODE_CONNECTABLE");

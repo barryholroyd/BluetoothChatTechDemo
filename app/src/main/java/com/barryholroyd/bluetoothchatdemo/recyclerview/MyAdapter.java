@@ -20,7 +20,7 @@ import java.util.Locale;
  * and the list of paired devices.
  */
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
-    final BluetoothDevices bluetoothDevices = new BluetoothDevices();
+    private final BluetoothDevices bluetoothDevices = new BluetoothDevices();
 
     /**
      * Standard ViewHolder class.
@@ -30,8 +30,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
      *     on that row.
      */
     class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView mTvText;
-        public TextView mTvMac;
+        public final TextView mTvText;
+        public final TextView mTvMac;
         MyViewHolder(LinearLayout ll) {
             super(ll);
             mTvMac  = (TextView) ll.findViewById(R.id.row_mac);
@@ -48,8 +48,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LinearLayout ll = (LinearLayout)
                 LayoutInflater.from(parent.getContext()).inflate(R.layout.rvrow, parent, false);
-        MyViewHolder vh = new MyViewHolder(ll);
-        return vh;
+        return new MyViewHolder(ll);
     }
 
     @Override
@@ -75,7 +74,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
      * used by the onClick() method to create a Bluetooth connection. This effectively
      * makes this end the "client" (initiator) of the Bluetooth chat session.
      */
-    class OnClickListenerConnectDevice implements View.OnClickListener {
+    private class OnClickListenerConnectDevice implements View.OnClickListener {
         @Override
         public void onClick(View v) {
             TextView tvText = (TextView) v;

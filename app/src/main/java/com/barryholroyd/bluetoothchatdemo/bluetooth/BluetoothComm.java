@@ -47,7 +47,7 @@ public class BluetoothComm extends Thread
     private static Handler uiHandler = null;
 
     /** Handler to cause the calling ChatActivity to exit. */
-    private Handler caHandler;
+    private final Handler caHandler;
 
     /** Bluetooth input stream. */
     private static InputStream btIn;
@@ -145,8 +145,7 @@ public class BluetoothComm extends Thread
     @Override
     public void run() {
         if (!running) {
-            String msg = String.format(Locale.US, "Server not initialized... exiting.");
-            Support.userMessage(msg);
+            Support.userMessage("Server not initialized... exiting.");
             return;
         }
 
@@ -154,6 +153,7 @@ public class BluetoothComm extends Thread
             byte[] bytes = new byte[BUFSIZE];
             try {
                 Support.trace("Waiting to read input...");
+                //noinspection ResultOfMethodCallIgnored
                 btIn.read(bytes, 0, BUFSIZE);
             }
             catch (IOException ioe) {

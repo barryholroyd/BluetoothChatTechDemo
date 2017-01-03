@@ -69,7 +69,7 @@ public class ChatActivity extends ActivityTracker
         BluetoothSocket btsocket = ((ApplicationGlobalState) getApplication()).getBtSocket();
 
         // Callback to exit this activity.
-        Handler handler = new Handler() {
+        Handler handler = new Handler() { // TBD: Inspector says this should be static
             @Override
             public void handleMessage(Message message) {
                 if (message.what == FINISH) {
@@ -121,6 +121,7 @@ public class ChatActivity extends ActivityTracker
     }
 
     /** Handle write requests from the user. */
+    @SuppressWarnings("UnusedParameters")
     public void clickSend(View v) {
         String text = etTextSend.getText().toString();
         etTextSend.setText("");
@@ -150,6 +151,7 @@ public class ChatActivity extends ActivityTracker
      *
      * @param v the View the user clicked on.
      */
+    @SuppressWarnings("UnusedParameters")
     public void clickDone(View v) {
         BluetoothComm.closeConnection();
         finish();

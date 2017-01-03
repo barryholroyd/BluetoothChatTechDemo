@@ -1,5 +1,6 @@
 package com.barryholroyd.bluetoothchatdemo.bluetooth;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -125,7 +126,13 @@ public class BluetoothClient extends Thread
         }
 
         // Make the Bluetooth socket available to other components.
-        ((ApplicationGlobalState)  MainActivity.getActivity().getApplication()).setBtSocket(mSocket);
+        Activity a = MainActivity.getActivity();
+        if (a == null) {
+            Support.userMessage("Internal (temporary) error: could not get Activity.");
+            closeSocket(mSocket);
+            return;
+        }
+        ((ApplicationGlobalState)  a.getApplication()).setBtSocket(mSocket);
 
         // Pass control to the chat Activity.
         Intent intent = new Intent(c, ChatActivity.class);

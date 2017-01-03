@@ -11,10 +11,10 @@ import android.support.v7.app.AlertDialog;
  * at this point is to exit the application by pressing the "Exit" button.
  */
 public class FatalErrorDialog extends DialogFragment {
-    public static FatalErrorDialog newInstance(String title, String msg) {
+    public static FatalErrorDialog newInstance(String msg) {
         FatalErrorDialog frag = new FatalErrorDialog();
         Bundle args = new Bundle();
-        args.putString("title", title);
+        args.putString("title", "Fatal Error");
         args.putString("msg", msg);
         frag.setArguments(args);
         return frag;

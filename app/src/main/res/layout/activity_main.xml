@@ -4,15 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
->
+    tools:ignore="Overdraw">
     <LinearLayout
-        android:id="@+id/ll_top"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/color_background2"
         android:gravity="center"
-        >
+        tools:ignore="Overdraw">
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -20,7 +19,7 @@
             >
             <TextView
                 style="@style/TextLabel"
-                android:text="Bluetooth Devices"
+                android:text="@string/bluetooth_devices"
                 />
         </FrameLayout>
         <FrameLayout
@@ -29,17 +28,15 @@
             android:layout_weight="8"
             >
             <LinearLayout
-                android:id="@+id/ll_setup"
                 android:orientation="horizontal"
                 style="@style/LinearLayoutHorizRvs"
                 >
                 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:id="@+id/ll_discovered"
                     style="@style/LinearLayoutDiscoverContainer"
                     >
                     <TextView
                         style="@style/TextLabel"
-                        android:text="Discovered"
+                        android:text="@string/discovered"
                         />
                     <android.support.v7.widget.RecyclerView
                         android:id="@+id/rv_discovered"
@@ -49,17 +46,16 @@
 
                     <Button
                         style="@style/ButtonStyle"
-                        android:text="Refresh"
+                        android:text="@string/refresh"
                         android:onClick="clickRefreshDiscovered"
                         />
                 </LinearLayout>
                 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:id="@+id/ll_paired"
                     style="@style/LinearLayoutDiscoverContainer"
                     >
                     <TextView
                         style="@style/TextLabel"
-                        android:text="Paired"
+                        android:text="@string/paired"
                         />
                     <android.support.v7.widget.RecyclerView
                         android:id="@+id/rv_paired"
@@ -68,7 +64,7 @@
                     </android.support.v7.widget.RecyclerView>
                     <Button
                         style="@style/ButtonStyle"
-                        android:text="Refresh"
+                        android:text="@string/refresh_button_label"
                         android:onClick="clickRefreshPaired"
                         />
                 </LinearLayout>
@@ -82,7 +78,7 @@
             >
             <TextView
                 style="@style/TextLabel"
-                android:text="Click on an entry in either list to initiate a connection."
+                android:text="@string/click_to_initiate_connection"
             />
         </FrameLayout>
     </LinearLayout>

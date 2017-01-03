@@ -12,7 +12,7 @@ import static android.widget.Toast.LENGTH_LONG;
 /**
  * Helper class to display toasts from either the foreground or the background.
  */
-public class Toaster {
+class Toaster {
     /** Message command: TOAST */
     private static final int TOAST = 1;
 
@@ -29,7 +29,7 @@ public class Toaster {
         mHandler = new Handler(Looper.getMainLooper()) {
             /**
              * Create and show a toast (on the main thread).
-             * @param message
+             * @param message contains the text to be displayed in the toast.
              */
             @Override
             public void handleMessage(Message message) {
