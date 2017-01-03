@@ -135,7 +135,6 @@ public class BluetoothComm extends Thread
             return;
         }
         TextView tv = ca.getTextViewReceive();
-
         tv.setText(text);
     }
 

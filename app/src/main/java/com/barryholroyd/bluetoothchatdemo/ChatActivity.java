@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -63,6 +64,8 @@ public class ChatActivity extends ActivityTracker
         etTextSend = (EditText) findViewById(R.id.text_send);
         tvTextReceive = (TextView) findViewById(R.id.text_receive);
 
+        configureScrollBars();
+
         BluetoothSocket btsocket = ((ApplicationGlobalState) getApplication()).getBtSocket();
 
         // Callback to exit this activity.
@@ -88,6 +91,17 @@ public class ChatActivity extends ActivityTracker
 
         // Create a worker thread to handle the reads and writes from the Bluetooth connection.
         (new BluetoothComm(btsocket, handler)).start();
+    }
+
+    /**
+     * Configure scrollbars for the text receive TextView.
+     * For some reason, this doesn't seem to be configurable from XML.
+     */
+    private void configureScrollBars() {
+        TextView receive = (TextView) findViewById(R.id.text_receive);
+        receive.setHorizontallyScrolling(true);
+        receive.setMovementMethod(new ScrollingMovementMethod());
+        receive.setHint("text received"); // with scrolling, doesn't work from XML for some reason
     }
 
     /** Set the title of the chat window to reflect the name and MAC address of the remote device. */

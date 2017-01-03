@@ -40,7 +40,7 @@
                 <EditText
                     style="@style/TextInputOutput"
                     android:layout_width="0dp"
-                    android:layout_weight="4"
+                    android:layout_weight="3"
                     android:id="@+id/text_send"
                     android:hint="text to send"
                     android:background="@color/color_interactive" />
@@ -70,9 +70,9 @@
                 <TextView
                     style="@style/TextInputOutput"
                     android:layout_width="0dp"
-                    android:layout_weight="4"
+                    android:layout_weight="3"
                     android:background="@color/blue_cyan"
-                    android:hint="text received"
+                    android:scrollbars="horizontal|vertical"
                     android:id="@+id/text_receive"
                     />
             </LinearLayout>
