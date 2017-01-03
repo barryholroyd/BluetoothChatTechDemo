@@ -14,7 +14,7 @@
     <color name="blue_light_5">#FF9ccce9</color>
     <color name="blue_cyan">#00bcd4</color>		<!-- Material Design -->
     <color name="blue_deep">#FF000066</color>
-    <color name="blue_sky">#66CCFF</color>
+    <color name="blue_sky">#66ccff</color>
     <color name="blue_teal" tools:ignore="UnusedResources">#009688</color>		<!-- Material Design -->
     <color name="blue_teal_400">#26A69A</color>		<!-- Material Design -->
     <color name="blue_teal_800">#00695C</color>		<!-- Material Design -->
@@ -38,7 +38,7 @@
     <color name="green_light_1" tools:ignore="UnusedResources">#8BC34A</color>	<!-- Material Design -->
     <color name="green_light_2" tools:ignore="UnusedResources">#66BB6A</color>	<!-- Material Design -->
     <color name="green_light_3">#007A00</color>
-    <color name="green_light_4">#FFA3F79B</color>
+    <color name="green_light_4">#a3f79b</color>
     <color name="green_lime">#CDDC39</color>	<!-- Material Design -->
     <color name="green_olive" tools:ignore="UnusedResources">#465c18</color>
 

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
@@ -8,20 +9,19 @@
         android:id="@+id/ll_top"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
-        >
+        tools:background="@color/color_background2">
         <TextView
             style="@style/TextLabel"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
             android:id="@+id/connected_to"
             />
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="4">
-            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_height="wrap_content"
+            >
+            <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -43,15 +43,14 @@
                     android:layout_weight="4"
                     android:id="@+id/text_send"
                     android:hint="text to send"
-                    />
+                    android:background="@color/color_interactive" />
             </LinearLayout>
         </FrameLayout>
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="4"
+            android:layout_height="wrap_content"
             >
-            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -72,7 +71,7 @@
                     style="@style/TextInputOutput"
                     android:layout_width="0dp"
                     android:layout_weight="4"
-                    android:background="@color/yellow_amber"
+                    android:background="@color/blue_cyan"
                     android:hint="text received"
                     android:id="@+id/text_receive"
                     />
@@ -80,8 +79,7 @@
         </FrameLayout>
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
             >
             <Button
                 style="@style/ButtonStyle"
