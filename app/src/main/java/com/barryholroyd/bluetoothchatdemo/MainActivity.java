@@ -18,15 +18,22 @@ import com.barryholroyd.bluetoothchatdemo.support.Support;
 import java.util.Set;
 
 /*
- * TBD: Turn off Bluetooth: Server: waiting for a new connection to accept LOOPS
+ * Clean up
  * TBD: Run code analyzer (e.g., Handlers should be static?)
- * TBD: UI: adjust text fields left; ScrollView for full screen (?); colors, text view sizes.
- * TBD: Clean up Chat screen.
- * TBD: Test -- is alternate connect approach ever used by either device?
- * TBD: Test -- try killing server (pull USB cable?)
- * TBD: S7 portrait mode, Connected header, fully shows? (minLines=1)
  * TBD: clean out TBDs, etc.
  * TBD: move to apps
+ *
+ * Bugs
+ * TBD: Turn off Bluetooth: Server: waiting for a new connection to accept LOOPS
+ * TBD: Test -- is alternate connect approach ever used by either device?
+ * TBD: Test -- try killing server (pull USB cable?)
+ *
+ * Look and feel
+ * TBD: UI: adjust text fields left; ScrollView for full screen (?); colors, text view sizes.
+ * TBD: Clean up Chat screen.
+ * TBD: S7 portrait mode, Connected header, fully shows? (minLines=1)
+ *
+ * Closure
  * TBD: turn off tracing.
  */
 
