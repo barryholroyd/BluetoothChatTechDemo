@@ -11,7 +11,6 @@ import com.barryholroyd.bluetoothchatdemo.ChatActivity;
 import com.barryholroyd.bluetoothchatdemo.MainActivity;
 import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
-import com.barryholroyd.lib.ClassExplorer2;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -83,10 +82,6 @@ public class BluetoothClient extends Thread
              * the channel number passed in, in this case, '1'.
              */
             Support.trace("Attempting alternate approach to connect...");
-
-            ClassExplorer2.logBluetoothDevice(btdevice);
-
-            // TBD: TEST this.
             try {
                 Method m = btdevice.getClass().getMethod("createRfcommSocket",
                         int.class);
