@@ -2,6 +2,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Basic Library of Colors -->
 
+    <!-- TRANSPARENT -->
+    <color name="transparent">#00000000</color>
+
     <!-- BLUE -->
     <color name="blue">#2196F3</color>		<!-- Material Design -->
     <color name="blue_light_1">#03A9F4</color>	<!-- Material Design -->
@@ -35,6 +38,7 @@
     <color name="green_light_1" tools:ignore="UnusedResources">#8BC34A</color>	<!-- Material Design -->
     <color name="green_light_2" tools:ignore="UnusedResources">#66BB6A</color>	<!-- Material Design -->
     <color name="green_light_3">#007A00</color>
+    <color name="green_light_4">#FFA3F79B</color>
     <color name="green_lime">#CDDC39</color>	<!-- Material Design -->
     <color name="green_olive" tools:ignore="UnusedResources">#465c18</color>
 
