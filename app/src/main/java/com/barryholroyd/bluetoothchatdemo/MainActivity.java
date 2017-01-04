@@ -28,9 +28,9 @@ import java.util.Set;
  * TBD: Test -- try killing server (pull USB cable?)
  *
  * Look and feel
- * TBD: UI: adjust text fields left; ScrollView for full screen (?); colors, text view sizes.
- * TBD: Clean up Chat screen.
  * TBD: S7 portrait mode, Connected header, fully shows? (minLines=1)
+ * TBD: Check server end for name and mac address display.
+ * TBD: Rotate server end (S7) -- retains text received?
  *
  * Closure
  * TBD: turn off tracing.

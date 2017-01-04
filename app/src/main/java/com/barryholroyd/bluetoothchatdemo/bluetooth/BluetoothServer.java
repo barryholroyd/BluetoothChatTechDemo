@@ -1,10 +1,13 @@
 package com.barryholroyd.bluetoothchatdemo.bluetooth;
 
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.barryholroyd.bluetoothchatdemo.ChatActivity;
 import com.barryholroyd.bluetoothchatdemo.MainActivity;
@@ -72,8 +75,13 @@ public class BluetoothServer extends Thread
                 @SuppressWarnings("ConstantConditions")
                 BluetoothSocket btSocket = btServerSocket.accept();
 
+                BluetoothDevice btdevice = null;
                 if (btSocket == null) {
                     Support.fatalError("Failed to get Bluetooth socket.");
+                }
+                else {
+                    // Get the remote device information.
+                    btdevice = btSocket.getRemoteDevice();
                 }
 
                 // Make the Bluetooth socket available to ChatActivity.
@@ -82,10 +90,11 @@ public class BluetoothServer extends Thread
                 // Start communications.
                 Support.userMessage("Connected!");
 
+
                 // Pass control to the chat Activity.
                 Context c = ActivityTracker.getAppContext();
                 Intent intent = new Intent(c, ChatActivity.class);
-                intent.putExtra(ChatActivity.BUNDLE_KEY_BTDEVICE, (Parcelable) null);
+                intent.putExtra(ChatActivity.BUNDLE_KEY_BTDEVICE, btdevice);
                 intent.addFlags(FLAG_ACTIVITY_NEW_TASK); // required since an App Context is used
                 c.startActivity(intent);
 

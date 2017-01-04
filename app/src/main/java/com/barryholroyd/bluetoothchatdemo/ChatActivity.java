@@ -107,16 +107,16 @@ public class ChatActivity extends ActivityTracker
     /** Set the title of the chat window to reflect the name and MAC address of the remote device. */
     private void setTitle(BluetoothDevice btdevice) {
         TextView tvConnectedTo = (TextView) findViewById(R.id.connected_to);
-        String name = "<unknown>";
-        String mac  = "<unknown>";
+        String name = "?";
+        String mac  = "?";
 
         if (btdevice != null) {
             name = btdevice.getName();
             if (name == null)
-                name = "<unknown>";
+                name = "?";
             mac  = btdevice.getAddress();
         }
-        String title = String.format(Locale.US, "Connected to: %s [%s}", name, mac);
+        String title = String.format(Locale.US, "Connected to: %s [%s]", name, mac);
         tvConnectedTo.setText(title);
     }
 
