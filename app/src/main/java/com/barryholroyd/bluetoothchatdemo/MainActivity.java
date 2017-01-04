@@ -21,7 +21,6 @@ import java.util.Set;
  * Clean up
  * TBD: Run code analyzer (e.g., Handlers should be static?)
  * TBD: clean out TBDs, etc.
- * TBD: move to apps
  *
  * Bugs
  * TBD: Turn off Bluetooth: Server: waiting for a new connection to accept LOOPS
