@@ -38,14 +38,15 @@ public class BluetoothServer extends Thread
     static BluetoothServer bluetoothServer = null;
 
     /**
-     * Class used by other threads (ChatActivity, BluetoothBroadcastReceiver) to coordinate
+     * Class used by other threads to coordinate
      * with this server thread.
      * <p>
      *     The server thread waits on this lock after accepting a connection and initiating
-     *     a ChatActivity activity. The ChatActivity activity then notifies this thread, via
+     *     a ChatActivity activity. The ChatActivity thread then notifies this thread, via
      *     the Lock instance, when it is done, so that the server can resume waiting for
      *     another connection to accept.
-     * <p> TBD: BR is separate thread from UI?
+     * <p> TBD: BR is separate thread from UI? (NO)
+     * DEL:?
      *     The BluetoothBroadcastReceiver thread sends an interrupt to this thread when
      *     Bluetooth is turned off on the device so that this thread can exit.
      */
@@ -101,13 +102,23 @@ public class BluetoothServer extends Thread
             Support.fatalError("Failed to get Bluetooth server socket.");
         }
 
+        // to keep the compiler happy
+        if (btServerSocket == null) {
+            Support.fatalError("Failed to get Bluetooth server socket.");
+            return;
+        }
+
         //noinspection InfiniteLoopStatement
         while (true) {
+            BluetoothSocket btSocket = null;
             try {
+                if (!BluetoothUtils.isEnabled()) {
+                    Support.userMessage("Connection dropped.");
+                    return;
+                }
                 Support.trace("Server: waiting for a new connection to accept...");
 
-                @SuppressWarnings("ConstantConditions")
-                BluetoothSocket btSocket = btServerSocket.accept();
+                btSocket = btServerSocket.accept();
 
                 BluetoothDevice btdevice = null;
                 if (btSocket == null) {
@@ -149,18 +160,24 @@ public class BluetoothServer extends Thread
                                 serverLock.setExitFlag(false);
                                 return;
                             }
-                            String msg = String.format(Locale.US,
-                                    "Server: spurious interrupt exception while waiting on server lock: %s",
-                                    ioe.getMessage());
-                            Support.error(msg);
+                            Support.exception("Server: spurious interrupt exception while waiting on server lock", ioe);
                         }
                     }
                     serverLock.setChatDone(false);
                 }
             } catch (IOException ioe) {
-                String msg = String.format(Locale.US,
-                        "Server connection IO exception: %s", ioe.getMessage());
-                Support.error("***** SERVER ERROR: " + msg); // TBD:
+                Support.exception("Server connection IO exception", ioe); // TBD:
+            }
+            finally {
+                try {
+                    if (btSocket != null) {
+                        btSocket.close();
+                    }
+                }
+                catch (IOException ioe2){
+                    Support.exception("Server connection IO exception #2", ioe2); // TBD:
+                }
+                MainActivity.getApplicationGlobalState().setBtSocket(null);
             }
         }
     }

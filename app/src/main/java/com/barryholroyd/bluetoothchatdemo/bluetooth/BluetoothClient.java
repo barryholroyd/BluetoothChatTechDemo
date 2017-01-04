@@ -152,8 +152,7 @@ public class BluetoothClient extends Thread
             }
         }
         catch (IOException ioe) {
-            Support.error(String.format(Locale.US,
-                    "Failed to close the client connection: %s", ioe.getMessage()));
+            Support.exception("Failed to close the client connection", ioe);
         }
     }
 }

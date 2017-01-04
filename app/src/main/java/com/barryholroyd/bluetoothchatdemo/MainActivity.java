@@ -106,11 +106,6 @@ public class MainActivity extends ActivityTracker
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        String s = String.format("THREAD (UI): %s (%#x)", // DEL:
-                Thread.currentThread().getName(),
-                Thread.currentThread().getId());
-        Support.error(s);
-
         ags = (ApplicationGlobalState) getApplication();
 
         // Display the "client" interface.
@@ -121,8 +116,6 @@ public class MainActivity extends ActivityTracker
 
         // Register receiver for handling Bluetooth events (e.g., start/stop server worker thread).
         BluetoothUtils.registerBroadcastReceiver(this);
-        refreshPaired();
-        refreshDiscovered();
 
         /*
          * Ensure Bluetooth is enabled; if not, ask the user for permission.
@@ -132,6 +125,8 @@ public class MainActivity extends ActivityTracker
          * allows Bluetooth to be enabled.
          */
         if (BluetoothUtils.isEnabled()) {
+            refreshPaired();
+            refreshDiscovered();
             BluetoothUtils.requestDiscoverable();
             BluetoothServer.manage(BluetoothAdapter.STATE_ON);
         }
@@ -175,9 +170,12 @@ public class MainActivity extends ActivityTracker
         switch (requestCode) {
             case RT_BT_ENABLED:
                 if (resultCode == RESULT_OK) {
+                    refreshPaired();
+                    refreshDiscovered();
                     /** Only make this request once. */
                     if (ags.isAppInitialized())
                         BluetoothUtils.requestDiscoverable();
+                    // Server turned on by BluetoothBroadcastReceiver.
                     return;
                 }
                 else {

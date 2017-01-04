@@ -35,6 +35,7 @@ public class BluetoothUtils {
 
     /**
      * Do a device scan.
+     * Bluetooth must be turned on.
      * <p>
      *     When new devices are discovered, a broadcast is sent.
      *     See {@link BluetoothBroadcastReceiver#onReceive}.
@@ -45,6 +46,7 @@ public class BluetoothUtils {
 
     /**
      * Return the list of devices which are already paired with this one.
+     * Bluetooth must be turned on.
      */
     public static Set<BluetoothDevice> getPairedDevices() {
         return getBluetoothAdapter().getBondedDevices();
@@ -52,8 +54,12 @@ public class BluetoothUtils {
 
     /**
      * Ask the user for permission to make this device discoverable.
+     * The user will be asked to turn on Bluetooth if it is not already on.
      */
     public static void requestDiscoverable() {
+        // Only do this once.
+        if (MainActivity.getApplicationGlobalState().isAppInitialized())
+            return;
         Intent discoverableIntent = new
                 Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);

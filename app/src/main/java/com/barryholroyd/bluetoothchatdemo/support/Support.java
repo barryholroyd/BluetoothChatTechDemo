@@ -80,6 +80,13 @@ public class Support {
             init();
         Toaster.display(msg);
     }
+
+    /**
+     * Log an exception with a customized string.
+     */
+    public static void exception(String s, Exception e) {
+        Support.error(String.format(Locale.US, "%s: %s", s, e.getMessage()));
+    }
 }
 
 /** Support-specific exception. */
@@ -87,6 +94,6 @@ class SupportException extends RuntimeException
 {
     SupportException(String msg) {
         super(msg);
-        Support.error(String.format(Locale.US, "Support Exception: %s", msg));
+        Support.exception("Support Exception", this);
     }
 }

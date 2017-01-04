@@ -195,8 +195,7 @@ public class BluetoothComm extends Thread
                 btSocket.close();
             }
         } catch (IOException ioe) {
-            Support.error(String.format(Locale.US,
-                    "Failed to close the connection: %s", ioe.getMessage()));
+            Support.exception("Failed to close the connection", ioe);
         }
         btSocket = null;
     }

@@ -49,11 +49,6 @@ public class BluetoothBroadcastReceiver extends BroadcastReceiver
             return;
         MyAdapter myAdapterDiscovered = rvmd.getAdapter();
 
-        String s = String.format("THREAD (BR): %s (%#x)", // DEL:
-                Thread.currentThread().getName(),
-                Thread.currentThread().getId());
-        Support.error(s);
-
         String action = intent.getAction();
         switch (action) {
             case BluetoothDevice.ACTION_FOUND:
