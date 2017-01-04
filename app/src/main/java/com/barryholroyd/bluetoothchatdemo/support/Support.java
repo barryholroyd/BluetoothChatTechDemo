@@ -42,7 +42,6 @@ public class Support {
         Activity a = ActivityTracker.getActivity();
         if (a == null)
             throw new SupportException("Fatal Error: " + msg);
-
         FatalErrorDialog
             .newInstance(msg)
             .show(a.getFragmentManager(), "error_dialog");

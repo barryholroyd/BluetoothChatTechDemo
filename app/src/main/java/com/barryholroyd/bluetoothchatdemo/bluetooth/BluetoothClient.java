@@ -51,6 +51,12 @@ public class BluetoothClient extends Thread
      * to run the chat session.
      */
     public void run() {
+        /* Check for Bluetooth... it may have been turned off. */
+        if (!BluetoothUtils.getBluetoothAdapter().isEnabled()) {
+            Support.userMessage("Bluetooth must be turned on.");
+            return;
+        }
+
         /*
          * Discovery is very intensive -- it can slow down the connection attempt
          * and cause it to fail. To prevent that, if discovery is running we cancel it

@@ -24,12 +24,16 @@ import java.util.Set;
  *
  * Bugs
  * TBD: Turn off Bluetooth: Server: waiting for a new connection to accept LOOPS
+ *      Client contacts S7, S7 is server. Turn off bluetooth on S7, infinite loop in S7
+ *      Server: waiting for a new connection to accept...
+ *      SEE BluetoothServer.java.
+ *      Client: bluetooth is off -- exit
+ *      Server: connection lost; restart server (?).
  * TBD: Test -- is alternate connect approach ever used by either device?
  * TBD: Test -- try killing server (pull USB cable?)
  *
  * Look and feel
  * TBD: S7 portrait mode, Connected header, fully shows? (minLines=1)
- * TBD: Check server end for name and mac address display.
  * TBD: Rotate server end (S7) -- retains text received?
  *
  * Closure

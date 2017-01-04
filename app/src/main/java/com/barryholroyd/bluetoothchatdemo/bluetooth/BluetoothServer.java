@@ -115,7 +115,15 @@ public class BluetoothServer extends Thread
             } catch (IOException ioe) {
                 String msg = String.format(Locale.US,
                         "Server connection IO exception: %s", ioe.getMessage());
-                Support.fatalError(msg);
+                Support.error("***** SERVER ERROR: " + msg);
+
+                // TBD: If BT is off, can't do anything here. Must turn server on/off
+                // as BT is enabled/disabled.
+
+//                Support.fatalError(msg);
+//                return; // TBD: so that the UI doesn't get flooded (?); MUST NOW RESTART SERVER
+//                // TBD: BluetoothAdapter: onBluetoothStateChange: up=false -- USE THIS???
+//                // TBD: Note that MainActivity is running again since ChatActivity has exited (why???).
             }
         }
     }

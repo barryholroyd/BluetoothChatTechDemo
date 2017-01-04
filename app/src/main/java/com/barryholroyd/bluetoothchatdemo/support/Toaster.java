@@ -8,6 +8,7 @@ import android.view.Gravity;
 import android.widget.Toast;
 
 import static android.widget.Toast.LENGTH_LONG;
+import static android.widget.Toast.LENGTH_SHORT;
 
 /**
  * Helper class to display toasts from either the foreground or the background.
@@ -36,8 +37,8 @@ class Toaster {
                 Context ac = ActivityTracker.getAppContext();
                 if (message.what == TOAST) {
                     String msg = (String) message.obj;
-                    final Toast toast = Toast.makeText(ac, msg, LENGTH_LONG);
-                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    final Toast toast = Toast.makeText(ac, msg, LENGTH_SHORT);
+                    toast.setGravity(Gravity.BOTTOM, 0, 0);
                     toast.show();
                 }
             }
