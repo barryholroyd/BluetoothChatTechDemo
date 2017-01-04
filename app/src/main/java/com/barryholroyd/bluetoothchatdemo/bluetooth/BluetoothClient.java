@@ -48,15 +48,11 @@ public class BluetoothClient extends Thread
 
     /**
      * Create a connection to a remote Bluetooth server and then pass it to BluetoothComm
-     * to run the chat session.
+     * to run the chat session. This thread exits after spawning the communication thread.
+     *
+     * The check to ensure that Bluetooth is enabled is done before starting this worker thread.
      */
     public void run() {
-        /* Check for Bluetooth... it may have been turned off. */
-        if (!BluetoothUtils.getBluetoothAdapter().isEnabled()) {
-            Support.userMessage("Bluetooth must be turned on.");
-            return;
-        }
-
         /*
          * Discovery is very intensive -- it can slow down the connection attempt
          * and cause it to fail. To prevent that, if discovery is running we cancel it
@@ -69,8 +65,6 @@ public class BluetoothClient extends Thread
         }
 
         Support.userMessage("Connecting...");
-
-
 
         try{
             mSocket = btdevice.createRfcommSocketToServiceRecord( MY_UUID );

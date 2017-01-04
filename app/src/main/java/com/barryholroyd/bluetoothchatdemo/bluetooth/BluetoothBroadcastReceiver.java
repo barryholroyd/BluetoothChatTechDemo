@@ -24,6 +24,10 @@ import static android.bluetooth.BluetoothAdapter.EXTRA_STATE;
 /**
  * Broadcast Receiver for Bluetooth broadcasts.
  * <p>
+ *     This class is responsible for starting/stopping the server worker thread (if/when
+ *     Bluetooth is turned on/off), handling results from Bluetooth discovery and
+ *     logging of various Bluetooth events.
+ * <p>
  *     This needs to be registered and unregistered at the beginning and end of each
  *     MainActivity life cycle because it uses a RecyclerView adapter and that comes
  *     and goes with the Activity (retaining the RecyclerView would cause the Activity
@@ -44,6 +48,11 @@ public class BluetoothBroadcastReceiver extends BroadcastReceiver
         if (rvmd == null) // if MainActivity isn't currently running, then ignore this call
             return;
         MyAdapter myAdapterDiscovered = rvmd.getAdapter();
+
+        String s = String.format("THREAD (BR): %s (%#x)", // DEL:
+                Thread.currentThread().getName(),
+                Thread.currentThread().getId());
+        Support.error(s);
 
         String action = intent.getAction();
         switch (action) {
@@ -68,6 +77,7 @@ public class BluetoothBroadcastReceiver extends BroadcastReceiver
                 break;
             case BluetoothAdapter.ACTION_STATE_CHANGED:
                 BtBrLog.logActionStateChanged(intent);
+                BluetoothServer.manage(intent.getExtras().getInt(EXTRA_STATE));
                 break;
             case BluetoothAdapter.ACTION_SCAN_MODE_CHANGED:
                 BtBrLog.logScanModeChanged(intent);
@@ -80,9 +90,6 @@ public class BluetoothBroadcastReceiver extends BroadcastReceiver
  * Bluetooth Broadcast Receiver logging.
  */
 class BtBrLog {
-    /** Flag to enable/disable Bluetooth broadcast receiver logging. */
-    private static final boolean btBrLog = false;
-
     private static final HashMap<Integer,String> BtState = new HashMap<Integer,String>() {
         {
             put(BluetoothAdapter.STATE_OFF, "STATE_OFF");
@@ -121,8 +128,6 @@ class BtBrLog {
 
     /** Wrapper for Bluetooth Broad Receiver log messages. */
     static void brlog(String s) {
-        if (btBrLog) {
-            Support.trace(String.format(Locale.US, "> Broadcast received: [%s]", s));
-        }
+        Support.trace(String.format(Locale.US, "> Broadcast received: [%s]", s));
     }
 }

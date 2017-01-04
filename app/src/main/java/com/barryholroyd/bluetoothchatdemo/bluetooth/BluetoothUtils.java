@@ -28,6 +28,11 @@ public class BluetoothUtils {
         return mBluetoothAdapter;
     }
 
+    /** Check to see if Bluetooth is up and running. */
+    public static boolean isEnabled() {
+        return getBluetoothAdapter().isEnabled();
+    }
+
     /**
      * Do a device scan.
      * <p>
@@ -49,10 +54,6 @@ public class BluetoothUtils {
      * Ask the user for permission to make this device discoverable.
      */
     public static void requestDiscoverable() {
-        /** Only make this request once. */
-        if (MainActivity.getApplicationGlobalState().isAppInitialized())
-            return;
-
         Intent discoverableIntent = new
                 Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
@@ -65,8 +66,7 @@ public class BluetoothUtils {
     }
 
     /**
-     * Register the broadcast receiver that records each device found
-     * during a Bluetooth scan.
+     * Register the Bluetooth broadcast receiver.
      *
      * @param c current Activity's Context.
      */

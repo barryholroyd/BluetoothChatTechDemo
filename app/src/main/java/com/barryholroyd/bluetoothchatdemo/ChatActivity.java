@@ -75,7 +75,7 @@ public class ChatActivity extends ActivityTracker
                 if (message.what == FINISH) {
                     Support.trace("Exiting ChatActivity...");
                     synchronized (serverLock) {
-                        serverLock.setCondition(true);
+                        serverLock.setChatDone(true);
                         serverLock.notifyAll();
                     }
                     finish();

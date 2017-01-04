@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.barryholroyd.bluetoothchatdemo.R;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothClient;
+import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothUtils;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothDevices;
 
@@ -85,6 +86,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             if (btdevice == null) {
                 Support.fatalError(String.format(Locale.US, "Device missing: %s", mac));
             }
+
+            /* Check for Bluetooth... it may have been turned off. */
+            if (!BluetoothUtils.isEnabled()) {
+                Support.userMessage("Bluetooth must be turned on.");
+                return;
+            }
+
             // Set up a Bluetooth client connection to the remote device.
             (new BluetoothClient(btdevice)).start();
         }

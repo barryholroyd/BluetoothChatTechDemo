@@ -106,6 +106,11 @@ public class MainActivity extends ActivityTracker
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        String s = String.format("THREAD (UI): %s (%#x)", // DEL:
+                Thread.currentThread().getName(),
+                Thread.currentThread().getId());
+        Support.error(s);
+
         ags = (ApplicationGlobalState) getApplication();
 
         // Display the "client" interface.
@@ -114,6 +119,11 @@ public class MainActivity extends ActivityTracker
         rvmPaired         = new RecyclerViewManager(this, R.id.rv_paired);
         rvmDiscovered     = new RecyclerViewManager(this, R.id.rv_discovered);
 
+        // Register receiver for handling Bluetooth events (e.g., start/stop server worker thread).
+        BluetoothUtils.registerBroadcastReceiver(this);
+        refreshPaired();
+        refreshDiscovered();
+
         /*
          * Ensure Bluetooth is enabled; if not, ask the user for permission.
          * Bluetooth configuration and starting the "server" worker thread
@@ -121,13 +131,13 @@ public class MainActivity extends ActivityTracker
          * they are started in onActivityResult() if and only if the user
          * allows Bluetooth to be enabled.
          */
-        if (!BluetoothUtils.getBluetoothAdapter().isEnabled()) {
-            Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(intent, RT_BT_ENABLED);
+        if (BluetoothUtils.isEnabled()) {
+            BluetoothUtils.requestDiscoverable();
+            BluetoothServer.manage(BluetoothAdapter.STATE_ON);
         }
         else {
-            configureBluetooth();
-            startServer();
+            Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(intent, RT_BT_ENABLED);
         }
 
         ags.setAppInitialized();
@@ -140,6 +150,10 @@ public class MainActivity extends ActivityTracker
      */
     @SuppressWarnings("UnusedParameters")
     public void clickRefreshDiscovered(View v) {
+        if (!BluetoothUtils.isEnabled()) {
+            Support.userMessage("Bluetooth must be turned on.");
+            return;
+        }
         Support.userMessage("Refreshing list of discovered devices...");
         refreshDiscovered();
     }
@@ -161,8 +175,9 @@ public class MainActivity extends ActivityTracker
         switch (requestCode) {
             case RT_BT_ENABLED:
                 if (resultCode == RESULT_OK) {
-                    configureBluetooth();
-                    startServer();
+                    /** Only make this request once. */
+                    if (ags.isAppInitialized())
+                        BluetoothUtils.requestDiscoverable();
                     return;
                 }
                 else {
@@ -177,35 +192,6 @@ public class MainActivity extends ActivityTracker
     public void onDestroy() {
         super.onDestroy();
         BluetoothUtils.unregisterBroadcastReceiver(this);
-    }
-
-    /**
-     * Configure the Bluetooth session (init BroadcastReceiver for discovery, refresh paired
-     * and discovered windows, request that the device be discoverable).
-     * <p>
-     *     Passing in the Activity is appropriate because the BroadcastReceiver must be
-     *     registered and unregistered at the beginning and end of each MainActivity lifecycle.
-     */
-    private void configureBluetooth() {
-        // Register receiver for handling newly discovered devices during a scan.
-        BluetoothUtils.registerBroadcastReceiver(this);
-        refreshPaired();
-        refreshDiscovered();
-        BluetoothUtils.requestDiscoverable();
-    }
-
-    /**
-     * Fire up a Bluetooth server on this device.
-     * <p>
-     *     Must ensure that Bluetooth is enabled first. Only a single server should be
-     *     run during the lifetime of the application.
-     */
-    private static synchronized void startServer() {
-        if (!MainActivity.getApplicationGlobalState().isServerRunning()) {
-            Support.trace("Starting server...");
-            (new BluetoothServer()).start();
-            MainActivity.getApplicationGlobalState().setServerRunning(true);
-        }
     }
 
     /**
