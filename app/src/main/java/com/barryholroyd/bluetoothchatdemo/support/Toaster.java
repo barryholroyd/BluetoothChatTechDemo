@@ -38,7 +38,7 @@ class Toaster {
                 if (message.what == TOAST) {
                     String msg = (String) message.obj;
                     final Toast toast = Toast.makeText(ac, msg, LENGTH_SHORT);
-                    toast.setGravity(Gravity.BOTTOM, 0, 0);
+                    toast.setGravity(Gravity.BOTTOM, 0, 50);
                     toast.show();
                 }
             }

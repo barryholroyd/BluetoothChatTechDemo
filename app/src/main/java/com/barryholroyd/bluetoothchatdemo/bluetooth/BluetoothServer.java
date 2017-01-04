@@ -123,7 +123,7 @@ public class BluetoothServer extends Thread
                 BluetoothDevice btdevice = null;
                 if (btSocket == null) {
                     Support.fatalError("Failed to get Bluetooth socket.");
-                }
+                    Support.userMessage("*** Failed to get Bluetooth socket.");} // TBD:
                 else {
                     // Get the remote device information.
                     btdevice = btSocket.getRemoteDevice();

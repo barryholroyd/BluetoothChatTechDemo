@@ -160,6 +160,10 @@ public class MainActivity extends ActivityTracker
      */
     @SuppressWarnings("UnusedParameters")
     public void clickRefreshPaired(View v) {
+        if (!BluetoothUtils.isEnabled()) {
+            Support.userMessage("Bluetooth must be turned on.");
+            return;
+        }
         Support.userMessage("Refreshing list of paired devices...");
         refreshPaired();
     }
@@ -177,9 +181,6 @@ public class MainActivity extends ActivityTracker
                         BluetoothUtils.requestDiscoverable();
                     // Server turned on by BluetoothBroadcastReceiver.
                     return;
-                }
-                else {
-                    Support.fatalError("No Bluetooth available.");
                 }
                 break;
         }

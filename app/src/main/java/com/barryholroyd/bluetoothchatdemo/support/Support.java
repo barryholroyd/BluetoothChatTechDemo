@@ -38,10 +38,12 @@ public class Support {
 
     /** Display a Dialog to the user indicating a fatal error, then exit the app. */
     public static void fatalError(String msg) {
+        String s = String.format(Locale.US, "Fatal Error: %s", msg);
+        Support.error("*** " + s);
         // Get the currently running Activity.
         Activity a = ActivityTracker.getActivity();
         if (a == null)
-            throw new SupportException("Fatal Error: " + msg);
+            throw new SupportException(s);
         FatalErrorDialog
             .newInstance(msg)
             .show(a.getFragmentManager(), "error_dialog");
