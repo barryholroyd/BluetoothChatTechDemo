@@ -61,11 +61,9 @@ public class ChatServer extends Thread
     public ChatServer(BluetoothSocket _btSocket, Handler handler) throws ChatServerException {
         btSocket = _btSocket;
         caHandler = handler;
-
         if (btSocket == null) {
             throw new ChatServerException("Null Bluetooth socket.");
         }
-
         try {
             btIn = btSocket.getInputStream();
             btOut = btSocket.getOutputStream();
@@ -76,7 +74,6 @@ public class ChatServer extends Thread
                     ioe.getMessage());
             throw new ChatServerException(msg);
         }
-
         /*
          * Create the UI handler responsible for displaying the text on the UI thread.
          * ChatActivity should be running; processMessage() will check to make sure.

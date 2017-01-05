@@ -48,9 +48,14 @@ public class ChatActivity extends ActivityTracker
     /** Only allow a single running server thread at a time. */
     static ChatServer chatServer = null;
 
+    /** Bluetooth socket passed in from SelectActivity via static hook in app. */
     static BluetoothSocket btsocket = null;
 
+    /** Handler providing callback to exit this Activity. */
     static Handler handler = null;
+
+    /** Singleton implementation. */
+    private ChatActivity() {}
 
     /**
      * Display the chat window for the user, get the BluetoothSocket stored in
@@ -79,8 +84,9 @@ public class ChatActivity extends ActivityTracker
         btsocket = ((ApplicationGlobalState) getApplication()).getBtSocket();
 
         /*
-         * Callback to exit this activity. Must (re-)initialize each time so that
-         * finish() references the correct instance.
+         * Callback to exit this activity; used by ChatServer when it has an error.
+         * Must (re-)initialize each time so that finish() references the correct
+         * ChatActivity instance.
          */
         handler = new Handler() { // TBD: inspector thinks this might leak memory ...?
             @Override
@@ -101,7 +107,6 @@ public class ChatActivity extends ActivityTracker
                 }
             }
         };
-
     }
 
     @Override

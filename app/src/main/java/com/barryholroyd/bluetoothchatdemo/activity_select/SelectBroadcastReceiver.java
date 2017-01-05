@@ -42,12 +42,9 @@ public class SelectBroadcastReceiver extends BroadcastReceiver
             case BluetoothDevice.ACTION_FOUND:
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 // Do not add to the discovered list if the device has already been paired.
-                RecyclerViewManager rvmp = SelectActivity.getRvmPaired();
-                if (rvmp != null) {
-                    if (rvmp.getAdapter().getDevices().getDevice(device.getAddress()) != null) {
-                        break;
-                    }
-                }
+                if (SelectActivity.getRvmPaired().getAdapter()
+                        .getDevices().getDevice(device.getAddress()) != null)
+                    break;
                 MyAdapter myAdapterDiscovered = SelectActivity.getRvmDiscovered().getAdapter();
                 myAdapterDiscovered.getDevices().addNoDup(device);
                 myAdapterDiscovered.notifyDataSetChanged();
