@@ -21,9 +21,6 @@ import com.barryholroyd.bluetoothchatdemo.support.Support;
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
-// DEL:
-//import static com.barryholroyd.bluetoothchatdemo.activity_select.SelectConnectionListener.listenerLock;
-
 /**
  * Display the Chat view for the user and manage the sending/receiving of text.
  * <p>
@@ -57,7 +54,7 @@ public class ChatActivity extends ActivityTracker
 
     /**
      * Display the chat window for the user, get the BluetoothSocket stored in
-     * ApplicationGlobalState by BluetoothClient or SelectConnectionListener, configure a
+     * ApplicationGlobalState by SelectClient or SelectConnectionListener, configure a
      * callback Handler to exit the Activity is requested by the worker thread and
      * then start the ChatServer worker thread to handle the actual reads and writes
      * from the connection.
@@ -80,7 +77,6 @@ public class ChatActivity extends ActivityTracker
         configureScrollBars();
 
         btsocket = ((ApplicationGlobalState) getApplication()).getBtSocket();
-        Support.trace(String.format("### 1. btsocket: %s", (btsocket == null) ? "NULL" : btsocket.toString()));
 
         /*
          * Callback to exit this activity; used by ChatServer when it has an error.
@@ -91,12 +87,7 @@ public class ChatActivity extends ActivityTracker
             @Override
             public void handleMessage(Message message) {
                 if (message.what == FINISH) {
-                    Support.trace("Exiting ChatActivity...");
-                    // DEL:
-//                    synchronized (listenerLock) {
-//                        listenerLock.setChatDone(true);
-//                        listenerLock.notifyAll();
-//                    }
+                    Support.trace("Exiting chat activity...");
                     finish();
                 }
                 else {
@@ -131,7 +122,6 @@ public class ChatActivity extends ActivityTracker
             }
             Support.trace("Starting chat server...");
             try {
-                Support.trace(String.format("### 2. btsocket: %s", (btsocket == null) ? "NULL" : btsocket.toString()));
                 chatServer = new ChatServer(btsocket, handler);
                 chatServer.start();
             }
@@ -142,19 +132,12 @@ public class ChatActivity extends ActivityTracker
     }
 
     public static void stopChatServer() {
-//        Support.trace("*** NOT *** Stopping chat server..."); // DEL:
-
         if (chatServer == null) {
             throw new IllegalStateException(
                     "Attempt to stop a non-existent chat server.");
         }
         Support.trace("Stopping chat server...");
-
-//        chatServer.interrupt(); // DEL:
-        ChatServer.closeStream(); // TBD: http://stackoverflow.com/questions/6579539/how-to-unblock-inputstream-read-on-android
-
-        Support.trace(String.format("CHAT SERVER THREAD IS INTERRUPTED: %b",
-                chatServer.isInterrupted()));
+        ChatServer.stopServer();
         chatServer = null;
     }
 
@@ -218,21 +201,6 @@ public class ChatActivity extends ActivityTracker
      */
     @SuppressWarnings("UnusedParameters")
     public void clickDone(View v) {
-//        // DEL:
-//        if (chatServer == null) {
-//            throw new IllegalStateException(
-//                    "Attempt to stop a non-existent chat server.");
-//        }
-//        Support.trace("Stopping chat server...");
-//        // TBD: listenerLock.setExitFlag(true);
-//        ChatServer.closeStream(); // TBD:
-//        chatServer.interrupt();
-//        Support.trace(String.format("CHAT SERVER THREAD IS INTERRUPTED: %b",
-//                chatServer.isInterrupted()));
-//        chatServer = null;
-//
-//
-//
         finish();
     }
 }

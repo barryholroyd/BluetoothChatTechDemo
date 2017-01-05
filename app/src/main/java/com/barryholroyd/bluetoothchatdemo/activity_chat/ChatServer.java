@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.channels.ClosedByInterruptException;
 import java.util.Locale;
 
 /**
@@ -65,7 +64,6 @@ public class ChatServer extends Thread
     public ChatServer(BluetoothSocket _btSocket, Handler handler) throws ChatServerException {
         btSocket = _btSocket;
         caHandler = handler;
-        Support.trace(String.format("* 1. btSocket connected: %b", btSocket.isConnected()));
         if (btSocket == null) {
             throw new ChatServerException("Null Bluetooth socket.");
         }
@@ -97,7 +95,6 @@ public class ChatServer extends Thread
                 }
             }
         };
-        Support.trace(String.format("* 2. btSocket connected: %b", btSocket.isConnected()));
     }
 
     /**
@@ -139,49 +136,52 @@ public class ChatServer extends Thread
         tv.setText(text);
     }
 
-    /*
-     * Run read/display loop. When the connection is closed, exit the loop and tell the
-     * running ChatActivity to exit, returning control to the original SelectActivity.
+    /**
+     * Run read/display loop.
+     * <p>
+     *     When the connection is closed, exit the loop and tell the running ChatActivity
+     *     to exit, returning control to the original SelectActivity.
+     * <p>
+     *     Sending this thread an interrupt won't have any effect. To interrupt the read(),
+     *     the btIn input stream needs to be closed. This is due to an apparent bug in
+     *     Android.
+     *
+     * @see <a href="http://stackoverflow.com/questions/6579539/how-to-unblock-inputstream-read-on-android">
+     *     How to unblock InputStream.read() on Android?</a>
+     * @see #stopServer()
+     *     TBD: check links in javadocs
      */
     @Override
     public void run() {
-        Support.trace(String.format("* 3. btSocket connected: %b", btSocket.isConnected()));
         while (true) {
             byte[] bytes = new byte[BUFSIZE];
             Support.trace("Waiting to read input...");
             try {
                 //noinspection ResultOfMethodCallIgnored
-                Support.trace(String.format("* 4a. btSocket connected: %b", btSocket.isConnected()));
-                Support.trace(String.format("CHAT SERVER THREAD IS INTERRUPTED (ME1): %b", interrupted()));
                 btIn.read(bytes, 0, BUFSIZE);
-                Support.trace(String.format("* 4b. btSocket connected: %b", btSocket.isConnected()));
-                Support.trace(String.format("CHAT SERVER THREAD IS INTERRUPTED (ME2): %b", interrupted()));
-            }
-            catch (ClosedByInterruptException ioe) {
-                // ChatActivity sends an interrupt when it wants to kill this server thread.
-                Support.trace("Connection closed by interrupt.");
-                Support.trace(String.format("CHAT SERVER THREAD IS INTERRUPTED (ME3): %b", interrupted()));
-                return;
             }
             catch (IOException ioe) {
+                /*
+                 * This can be caused by either the connection going down (e.g., if the other
+                 * end closed it) or by a call to stopServer() (which closes btIn to force
+                 * this exception to be generated).
+                 */
                 Support.trace("Closing the connection...");
-                Support.exception("IOException during read", ioe);
-                Support.trace(String.format("* 5. btSocket connected: %b", btSocket.isConnected()));
-                Support.trace(String.format("CHAT SERVER THREAD IS INTERRUPTED (ME4): %b", interrupted()));
                 try {
                     btSocket.close();
                 } catch (IOException ioe2) {
                     Support.exception("Failed to close the connection", ioe2);
                 }
-                // TBD: this is sometimes necessary and sometimes not necessary?
+
+                /*
+                 * If the exception was not requested by ChatActivity calling stopServer(),
+                 * then we need to tell the running ChatActivity instance to exit. Doing this
+                 * is o.k. even if the ChatActivity did trigger this exception.
+                 */
                 Message m = caHandler.obtainMessage(ChatActivity.FINISH);
                 caHandler.sendMessage(m);
                 return;
             }
-            catch (Exception e) {
-                Support.exception("*** CHAT SERVER EXCEPTION: ", e);
-            }
-            Support.trace(String.format("CHAT SERVER THREAD IS INTERRUPTED (ME5): %b", interrupted()));
             Message m = uiHandler.obtainMessage(CHATTEXT, bytes);
             uiHandler.sendMessage(m);
         }
@@ -206,11 +206,18 @@ public class ChatServer extends Thread
     }
 
     /**
-     * TBD:
-     * See: http://stackoverflow.com/questions/6579539/how-to-unblock-inputstream-read-on-android
+     * Close the input stream so that its read() method throws an exception and the thread
+     * can exit.
+     * <p>
+     *     Sending this thread an interrupt won't have any effect. To interrupt the read(),
+     *     the btIn input stream needs to be closed. This is due to an apparent bug in
+     *     Android.
+     *
+     * @see #run()
+     *     TBD: check link in javadocs
      */
-    static void closeStream() {
-        Support.trace("@@@ Closing ChatServer input stream..."); // DEL:
+    static void stopServer() {
+        Support.trace("++++++++ in stopServer()");
         if (btIn == null) {
             throw new IllegalStateException("Bluetooth input stream already closed.");
         }
@@ -218,13 +225,14 @@ public class ChatServer extends Thread
             btIn.close();
         }
         catch (Exception e) {
-            Support.exception("@@@ Exception closing input stream", e); // TBD:
+            Support.exception("Exception attempting to close input stream", e);
         }
     }
-
-
 }
 
+/**
+ * Exceptions specific to the chat server.
+ */
 class ChatServerException extends Exception {
     ChatServerException(String msg) {
         super(msg);

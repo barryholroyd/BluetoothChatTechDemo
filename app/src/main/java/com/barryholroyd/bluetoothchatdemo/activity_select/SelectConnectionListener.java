@@ -30,51 +30,14 @@ public class SelectConnectionListener extends Thread
     static private final String SERVICE_NAME = "BluetoothChatDemo";
 
     /** UUID generated at: https://www.uuidgenerator.net/. Used by both client and server code. */
-    static public final UUID MY_UUID = UUID.fromString("bb303707-5a56-4536-8d07-7ead8264f6b9");
-
-    /** Singleton -- only allow a single running server thread at a time. */
-    static private SelectConnectionListener btListener = null;
+    static final UUID MY_UUID = UUID.fromString("bb303707-5a56-4536-8d07-7ead8264f6b9");
 
     static private BluetoothServerSocket btServerSocket = null;
 
-
-    // DEL:
-//    /**
-//     * Class used by other threads to coordinate
-//     * with this server thread.
-//     * <p>
-//     *     The server thread waits on this lock after accepting a connection and initiating
-//     *     a ChatActivity activity. The ChatActivity thread then notifies this thread, via
-//     *     the Lock instance, when it is done, so that the server can resume waiting for
-//     *     another connection to accept.
-//     * <p> TBD: BR is separate thread from UI? (NO)
-//     * DEL:?
-//     *     The ChatBroadcastReceiver thread sends an interrupt to this thread when
-//     *     Bluetooth is turned off on the device so that this thread can exit.
-//     */
-//    static public class Lock
-//    {
-//        private boolean condition = false;
-//        private boolean exitFlag = false;
-//
-//        boolean isChatDone() { return condition; }
-//        public void setChatDone(boolean _condition) { condition = _condition; }
-//
-//        boolean getExitFlag() { return exitFlag; }
-//        void setExitFlag(boolean _exitFlag) { exitFlag = _exitFlag; }
-//    }
-//    public static final Lock listenerLock = new Lock();
-
-    public static void startListener() {
+    static void startListener() {
         if (BluetoothUtils.isEnabled()) {
-            if (btListener != null) {
-                throw new IllegalStateException("Attempt to create a second running listener.");
-            }
             Support.trace("Starting listener...");
-            // DEL:
-//            listenerLock.setExitFlag(false);
-            btListener = new SelectConnectionListener();
-            btListener.start();
+            (new SelectConnectionListener()).start();
         }
         else {
             Support.trace(
@@ -82,34 +45,9 @@ public class SelectConnectionListener extends Thread
         }
     }
 
-    public static void stopListener() {
-        if (btListener == null) { // TBD: don't need to check btListener?
-            throw new IllegalStateException("Attempt to stop a non-existent listener.");
-        }
+    static void stopListener() {
         Support.trace("Stopping listener...");
-    // DEL:
-//            listenerLock.setExitFlag(true);
-//            btListener.interrupt();
         closeSocket();
-        btListener = null; // TBD: don't need to check btListener?
-    }
-
-    /**
-     * Close the listening BluetoothServerSocket. Per the BluetoothServerSocket
-     * reference page, its close() method must be used to abort its accept() method
-     * (the worker thread's interrupt() method is ignored).
-     */
-    private static void closeSocket() {
-        Support.trace("@@@ Closing BluetoothServerSocket input stream..."); // DEL:
-        if (btServerSocket == null) {
-            throw new IllegalStateException("Bluetooth server socket already closed.");
-        }
-        try {
-            btServerSocket.close();
-        }
-        catch (Exception e) {
-            Support.exception("@@@ Exception closing input stream", e); // TBD:
-        }
     }
 
     /**
@@ -117,7 +55,6 @@ public class SelectConnectionListener extends Thread
      * to run the chat session.
      */
     public void run() {
-
         try {
             Support.trace("Creating new server socket...");
             btServerSocket = BluetoothUtils.getBluetoothAdapter().
@@ -134,9 +71,10 @@ public class SelectConnectionListener extends Thread
             return;
         }
 
+        // Server socket. ChatServer is responsible for closing it.
         //noinspection InfiniteLoopStatement
-//        while (true) {
         BluetoothSocket btSocket = null;
+
         if (!BluetoothUtils.isEnabled()) {
             Support.userMessage("Connection dropped.");
             return;
@@ -147,16 +85,13 @@ public class SelectConnectionListener extends Thread
             btSocket = btServerSocket.accept();
         }
         catch (IOException ioe) {
-            // TBD: caused by closing the BluetoothServerSocket.
+            // Caused by closing the BluetoothServerSocket.
             Support.trace("Listener: exiting...");
-            Support.exception("Listener connection IO exception", ioe); // TBD:
-            // TBD: this should never happen.
-            if (btSocket != null)
-                throw new IllegalStateException("btSocket is non-null");
             return;
         }
 
         BluetoothDevice btdevice;
+        // TBD: test fatalError
         if (btSocket == null) {
             Support.fatalError("Failed to get Bluetooth socket.");
             Support.userMessage("*** Failed to get Bluetooth socket."); // TBD:
@@ -169,11 +104,9 @@ public class SelectConnectionListener extends Thread
         /*
          * Make the Bluetooth socket available to ChatActivity.
          * ChatActivity is responsible for closing it.
-         * TBD: check client version.
          */
         SelectActivity.getApplicationGlobalState().setBtSocket(btSocket);
 
-        // Start communications.
         Support.userMessage("Connected!");
 
         // Pass control to the chat Activity.
@@ -182,45 +115,22 @@ public class SelectConnectionListener extends Thread
         intent.putExtra(ChatActivity.BUNDLE_KEY_BTDEVICE, btdevice);
         intent.addFlags(FLAG_ACTIVITY_NEW_TASK); // required since an App Context is used
         c.startActivity(intent);
+    }
 
-                // TBD: not needed
-//                /*
-//                 * Wait for the ChatActivity to complete. Exit this thread if Bluetooth
-//                 * is turned off.
-//                 */
-//                synchronized (listenerLock) {
-//                    while (!listenerLock.isChatDone()) {
-//                        try {
-//                            Support.trace("Listener: entering wait()...");
-//                            listenerLock.wait();
-//                            Support.trace("Listener: resuming after wait()...");
-//                        } catch (InterruptedException ioe) {
-//                            Support.trace("Listener: InterruptedException caught...");
-//                            if (listenerLock.getExitFlag()) {
-//                                Support.trace("Listener: exiting...");
-//                                listenerLock.setExitFlag(false);
-//                                return;
-//                            }
-//                            Support.exception("Listener: spurious interrupt exception while waiting on server lock", ioe);
-//                        }
-//                    }
-//                    listenerLock.setChatDone(false);
-//                }
-//            }
-//            catch (IOException ioe) {
-//                Support.exception("Listener connection IO exception", ioe); // TBD:
-//            }
-            // DEL:
-//            finally {
-//                try {
-//                    if (btSocket != null) {
-//                        btSocket.close();
-//                    }
-//                }
-//                catch (IOException ioe2){
-//                    Support.exception("Server connection IO exception #2", ioe2); // TBD:
-//                }
-//            }
-//        }
+    /**
+     * Close the listening BluetoothServerSocket. Per the BluetoothServerSocket
+     * reference page, its close() method must be used to abort its accept() method
+     * (the worker thread's interrupt() method is ignored).
+     */
+    private static void closeSocket() {
+        if (btServerSocket == null) {
+            throw new IllegalStateException("Bluetooth server socket already closed.");
+        }
+        try {
+            btServerSocket.close();
+        }
+        catch (Exception e) {
+            Support.exception("Exception attempting to close Bluetooth server socket", e);
+        }
     }
 }

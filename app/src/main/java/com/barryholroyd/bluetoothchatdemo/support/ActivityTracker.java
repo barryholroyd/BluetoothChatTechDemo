@@ -9,8 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import java.util.Locale;
 import java.util.Stack;
 
-// TBD: Do we need this?
-
 /**
  * Registry to track the creation and destruction of Activities.
  * <p>

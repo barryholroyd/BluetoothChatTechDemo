@@ -41,23 +41,14 @@ public class ChatBroadcastReceiver extends BroadcastReceiver
             case BluetoothAdapter.ACTION_STATE_CHANGED:
                 switch (intent.getExtras().getInt(EXTRA_STATE)) {
                     case BluetoothAdapter.STATE_ON:
-                        // TBD: we don't receive broadcasts if we aren't in at least STARTED state
-                        // If the activity is STARTED or RESUMED, start listener.
-//                        ActivityTracker.ActivityState state = ActivityTracker.getState();
-//                        if (    (state == ActivityTracker.ActivityState.STARTED) ||
-//                                (state == ActivityTracker.ActivityState.RESUMED)) {
-                            ChatActivity.startChatServer();
-//                        }
+                        ChatActivity.startChatServer();
                         break;
                     case BluetoothAdapter.STATE_TURNING_ON:
                         break;
                     case BluetoothAdapter.STATE_OFF | BluetoothAdapter.STATE_TURNING_OFF:
-                        Support.error("ChatBR: stopping server..."); // DEL:
                         ChatActivity.stopChatServer();
-                        Support.error("ChatBR: displaying user message..."); // DEL:
                         Support.userMessage("No Bluetooth... exiting chat");
                         Activity a = ActivityTracker.getActivity();
-                        Support.error("ChatBR: a.finish()..."); // DEL:
                         if (a != null) a.finish();
                         else throw new IllegalStateException("Missing activity.");
                         break;

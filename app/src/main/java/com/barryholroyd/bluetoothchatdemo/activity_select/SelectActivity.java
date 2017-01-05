@@ -24,19 +24,7 @@ import java.util.Set;
  * TBD: Run code analyzer (e.g., Handlers should be static?)
  * TBD: clean out TBDs, etc.
  *
- * Bugs
- * TBD: Turn off Bluetooth: Server: waiting for a new connection to accept LOOPS
- *      Client contacts S7, S7 is server. Turn off bluetooth on S7, infinite loop in S7
- *      Server: waiting for a new connection to accept...
- *      SEE SelectConnectionListener.java.
- *      Client: bluetooth is off -- exit
- *      Server: connection lost; restart server (?).
- * TBD: Test -- is alternate connect approach ever used by either device?
- * TBD: Test -- try killing server (pull USB cable?)
- *
  * Look and feel
- * TBD: S7 portrait mode, Connected header, fully shows? (minLines=1)
- * TBD: Rotate server end (S7) -- retains text received?
  *
  * Closure
  * TBD: turn off tracing.
@@ -44,7 +32,7 @@ import java.util.Set;
 
 /**
  * Display client UI to initiate connection requests and fork off a worker
- * thread to listen for incoming connection requests. Use BluetoothClient
+ * thread to listen for incoming connection requests. Use SelectClient
  * and SelectConnectionListener, respectively, to perform the actual connect, then
  * instantiate ChatActivity to manage the chat session. ChatActivity uses
  * ChatServer to send and receive text over the Bluetooth connection.
@@ -65,7 +53,7 @@ public class SelectActivity extends ActivityTracker
     /**
      * All code in this app, except for code in ChatActivity and ChatServer (which is
      * only called by ChatActivity) executes while SelectActivity should be present and
-     * available, with one caveat: BluetoothClient and SelectConnectionListener classes are both
+     * available, with one caveat: SelectClient and SelectConnectionListener classes are both
      * extensions of Thread so that they can set up connections in the background. In both
      * the cases it is possible (although not likely) that the SelectActivity instance will
      * be gone by the time they need it. For that reason, we route requests for the SelectActivity
