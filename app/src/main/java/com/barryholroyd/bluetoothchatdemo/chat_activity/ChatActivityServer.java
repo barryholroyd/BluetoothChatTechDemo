@@ -1,4 +1,4 @@
-package com.barryholroyd.bluetoothchatdemo.bluetooth;
+package com.barryholroyd.bluetoothchatdemo.chat_activity;
 
 import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
@@ -6,7 +6,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.widget.TextView;
 
-import com.barryholroyd.bluetoothchatdemo.ChatActivity;
 import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
@@ -29,7 +28,7 @@ import java.util.Locale;
  *     to the remote app.
  */
 
-public class BluetoothComm extends Thread
+public class ChatActivityServer extends Thread
 {
     /** Bluetooth socket to be read and written. */
     private static BluetoothSocket btSocket;
@@ -61,7 +60,7 @@ public class BluetoothComm extends Thread
      * @param _btSocket Bluetooth socket to be read and written.
      * @param handler   Handler to cause the calling ChatActivity to exit.
      */
-    public BluetoothComm(BluetoothSocket _btSocket, Handler handler) {
+    public ChatActivityServer(BluetoothSocket _btSocket, Handler handler) {
         btSocket = _btSocket;
         caHandler = handler;
         running = false;
@@ -90,7 +89,7 @@ public class BluetoothComm extends Thread
                 }
                 else {
                     String msg = String.format(Locale.US,
-                            "Unexpected message type in BluetoothComm: %d.",
+                            "Unexpected message type in ChatActivityServer: %d.",
                             message.what);
                     throw new IllegalStateException(msg);
                 }
@@ -140,7 +139,7 @@ public class BluetoothComm extends Thread
 
     /*
      * Run read/display loop. When the connection is closed, exit the loop and tell the
-     * running ChatActivity to exit, returning control to the original MainActivity.
+     * running ChatActivity to exit, returning control to the original SelectActivity.
      */
     @Override
     public void run() {

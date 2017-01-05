@@ -8,8 +8,8 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.barryholroyd.bluetoothchatdemo.ApplicationGlobalState;
-import com.barryholroyd.bluetoothchatdemo.ChatActivity;
-import com.barryholroyd.bluetoothchatdemo.MainActivity;
+import com.barryholroyd.bluetoothchatdemo.chat_activity.ChatActivity;
+import com.barryholroyd.bluetoothchatdemo.select_activity.SelectActivity;
 import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
@@ -18,7 +18,7 @@ import java.lang.reflect.Method;
 import java.util.Locale;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-import static com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothServer.MY_UUID;
+import static com.barryholroyd.bluetoothchatdemo.select_activity.BtConnectionListener.MY_UUID;
 
 /**
  * Bluetooth "chat" client connection set up.
@@ -26,10 +26,10 @@ import static com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothServer.MY_UU
  *     Given a remote device, create a connection to it and then call start
  *     ChatActivity to run a chat session.
  * <p>
- *     Runs as a background thread so that the user can still do other stuff (e.g.,
+ *     TBD: Runs as a background thread so that the user can still do other stuff (e.g.,
  *     adjust settings) even if the write to the network hangs.
  */
-public class BluetoothClient extends Thread
+public class BluetoothClient
 {
     /** client socket */
     private static BluetoothSocket mSocket = null;
@@ -47,7 +47,7 @@ public class BluetoothClient extends Thread
     }
 
     /**
-     * Create a connection to a remote Bluetooth server and then pass it to BluetoothComm
+     * Create a connection to a remote Bluetooth server and then pass it to ChatActivityServer
      * to run the chat session. This thread exits after spawning the communication thread.
      *
      * The check to ensure that Bluetooth is enabled is done before starting this worker thread.
@@ -126,7 +126,7 @@ public class BluetoothClient extends Thread
         }
 
         // Make the Bluetooth socket available to other components.
-        Activity a = MainActivity.getActivity();
+        Activity a = SelectActivity.getActivity();
         if (a == null) {
             Support.userMessage("Internal (temporary) error: could not get Activity.");
             closeSocket(mSocket);
@@ -142,7 +142,7 @@ public class BluetoothClient extends Thread
         btdevice = null;
     }
 
-    /** Local method to close the socket if it hasn't been passed to BluetoothComm yet. */
+    /** Local method to close the socket if it hasn't been passed to ChatActivityServer yet. */
     private void closeSocket(BluetoothSocket socket) {
         btdevice = null;
         try   {

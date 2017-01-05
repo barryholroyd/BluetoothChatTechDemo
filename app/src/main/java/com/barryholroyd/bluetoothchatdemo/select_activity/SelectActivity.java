@@ -1,4 +1,4 @@
-package com.barryholroyd.bluetoothchatdemo;
+package com.barryholroyd.bluetoothchatdemo.select_activity;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -7,12 +7,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.barryholroyd.bluetoothchatdemo.ApplicationGlobalState;
+import com.barryholroyd.bluetoothchatdemo.R;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothDevices;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothUtils;
-import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothServer;
 import com.barryholroyd.bluetoothchatdemo.recyclerview.MyAdapter;
 import com.barryholroyd.bluetoothchatdemo.recyclerview.RecyclerViewManager;
 import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
+import com.barryholroyd.bluetoothchatdemo.support.BroadcastReceivers;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.util.Set;
@@ -26,7 +28,7 @@ import java.util.Set;
  * TBD: Turn off Bluetooth: Server: waiting for a new connection to accept LOOPS
  *      Client contacts S7, S7 is server. Turn off bluetooth on S7, infinite loop in S7
  *      Server: waiting for a new connection to accept...
- *      SEE BluetoothServer.java.
+ *      SEE BtConnectionListener.java.
  *      Client: bluetooth is off -- exit
  *      Server: connection lost; restart server (?).
  * TBD: Test -- is alternate connect approach ever used by either device?
@@ -43,11 +45,11 @@ import java.util.Set;
 /**
  * Display client UI to initiate connection requests and fork off a worker
  * thread to listen for incoming connection requests. Use BluetoothClient
- * and BluetoothServer, respectively, to perform the actual connect, then
+ * and BtConnectionListener, respectively, to perform the actual connect, then
  * instantiate ChatActivity to manage the chat session. ChatActivity uses
- * BluetoothComm to send and receive text over the Bluetooth connection.
+ * ChatActivityServer to send and receive text over the Bluetooth connection.
  */
-public class MainActivity extends ActivityTracker
+public class SelectActivity extends ActivityTracker
 {
     // Global state is stored at the app level.
     private static ApplicationGlobalState ags;
@@ -61,40 +63,40 @@ public class MainActivity extends ActivityTracker
     private RecyclerViewManager rvmPaired;
 
     /**
-     * All code in this app, except for code in ChatActivity and BluetoothComm (which is
-     * only called by ChatActivity) executes while MainActivity should be present and
-     * available, with one caveat: BluetoothClient and BluetoothServer classes are both
+     * All code in this app, except for code in ChatActivity and ChatActivityServer (which is
+     * only called by ChatActivity) executes while SelectActivity should be present and
+     * available, with one caveat: BluetoothClient and BtConnectionListener classes are both
      * extensions of Thread so that they can set up connections in the background. In both
-     * the cases it is possible (although not likely) that the MainActivity instance will
-     * be gone by the time they need it. For that reason, we route requests for the MainActivity
+     * the cases it is possible (although not likely) that the SelectActivity instance will
+     * be gone by the time they need it. For that reason, we route requests for the SelectActivity
      * instance through ActivityTracker, which tracks the creation and destruction of
      * Activities in this app.
      *
-     * @return the current MainActivity instance if it exists; else null.
+     * @return the current SelectActivity instance if it exists; else null.
      */
-    private static MainActivity  getMainActivity() {
+    private static SelectActivity getMainActivity() {
         Activity a = getActivity(); // from ActivityTracker
 
-        // This should only happen if this method is called from MainActivity's onCreate() method.
+        // This should only happen if this method is called from SelectActivity's onCreate() method.
         if (a == null) {
-            Support.fatalError("Attempt to access uninitialized MainActivity instance.");
+            Support.fatalError("Attempt to access uninitialized SelectActivity instance.");
         }
-        if (! (a instanceof MainActivity)) {
+        if (! (a instanceof SelectActivity)) {
             return null;
         }
-        return (MainActivity) a;
+        return (SelectActivity) a;
     }
 
     /** Get the "Discovered" RecyclerViewManager. */
     public static RecyclerViewManager  getRvmDiscovered(){
-        MainActivity ma = getMainActivity();
+        SelectActivity ma = getMainActivity();
         if (ma != null) return ma.rvmDiscovered;
         else            return null;
     }
 
     /** Get the "Paired" RecyclerViewManager. */
     public static RecyclerViewManager  getRvmPaired()    {
-        MainActivity ma = getMainActivity();
+        SelectActivity ma = getMainActivity();
         if (ma != null) return ma.rvmPaired;
         else            return null;
     }
@@ -114,8 +116,8 @@ public class MainActivity extends ActivityTracker
         rvmPaired         = new RecyclerViewManager(this, R.id.rv_paired);
         rvmDiscovered     = new RecyclerViewManager(this, R.id.rv_discovered);
 
-        // Register receiver for handling Bluetooth events (e.g., start/stop server worker thread).
-        BluetoothUtils.registerBroadcastReceiver(this);
+        // Register receiver for handling Bluetooth events.
+        BroadcastReceivers.registerBroadcastReceiver(this, new SelectActivityBroadcastReceiver());
 
         /*
          * Ensure Bluetooth is enabled; if not, ask the user for permission.
@@ -128,7 +130,6 @@ public class MainActivity extends ActivityTracker
             refreshPaired();
             refreshDiscovered();
             BluetoothUtils.requestDiscoverable();
-            BluetoothServer.manage(BluetoothAdapter.STATE_ON);
         }
         else {
             Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -136,6 +137,16 @@ public class MainActivity extends ActivityTracker
         }
 
         ags.setAppInitialized();
+    }
+
+    @Override
+    public void onStart() {
+        BtConnectionListener.startListener();
+    }
+
+    @Override
+    public void onStop() {
+        BtConnectionListener.stopListener();
     }
 
     /**
@@ -179,18 +190,18 @@ public class MainActivity extends ActivityTracker
                     /** Only make this request once. */
                     if (ags.isAppInitialized())
                         BluetoothUtils.requestDiscoverable();
-                    // Server turned on by BluetoothBroadcastReceiver.
+                    // Server turned on by SelectActivityBroadcastReceiver.
                     return;
                 }
                 break;
         }
     }
 
-    /** Unregister the BroadcastReceiver which handles device discovery results. */
+    /** Unregister the BroadcastReceiver. */
     @Override
     public void onDestroy() {
         super.onDestroy();
-        BluetoothUtils.unregisterBroadcastReceiver(this);
+        BroadcastReceivers.unregisterBroadcastReceiver(this);
     }
 
     /**
@@ -198,7 +209,7 @@ public class MainActivity extends ActivityTracker
      * <p>
      *     When new devices are discovered, a broadcast is sent out. The "Discovered" RecyclerView
      *     is updated by the BroadcastReceiver.
-     *     See {@link com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothBroadcastReceiver#onReceive}.
+     *     See {@link SelectActivityBroadcastReceiver#onReceive}.
      */
     private void refreshDiscovered() {
         MyAdapter myAdapter = rvmDiscovered.getAdapter();

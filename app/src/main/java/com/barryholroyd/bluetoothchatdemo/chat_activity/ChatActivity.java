@@ -1,4 +1,4 @@
-package com.barryholroyd.bluetoothchatdemo;
+package com.barryholroyd.bluetoothchatdemo.chat_activity;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -11,21 +11,24 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothComm;
+import com.barryholroyd.bluetoothchatdemo.ApplicationGlobalState;
+import com.barryholroyd.bluetoothchatdemo.R;
+import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothUtils;
 import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
+import com.barryholroyd.bluetoothchatdemo.support.BroadcastReceivers;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
-import static com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothServer.serverLock;
+import static com.barryholroyd.bluetoothchatdemo.select_activity.BtConnectionListener.listenerLock;
 
 /**
  * Display the Chat view for the user and manage the sending/receiving of text.
  * <p>
- *     Write requests are handled in this class. Incoming text is read by BluetoothComm --
+ *     Write requests are handled in this class. Incoming text is read by ChatActivityServer --
  *     it uses the main UI's Handler to get the ChatActivity instance and fill in the
- *     "received" text field. This works cleanly because BluetoothComm is only used by
+ *     "received" text field. This works cleanly because ChatActivityServer is only used by
  *     ChatActivity.
  */
 public class ChatActivity extends ActivityTracker
@@ -42,11 +45,18 @@ public class ChatActivity extends ActivityTracker
     /** Getter for "receive" TextView in ChatActivity. */
     public TextView getTextViewReceive()  { return tvTextReceive; }
 
+    /** Only allow a single running server thread at a time. */
+    static ChatActivityServer chatActivityServer = null;
+
+    static BluetoothSocket btsocket = null;
+
+    static Handler handler = null;
+
     /**
      * Display the chat window for the user, get the BluetoothSocket stored in
-     * ApplicationGlobalState by BluetoothClient or BluetoothServer, configure a
+     * ApplicationGlobalState by BluetoothClient or BtConnectionListener, configure a
      * callback Handler to exit the Activity is requested by the worker thread and
-     * then start the BluetoothComm worker thread to handle the actual reads and writes
+     * then start the ChatActivityServer worker thread to handle the actual reads and writes
      * from the connection.
      *
      * @param savedInstanceState standard Bundle argument.
@@ -66,17 +76,20 @@ public class ChatActivity extends ActivityTracker
 
         configureScrollBars();
 
-        BluetoothSocket btsocket = ((ApplicationGlobalState) getApplication()).getBtSocket();
+        btsocket = ((ApplicationGlobalState) getApplication()).getBtSocket();
 
-        // Callback to exit this activity.
-        Handler handler = new Handler() { // TBD: Inspector says this should be static
+        /*
+         * Callback to exit this activity. Must (re-)initialize each time so that
+         * finish() references the correct instance.
+         */
+        handler = new Handler() { // TBD: inspector thinks this might leak memory ...?
             @Override
             public void handleMessage(Message message) {
                 if (message.what == FINISH) {
                     Support.trace("Exiting ChatActivity...");
-                    synchronized (serverLock) {
-                        serverLock.setChatDone(true);
-                        serverLock.notifyAll();
+                    synchronized (listenerLock) {
+                        listenerLock.setChatDone(true);
+                        listenerLock.notifyAll();
                     }
                     finish();
                 }
@@ -89,8 +102,43 @@ public class ChatActivity extends ActivityTracker
             }
         };
 
-        // Create a worker thread to handle the reads and writes from the Bluetooth connection.
-        (new BluetoothComm(btsocket, handler)).start();
+    }
+
+    @Override
+    public void onStart() {
+        BroadcastReceivers.registerBroadcastReceiver(this, new ChatActivityBroadcastReceiver());
+        startChat();
+    }
+
+    @Override
+    public void onStop() {
+        BroadcastReceivers.unregisterBroadcastReceiver(this);
+        stopChat();
+    }
+
+    public static void startChat() {
+        if (BluetoothUtils.isEnabled()) {
+            if (chatActivityServer != null) {
+                throw new IllegalStateException(
+                        "Attempt to create a second running chat server.");
+            }
+            Support.trace("Starting chat server...");
+            chatActivityServer = new ChatActivityServer(btsocket, handler);
+            chatActivityServer.start();
+        }
+    }
+
+    public static void stopChat() {
+        if (BluetoothUtils.isEnabled()) {
+            if (chatActivityServer == null) {
+                throw new IllegalStateException(
+                        "Attempt to stop a non-existent chat server.");
+            }
+            Support.trace("Stopping chat server...");
+            // TBD: listenerLock.setExitFlag(true);
+            chatActivityServer.interrupt();
+            chatActivityServer = null;
+        }
     }
 
     /**
@@ -135,25 +183,25 @@ public class ChatActivity extends ActivityTracker
             return;
         }
 
-        if (bytes.length > BluetoothComm.BUFSIZE) {
+        if (bytes.length > ChatActivityServer.BUFSIZE) {
             Support.userMessage(String.format(Locale.US,
                     "Message is too long (%d). Maximum length is %d.",
-                    bytes.length, BluetoothComm.BUFSIZE));
+                    bytes.length, ChatActivityServer.BUFSIZE));
             return;
         }
 
-        BluetoothComm.writeChat(bytes);
+        ChatActivityServer.writeChat(bytes);
     }
 
     /**
-     * Cancel the connection if it exists, then exit the ChatActivity. The original MainActivity
+     * Cancel the connection if it exists, then exit the ChatActivity. The original SelectActivity
      * will then be brought into the foreground from the back stack.
      *
      * @param v the View the user clicked on.
      */
     @SuppressWarnings("UnusedParameters")
     public void clickDone(View v) {
-        BluetoothComm.closeConnection();
+        ChatActivityServer.closeConnection();
         finish();
     }
 }

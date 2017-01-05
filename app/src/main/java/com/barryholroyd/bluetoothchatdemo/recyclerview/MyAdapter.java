@@ -94,7 +94,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             }
 
             // Set up a Bluetooth client connection to the remote device.
-            (new BluetoothClient(btdevice)).start();
+            (new BluetoothClient(btdevice)).run(); // TBD: clean up, no longer a thread
         }
     }
 }
