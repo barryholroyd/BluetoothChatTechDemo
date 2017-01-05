@@ -142,14 +142,18 @@ public class ChatActivity extends ActivityTracker
     }
 
     public static void stopChatServer() {
-        if (chatServer == null) {
-            throw new IllegalStateException(
-                    "Attempt to stop a non-existent chat server.");
-        }
-        Support.trace("Stopping chat server...");
-        // TBD: listenerLock.setExitFlag(true);
-        chatServer.interrupt();
-        chatServer = null;
+        Support.trace("*** NOT *** Stopping chat server...");
+
+//        if (chatServer == null) {
+//            throw new IllegalStateException(
+//                    "Attempt to stop a non-existent chat server.");
+//        }
+//        Support.trace("Stopping chat server...");
+//        // TBD: listenerLock.setExitFlag(true);
+//        chatServer.interrupt();
+//        Support.trace(String.format("CHAT SERVER THREAD IS INTERRUPTED: %b",
+//                chatServer.isInterrupted()));
+//        chatServer = null;
     }
 
     /**
@@ -212,7 +216,21 @@ public class ChatActivity extends ActivityTracker
      */
     @SuppressWarnings("UnusedParameters")
     public void clickDone(View v) {
-        stopChatServer();
+        // DEL:
+        if (chatServer == null) {
+            throw new IllegalStateException(
+                    "Attempt to stop a non-existent chat server.");
+        }
+        Support.trace("Stopping chat server...");
+        // TBD: listenerLock.setExitFlag(true);
+        ChatServer.closeStream(); // TBD:
+        chatServer.interrupt();
+        Support.trace(String.format("CHAT SERVER THREAD IS INTERRUPTED: %b",
+                chatServer.isInterrupted()));
+        chatServer = null;
+
+
+
         finish();
     }
 }

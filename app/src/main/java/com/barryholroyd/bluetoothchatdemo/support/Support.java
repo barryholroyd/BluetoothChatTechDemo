@@ -71,7 +71,8 @@ public class Support {
      * Log an exception with a customized string.
      */
     public static void exception(String s, Exception e) {
-        Support.error(String.format(Locale.US, "%s: %s", s, e.getMessage()));
+        Support.error(String.format(Locale.US, "%s: [%s -> %s]",
+                s, e.getClass().getSimpleName(), e.getMessage()));
     }
     /** Basic logging for the app. */
     private static void log(String msg) {

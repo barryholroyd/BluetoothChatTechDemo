@@ -52,8 +52,21 @@ public class ChatServer extends Thread
     /** Bluetooth output stream. */
     private static OutputStream btOut;
 
+    // DEL:
+    public static void closeStream() {
+        Support.trace("@@@ Closing input stream...");
+        try {
+            btIn.close();
+        }
+        catch (Exception e) {
+            Support.exception("@@@ Exception closing input stream", e);
+        }
+    }
+
     /**
      * Constructor -- set up IO and UI handler.
+     *
+     * ChatServer is responsible for closing the btSocket when done.
      *
      * @param _btSocket Bluetooth socket to be read and written.
      * @param handler   Handler to cause the calling ChatActivity to exit.
@@ -141,6 +154,7 @@ public class ChatServer extends Thread
      */
     @Override
     public void run() {
+        boolean sleeptest = false;
         Support.trace(String.format("* 3. btSocket connected: %b", btSocket.isConnected()));
         while (true) {
             byte[] bytes = new byte[BUFSIZE];
@@ -148,29 +162,43 @@ public class ChatServer extends Thread
             try {
                 //noinspection ResultOfMethodCallIgnored
                 Support.trace(String.format("* 4a. btSocket connected: %b", btSocket.isConnected()));
-                btIn.read(bytes, 0, BUFSIZE);
+                Support.trace(String.format("CHAT SERVER THREAD IS INTERRUPTED (ME1): %b", interrupted()));
+                if (!sleeptest)
+                    btIn.read(bytes, 0, BUFSIZE);
+                else
+                    sleep(4000);
                 Support.trace(String.format("* 4b. btSocket connected: %b", btSocket.isConnected()));
+                Support.trace(String.format("CHAT SERVER THREAD IS INTERRUPTED (ME2): %b", interrupted()));
             }
             catch (ClosedByInterruptException ioe) {
                 // ChatActivity sends an interrupt when it wants to kill this server thread.
                 Support.trace("Connection closed by interrupt.");
+                Support.trace(String.format("CHAT SERVER THREAD IS INTERRUPTED (ME3): %b", interrupted()));
                 return;
             }
             catch (IOException ioe) {
                 Support.trace("Closing the connection...");
                 Support.exception("IOException during read", ioe);
                 Support.trace(String.format("* 5. btSocket connected: %b", btSocket.isConnected()));
+                Support.trace(String.format("CHAT SERVER THREAD IS INTERRUPTED (ME4): %b", interrupted()));
                 try {
                     btSocket.close();
                 } catch (IOException ioe2) {
                     Support.exception("Failed to close the connection", ioe2);
                 }
+                // TBD: this is sometimes necessary and sometimes not necessary?
                 Message m = caHandler.obtainMessage(ChatActivity.FINISH);
                 caHandler.sendMessage(m);
                 return;
             }
-            Message m = uiHandler.obtainMessage(CHATTEXT, bytes);
-            uiHandler.sendMessage(m);
+            catch (Exception e) {
+                Support.exception("*** CHAT SERVER EXCEPTION: ", e);
+            }
+            Support.trace(String.format("CHAT SERVER THREAD IS INTERRUPTED (ME5): %b", interrupted()));
+            if (!sleeptest) {
+                Message m = uiHandler.obtainMessage(CHATTEXT, bytes);
+                uiHandler.sendMessage(m);
+            }
         }
     }
 
