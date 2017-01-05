@@ -33,7 +33,7 @@ public class SelectConnectionListener extends Thread
     static public final UUID MY_UUID = UUID.fromString("bb303707-5a56-4536-8d07-7ead8264f6b9");
 
     /** Singleton -- only allow a single running server thread at a time. */
-    static SelectConnectionListener btListener = null;
+    static private SelectConnectionListener btListener = null;
 
     /**
      * Class used by other threads to coordinate
@@ -58,34 +58,32 @@ public class SelectConnectionListener extends Thread
 
         boolean getExitFlag() { return exitFlag; }
         void setExitFlag(boolean _exitFlag) { exitFlag = _exitFlag; }
-
     }
     public static final Lock listenerLock = new Lock();
 
     public static void startListener() {
         if (BluetoothUtils.isEnabled()) {
             if (btListener != null) {
-                throw new IllegalStateException(
-                        "Attempt to create a second running listener.");
+                throw new IllegalStateException("Attempt to create a second running listener.");
             }
             Support.trace("Starting listener...");
             listenerLock.setExitFlag(false);
             btListener = new SelectConnectionListener();
             btListener.start();
         }
+        else {
+            Support.userMessage("Must turn on Bluetooth.");
+        }
     }
 
     public static void stopListener() {
-        if (BluetoothUtils.isEnabled()) {
             if (btListener == null) {
-                throw new IllegalStateException(
-                        "Attempt to stop a non-existent listener.");
+                throw new IllegalStateException("Attempt to stop a non-existent listener.");
             }
             Support.trace("Stopping listener...");
             listenerLock.setExitFlag(true);
             btListener.interrupt();
             btListener = null;
-        }
     }
 
     /**
@@ -100,7 +98,9 @@ public class SelectConnectionListener extends Thread
             btServerSocket = BluetoothUtils.getBluetoothAdapter().
                     listenUsingRfcommWithServiceRecord(SERVICE_NAME, MY_UUID);
         } catch (IOException e) {
+            // TBD: does fatalError work? If not, just always also throw an exception.
             Support.fatalError("Failed to get Bluetooth server socket.");
+            return;
         }
 
         // to keep the compiler happy
@@ -124,9 +124,10 @@ public class SelectConnectionListener extends Thread
                 BluetoothDevice btdevice = null;
                 if (btSocket == null) {
                     Support.fatalError("Failed to get Bluetooth socket.");
-                    Support.userMessage("*** Failed to get Bluetooth socket.");} // TBD:
+                    Support.userMessage("*** Failed to get Bluetooth socket."); // TBD:
+                    return;
+                }
                 else {
-                    // Get the remote device information.
                     btdevice = btSocket.getRemoteDevice();
                 }
 
@@ -135,7 +136,6 @@ public class SelectConnectionListener extends Thread
 
                 // Start communications.
                 Support.userMessage("Connected!");
-
 
                 // Pass control to the chat Activity.
                 Context c = ActivityTracker.getAppContext();

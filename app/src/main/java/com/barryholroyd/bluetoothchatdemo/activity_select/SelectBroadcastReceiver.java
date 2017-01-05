@@ -1,17 +1,14 @@
 package com.barryholroyd.bluetoothchatdemo.activity_select;
 
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothDevices;
 import com.barryholroyd.bluetoothchatdemo.recyclerview.RecyclerViewManager;
-import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
-import com.barryholroyd.bluetoothchatdemo.support.BroadcastReceivers;
+import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothBroadcastReceivers;
 import com.barryholroyd.bluetoothchatdemo.recyclerview.MyAdapter;
 
 import static android.bluetooth.BluetoothAdapter.EXTRA_STATE;
@@ -38,16 +35,7 @@ public class SelectBroadcastReceiver extends BroadcastReceiver
      */
     @Override
     public void onReceive(Context context, Intent intent) {
-        BroadcastReceivers.Log.logAction(context, intent);
-
-        // if SelectActivity isn't currently running, then ignore this call
-        Activity a = ActivityTracker.getActivity();
-        if ((a == null) || (!(a instanceof SelectActivity)))
-            return;
-
-        /** RecyclerView adapter instance for discovered devices. */
-        RecyclerViewManager rvmd = SelectActivity.getRvmDiscovered();
-        MyAdapter myAdapterDiscovered = rvmd.getAdapter();
+        BluetoothBroadcastReceivers.Log.logAction(context, intent);
 
         String action = intent.getAction();
         switch (action) {
@@ -60,19 +48,14 @@ public class SelectBroadcastReceiver extends BroadcastReceiver
                         break;
                     }
                 }
-                BluetoothDevices btds = myAdapterDiscovered.getDevices();
-                btds.addNoDup(device);
+                MyAdapter myAdapterDiscovered = SelectActivity.getRvmDiscovered().getAdapter();
+                myAdapterDiscovered.getDevices().addNoDup(device);
                 myAdapterDiscovered.notifyDataSetChanged();
                 break;
             case BluetoothAdapter.ACTION_STATE_CHANGED:
                 switch (intent.getExtras().getInt(EXTRA_STATE)) {
                     case BluetoothAdapter.STATE_ON:
-                        // If the activity is STARTED or RESUMED, start listener.
-                        ActivityTracker.ActivityState state = ActivityTracker.getState();
-                        if (    (state == ActivityTracker.ActivityState.STARTED) ||
-                                (state == ActivityTracker.ActivityState.RESUMED)) {
-                            SelectConnectionListener.startListener();
-                        }
+                        SelectConnectionListener.startListener();
                         break;
                     case BluetoothAdapter.STATE_TURNING_ON:
                         break;

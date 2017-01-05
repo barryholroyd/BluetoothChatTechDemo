@@ -1,4 +1,4 @@
-package com.barryholroyd.bluetoothchatdemo.support;
+package com.barryholroyd.bluetoothchatdemo.bluetooth;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+
+import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -17,16 +19,16 @@ import static android.bluetooth.BluetoothAdapter.EXTRA_SCAN_MODE;
 import static android.bluetooth.BluetoothAdapter.EXTRA_STATE;
 
 /**
- * TBD: comments
+ * Register and unregister Broadcast Receivers for Bluetooth events.
  */
 
-public class BroadcastReceivers {
+public class BluetoothBroadcastReceivers {
     private static final HashMap<Context, BroadcastReceiver> broadcastReceivers = new HashMap<>();
-
     /**
-     * Register the Bluetooth broadcast receiver.
+     * Register a Bluetooth broadcast receiver.
      *
-     * @param c current Activity's Context.
+     * @param c  the current Activity's Context.
+     * @param br the Broadcast Receiver to register.
      */
     public static void registerBroadcastReceiver(Context c, BroadcastReceiver br) {
         IntentFilter ifilter = new IntentFilter();
@@ -39,9 +41,8 @@ public class BroadcastReceivers {
         // Register the receiver.
         Support.trace(String.format("Registering Broadcast Receiver for: %s",
                 c.getClass().getSimpleName()));
-        BroadcastReceiver mReceiver = br;
-        broadcastReceivers.put(c, mReceiver);
-        c.registerReceiver(mReceiver, ifilter);
+        broadcastReceivers.put(c, br);
+        c.registerReceiver(br, ifilter);
     }
 
     /**
@@ -86,19 +87,19 @@ public class BroadcastReceivers {
             String action = intent.getAction();
             switch (action) {
                 case BluetoothDevice.ACTION_FOUND:
-                    BroadcastReceivers.Log.brlog(name, "Found device");
+                    BluetoothBroadcastReceivers.Log.brlog(name, "Found device");
                     break;
                 case BluetoothAdapter.ACTION_DISCOVERY_STARTED:
-                    BroadcastReceivers.Log.brlog(name, "Discovery Started");
+                    BluetoothBroadcastReceivers.Log.brlog(name, "Discovery Started");
                     break;
                 case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
-                    BroadcastReceivers.Log.brlog(name, "Discovery Finished");
+                    BluetoothBroadcastReceivers.Log.brlog(name, "Discovery Finished");
                     break;
                 case BluetoothAdapter.ACTION_STATE_CHANGED:
-                    BroadcastReceivers.Log.logActionStateChanged(name, intent);
+                    BluetoothBroadcastReceivers.Log.logActionStateChanged(name, intent);
                     break;
                 case BluetoothAdapter.ACTION_SCAN_MODE_CHANGED:
-                    BroadcastReceivers.Log.logScanModeChanged(name, intent);
+                    BluetoothBroadcastReceivers.Log.logScanModeChanged(name, intent);
                     break;
             }
 

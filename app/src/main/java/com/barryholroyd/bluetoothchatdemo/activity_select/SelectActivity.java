@@ -14,7 +14,7 @@ import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothUtils;
 import com.barryholroyd.bluetoothchatdemo.recyclerview.MyAdapter;
 import com.barryholroyd.bluetoothchatdemo.recyclerview.RecyclerViewManager;
 import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
-import com.barryholroyd.bluetoothchatdemo.support.BroadcastReceivers;
+import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothBroadcastReceivers;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.util.Set;
@@ -74,31 +74,30 @@ public class SelectActivity extends ActivityTracker
      *
      * @return the current SelectActivity instance if it exists; else null.
      */
-    private static SelectActivity getMainActivity() {
+    private static SelectActivity getSelectActivity() {
         Activity a = getActivity(); // from ActivityTracker
 
         // This should only happen if this method is called from SelectActivity's onCreate() method.
         if (a == null) {
-            Support.fatalError("Attempt to access uninitialized SelectActivity instance.");
+            throw new IllegalStateException(
+                    "Attempt to access uninitialized SelectActivity instance.");
         }
         if (! (a instanceof SelectActivity)) {
-            return null;
+            String msg = String.format(
+                    "Unexpected Activity type: %s", a.getClass().getSimpleName());
+            throw new IllegalStateException(msg);
         }
         return (SelectActivity) a;
     }
 
     /** Get the "Discovered" RecyclerViewManager. */
     public static RecyclerViewManager  getRvmDiscovered(){
-        SelectActivity ma = getMainActivity();
-        if (ma != null) return ma.rvmDiscovered;
-        else            return null;
+        return getSelectActivity().rvmDiscovered;
     }
 
     /** Get the "Paired" RecyclerViewManager. */
     public static RecyclerViewManager  getRvmPaired()    {
-        SelectActivity ma = getMainActivity();
-        if (ma != null) return ma.rvmPaired;
-        else            return null;
+        return getSelectActivity().rvmPaired;
     }
 
     /**
@@ -116,9 +115,6 @@ public class SelectActivity extends ActivityTracker
         rvmPaired         = new RecyclerViewManager(this, R.id.rv_paired);
         rvmDiscovered     = new RecyclerViewManager(this, R.id.rv_discovered);
 
-        // Register receiver for handling Bluetooth events.
-        BroadcastReceivers.registerBroadcastReceiver(this, new SelectBroadcastReceiver());
-
         /*
          * Ensure Bluetooth is enabled; if not, ask the user for permission.
          * Bluetooth configuration and starting the "server" worker thread
@@ -129,7 +125,6 @@ public class SelectActivity extends ActivityTracker
         if (BluetoothUtils.isEnabled()) {
             refreshPaired();
             refreshDiscovered();
-            BluetoothUtils.requestDiscoverable();
         }
         else {
             Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -141,11 +136,18 @@ public class SelectActivity extends ActivityTracker
 
     @Override
     public void onStart() {
+        super.onStart();
+        BluetoothBroadcastReceivers.registerBroadcastReceiver(this, new SelectBroadcastReceiver());
+        BluetoothUtils.requestDiscoverable();
+        // Start listening for incoming connections.
         SelectConnectionListener.startListener();
     }
 
     @Override
     public void onStop() {
+        super.onStop();
+        BluetoothBroadcastReceivers.unregisterBroadcastReceiver(this);
+        // Stop listening for incoming connections.
         SelectConnectionListener.stopListener();
     }
 
@@ -187,21 +189,14 @@ public class SelectActivity extends ActivityTracker
                 if (resultCode == RESULT_OK) {
                     refreshPaired();
                     refreshDiscovered();
-                    /** Only make this request once. */
+                    /* Only make this request once. */
                     if (ags.isAppInitialized())
                         BluetoothUtils.requestDiscoverable();
-                    // Server turned on by SelectBroadcastReceiver.
+                    // SelectConnectionListener is started by SelectBroadcastReceiver.
                     return;
                 }
                 break;
         }
-    }
-
-    /** Unregister the BroadcastReceiver. */
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        BroadcastReceivers.unregisterBroadcastReceiver(this);
     }
 
     /**

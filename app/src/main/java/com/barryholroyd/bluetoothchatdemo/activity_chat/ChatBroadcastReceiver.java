@@ -6,7 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.barryholroyd.bluetoothchatdemo.support.BroadcastReceivers;
+import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothBroadcastReceivers;
 
 import static android.bluetooth.BluetoothAdapter.EXTRA_STATE;
 
@@ -32,7 +32,7 @@ public class ChatBroadcastReceiver extends BroadcastReceiver
      */
     @Override
     public void onReceive(Context context, Intent intent) {
-        BroadcastReceivers.Log.logAction(context, intent);
+        BluetoothBroadcastReceivers.Log.logAction(context, intent);
         String action = intent.getAction();
         switch (action) {
             case BluetoothAdapter.ACTION_STATE_CHANGED:

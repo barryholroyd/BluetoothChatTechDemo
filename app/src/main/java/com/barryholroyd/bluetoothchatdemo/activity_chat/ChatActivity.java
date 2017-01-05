@@ -15,7 +15,7 @@ import com.barryholroyd.bluetoothchatdemo.support.ApplicationGlobalState;
 import com.barryholroyd.bluetoothchatdemo.R;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothUtils;
 import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
-import com.barryholroyd.bluetoothchatdemo.support.BroadcastReceivers;
+import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothBroadcastReceivers;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.io.UnsupportedEncodingException;
@@ -106,13 +106,15 @@ public class ChatActivity extends ActivityTracker
 
     @Override
     public void onStart() {
-        BroadcastReceivers.registerBroadcastReceiver(this, new ChatBroadcastReceiver());
+        super.onStart();
+        BluetoothBroadcastReceivers.registerBroadcastReceiver(this, new ChatBroadcastReceiver());
         startChatServer();
     }
 
     @Override
     public void onStop() {
-        BroadcastReceivers.unregisterBroadcastReceiver(this);
+        super.onStop();
+        BluetoothBroadcastReceivers.unregisterBroadcastReceiver(this);
         stopChatServer();
     }
 
