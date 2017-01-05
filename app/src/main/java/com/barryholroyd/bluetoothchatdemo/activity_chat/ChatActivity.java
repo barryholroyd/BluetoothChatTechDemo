@@ -1,4 +1,4 @@
-package com.barryholroyd.bluetoothchatdemo.chat_activity;
+package com.barryholroyd.bluetoothchatdemo.activity_chat;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -11,7 +11,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.barryholroyd.bluetoothchatdemo.ApplicationGlobalState;
+import com.barryholroyd.bluetoothchatdemo.support.ApplicationGlobalState;
 import com.barryholroyd.bluetoothchatdemo.R;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothUtils;
 import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
@@ -21,14 +21,14 @@ import com.barryholroyd.bluetoothchatdemo.support.Support;
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
-import static com.barryholroyd.bluetoothchatdemo.select_activity.BtConnectionListener.listenerLock;
+import static com.barryholroyd.bluetoothchatdemo.activity_select.SelectConnectionListener.listenerLock;
 
 /**
  * Display the Chat view for the user and manage the sending/receiving of text.
  * <p>
- *     Write requests are handled in this class. Incoming text is read by ChatActivityServer --
+ *     Write requests are handled in this class. Incoming text is read by ChatServer --
  *     it uses the main UI's Handler to get the ChatActivity instance and fill in the
- *     "received" text field. This works cleanly because ChatActivityServer is only used by
+ *     "received" text field. This works cleanly because ChatServer is only used by
  *     ChatActivity.
  */
 public class ChatActivity extends ActivityTracker
@@ -46,7 +46,7 @@ public class ChatActivity extends ActivityTracker
     public TextView getTextViewReceive()  { return tvTextReceive; }
 
     /** Only allow a single running server thread at a time. */
-    static ChatActivityServer chatActivityServer = null;
+    static ChatServer chatServer = null;
 
     static BluetoothSocket btsocket = null;
 
@@ -54,9 +54,9 @@ public class ChatActivity extends ActivityTracker
 
     /**
      * Display the chat window for the user, get the BluetoothSocket stored in
-     * ApplicationGlobalState by BluetoothClient or BtConnectionListener, configure a
+     * ApplicationGlobalState by BluetoothClient or SelectConnectionListener, configure a
      * callback Handler to exit the Activity is requested by the worker thread and
-     * then start the ChatActivityServer worker thread to handle the actual reads and writes
+     * then start the ChatServer worker thread to handle the actual reads and writes
      * from the connection.
      *
      * @param savedInstanceState standard Bundle argument.
@@ -106,39 +106,42 @@ public class ChatActivity extends ActivityTracker
 
     @Override
     public void onStart() {
-        BroadcastReceivers.registerBroadcastReceiver(this, new ChatActivityBroadcastReceiver());
-        startChat();
+        BroadcastReceivers.registerBroadcastReceiver(this, new ChatBroadcastReceiver());
+        startChatServer();
     }
 
     @Override
     public void onStop() {
         BroadcastReceivers.unregisterBroadcastReceiver(this);
-        stopChat();
+        stopChatServer();
     }
 
-    public static void startChat() {
+    public static void startChatServer() {
         if (BluetoothUtils.isEnabled()) {
-            if (chatActivityServer != null) {
+            if (chatServer != null) {
                 throw new IllegalStateException(
                         "Attempt to create a second running chat server.");
             }
             Support.trace("Starting chat server...");
-            chatActivityServer = new ChatActivityServer(btsocket, handler);
-            chatActivityServer.start();
+            try {
+                chatServer = new ChatServer(btsocket, handler);
+                chatServer.start();
+            }
+            catch (ChatServerException cse) {
+                throw new IllegalStateException("Could not start chat server.");
+            }
         }
     }
 
-    public static void stopChat() {
-        if (BluetoothUtils.isEnabled()) {
-            if (chatActivityServer == null) {
-                throw new IllegalStateException(
-                        "Attempt to stop a non-existent chat server.");
-            }
-            Support.trace("Stopping chat server...");
-            // TBD: listenerLock.setExitFlag(true);
-            chatActivityServer.interrupt();
-            chatActivityServer = null;
+    public static void stopChatServer() {
+        if (chatServer == null) {
+            throw new IllegalStateException(
+                    "Attempt to stop a non-existent chat server.");
         }
+        Support.trace("Stopping chat server...");
+        // TBD: listenerLock.setExitFlag(true);
+        chatServer.interrupt();
+        chatServer = null;
     }
 
     /**
@@ -183,14 +186,14 @@ public class ChatActivity extends ActivityTracker
             return;
         }
 
-        if (bytes.length > ChatActivityServer.BUFSIZE) {
+        if (bytes.length > ChatServer.BUFSIZE) {
             Support.userMessage(String.format(Locale.US,
                     "Message is too long (%d). Maximum length is %d.",
-                    bytes.length, ChatActivityServer.BUFSIZE));
+                    bytes.length, ChatServer.BUFSIZE));
             return;
         }
 
-        ChatActivityServer.writeChat(bytes);
+        ChatServer.writeChat(bytes);
     }
 
     /**
@@ -201,7 +204,7 @@ public class ChatActivity extends ActivityTracker
      */
     @SuppressWarnings("UnusedParameters")
     public void clickDone(View v) {
-        ChatActivityServer.closeConnection();
+        stopChatServer();
         finish();
     }
 }

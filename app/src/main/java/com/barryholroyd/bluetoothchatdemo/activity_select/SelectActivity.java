@@ -1,4 +1,4 @@
-package com.barryholroyd.bluetoothchatdemo.select_activity;
+package com.barryholroyd.bluetoothchatdemo.activity_select;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import com.barryholroyd.bluetoothchatdemo.ApplicationGlobalState;
+import com.barryholroyd.bluetoothchatdemo.support.ApplicationGlobalState;
 import com.barryholroyd.bluetoothchatdemo.R;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothDevices;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothUtils;
@@ -28,7 +28,7 @@ import java.util.Set;
  * TBD: Turn off Bluetooth: Server: waiting for a new connection to accept LOOPS
  *      Client contacts S7, S7 is server. Turn off bluetooth on S7, infinite loop in S7
  *      Server: waiting for a new connection to accept...
- *      SEE BtConnectionListener.java.
+ *      SEE SelectConnectionListener.java.
  *      Client: bluetooth is off -- exit
  *      Server: connection lost; restart server (?).
  * TBD: Test -- is alternate connect approach ever used by either device?
@@ -45,9 +45,9 @@ import java.util.Set;
 /**
  * Display client UI to initiate connection requests and fork off a worker
  * thread to listen for incoming connection requests. Use BluetoothClient
- * and BtConnectionListener, respectively, to perform the actual connect, then
+ * and SelectConnectionListener, respectively, to perform the actual connect, then
  * instantiate ChatActivity to manage the chat session. ChatActivity uses
- * ChatActivityServer to send and receive text over the Bluetooth connection.
+ * ChatServer to send and receive text over the Bluetooth connection.
  */
 public class SelectActivity extends ActivityTracker
 {
@@ -63,9 +63,9 @@ public class SelectActivity extends ActivityTracker
     private RecyclerViewManager rvmPaired;
 
     /**
-     * All code in this app, except for code in ChatActivity and ChatActivityServer (which is
+     * All code in this app, except for code in ChatActivity and ChatServer (which is
      * only called by ChatActivity) executes while SelectActivity should be present and
-     * available, with one caveat: BluetoothClient and BtConnectionListener classes are both
+     * available, with one caveat: BluetoothClient and SelectConnectionListener classes are both
      * extensions of Thread so that they can set up connections in the background. In both
      * the cases it is possible (although not likely) that the SelectActivity instance will
      * be gone by the time they need it. For that reason, we route requests for the SelectActivity
@@ -117,7 +117,7 @@ public class SelectActivity extends ActivityTracker
         rvmDiscovered     = new RecyclerViewManager(this, R.id.rv_discovered);
 
         // Register receiver for handling Bluetooth events.
-        BroadcastReceivers.registerBroadcastReceiver(this, new SelectActivityBroadcastReceiver());
+        BroadcastReceivers.registerBroadcastReceiver(this, new SelectBroadcastReceiver());
 
         /*
          * Ensure Bluetooth is enabled; if not, ask the user for permission.
@@ -141,12 +141,12 @@ public class SelectActivity extends ActivityTracker
 
     @Override
     public void onStart() {
-        BtConnectionListener.startListener();
+        SelectConnectionListener.startListener();
     }
 
     @Override
     public void onStop() {
-        BtConnectionListener.stopListener();
+        SelectConnectionListener.stopListener();
     }
 
     /**
@@ -190,7 +190,7 @@ public class SelectActivity extends ActivityTracker
                     /** Only make this request once. */
                     if (ags.isAppInitialized())
                         BluetoothUtils.requestDiscoverable();
-                    // Server turned on by SelectActivityBroadcastReceiver.
+                    // Server turned on by SelectBroadcastReceiver.
                     return;
                 }
                 break;
@@ -209,7 +209,7 @@ public class SelectActivity extends ActivityTracker
      * <p>
      *     When new devices are discovered, a broadcast is sent out. The "Discovered" RecyclerView
      *     is updated by the BroadcastReceiver.
-     *     See {@link SelectActivityBroadcastReceiver#onReceive}.
+     *     See {@link SelectBroadcastReceiver#onReceive}.
      */
     private void refreshDiscovered() {
         MyAdapter myAdapter = rvmDiscovered.getAdapter();

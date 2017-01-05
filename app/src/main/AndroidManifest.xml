@@ -13,16 +13,16 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name="ApplicationGlobalState"
+        android:name=".support.ApplicationGlobalState"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name="com.barryholroyd.bluetoothchatdemo.select_activity.SelectActivity">
+        <activity android:name="com.barryholroyd.bluetoothchatdemo.activity_select.SelectActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name="com.barryholroyd.bluetoothchatdemo.chat_activity.ChatActivity"
+            android:name="com.barryholroyd.bluetoothchatdemo.activity_chat.ChatActivity"
             android:windowSoftInputMode="stateVisible|adjustResize"
             >
         </activity>

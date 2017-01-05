@@ -1,4 +1,4 @@
-package com.barryholroyd.bluetoothchatdemo;
+package com.barryholroyd.bluetoothchatdemo.support;
 
 import android.app.Application;
 import android.bluetooth.BluetoothSocket;
@@ -7,7 +7,7 @@ import android.bluetooth.BluetoothSocket;
  * Extended Application class used to save state across components.
  * <p>
  *     This is used to allow the main Activity to pass an existing socket
- *     to the chat Activity when the background BtConnectionListener thread accepts
+ *     to the chat Activity when the background SelectConnectionListener thread accepts
  *     an incoming connection request.
  */
 

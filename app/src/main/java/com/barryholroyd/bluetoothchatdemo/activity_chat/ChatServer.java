@@ -1,4 +1,4 @@
-package com.barryholroyd.bluetoothchatdemo.chat_activity;
+package com.barryholroyd.bluetoothchatdemo.activity_chat;
 
 import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.channels.ClosedByInterruptException;
 import java.util.Locale;
 
 /**
@@ -28,13 +29,10 @@ import java.util.Locale;
  *     to the remote app.
  */
 
-public class ChatActivityServer extends Thread
+public class ChatServer extends Thread
 {
     /** Bluetooth socket to be read and written. */
     private static BluetoothSocket btSocket;
-
-    /** running is "true" when initialization is successful. */
-    private static boolean running;
 
     /** Handler message: display incoming chat text. */
     private static final int CHATTEXT = 1;
@@ -60,10 +58,13 @@ public class ChatActivityServer extends Thread
      * @param _btSocket Bluetooth socket to be read and written.
      * @param handler   Handler to cause the calling ChatActivity to exit.
      */
-    public ChatActivityServer(BluetoothSocket _btSocket, Handler handler) {
+    public ChatServer(BluetoothSocket _btSocket, Handler handler) throws ChatServerException {
         btSocket = _btSocket;
         caHandler = handler;
-        running = false;
+
+        if (btSocket == null) {
+            throw new ChatServerException("Null Bluetooth socket.");
+        }
 
         try {
             btIn = btSocket.getInputStream();
@@ -73,8 +74,7 @@ public class ChatActivityServer extends Thread
             String msg = String.format(Locale.US,
                     "Error: could not get input or output stream: %s",
                     ioe.getMessage());
-            Support.userMessage(msg);
-            return;
+            throw new ChatServerException(msg);
         }
 
         /*
@@ -89,13 +89,12 @@ public class ChatActivityServer extends Thread
                 }
                 else {
                     String msg = String.format(Locale.US,
-                            "Unexpected message type in ChatActivityServer: %d.",
+                            "Unexpected message type in ChatServer: %d.",
                             message.what);
                     throw new IllegalStateException(msg);
                 }
             }
         };
-        running = true;
     }
 
     /**
@@ -143,28 +142,32 @@ public class ChatActivityServer extends Thread
      */
     @Override
     public void run() {
-        if (!running) {
-            Support.userMessage("Server not initialized... exiting.");
-            return;
-        }
-
         while (true) {
             byte[] bytes = new byte[BUFSIZE];
+            Support.trace("Waiting to read input...");
             try {
-                Support.trace("Waiting to read input...");
                 //noinspection ResultOfMethodCallIgnored
                 btIn.read(bytes, 0, BUFSIZE);
             }
+            catch (ClosedByInterruptException ioe) {
+                // ChatActivity sends an interrupt when it wants to kill this server thread.
+                Support.trace("Connection closed by interrupt.");
+                return;
+            }
             catch (IOException ioe) {
-                Support.userMessage("Connection closed.");
-                break;
+                Support.trace("Closing the connection...");
+                try {
+                    btSocket.close();
+                } catch (IOException ioe2) {
+                    Support.exception("Failed to close the connection", ioe2);
+                }
+                Message m = caHandler.obtainMessage(ChatActivity.FINISH);
+                caHandler.sendMessage(m);
+                return;
             }
             Message m = uiHandler.obtainMessage(CHATTEXT, bytes);
             uiHandler.sendMessage(m);
         }
-        closeConnection();
-        Message m = caHandler.obtainMessage(ChatActivity.FINISH);
-        caHandler.sendMessage(m);
     }
 
     /**
@@ -175,7 +178,7 @@ public class ChatActivityServer extends Thread
      *
      * @param bytes the buffer of bytes to write out.
      */
-    static public void writeChat(byte[] bytes) {
+    static void writeChat(byte[] bytes) {
         try {
             btOut.write(bytes, 0, bytes.length);
         }
@@ -184,18 +187,10 @@ public class ChatActivityServer extends Thread
                     "Could not write message: %s", ioe.getMessage()));
         }
     }
-    /**
-     * Close the current open connection if there is one.
-     */
-    static public void closeConnection() {
-        try {
-            if (btSocket != null) {
-                Support.trace("Closing the connection...");
-                btSocket.close();
-            }
-        } catch (IOException ioe) {
-            Support.exception("Failed to close the connection", ioe);
-        }
-        btSocket = null;
+}
+
+class ChatServerException extends Exception {
+    ChatServerException(String msg) {
+        super(msg);
     }
 }

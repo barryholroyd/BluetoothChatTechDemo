@@ -1,13 +1,12 @@
-package com.barryholroyd.bluetoothchatdemo.select_activity;
+package com.barryholroyd.bluetoothchatdemo.activity_select;
 
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 
-import com.barryholroyd.bluetoothchatdemo.chat_activity.ChatActivity;
+import com.barryholroyd.bluetoothchatdemo.activity_chat.ChatActivity;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothUtils;
 import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
@@ -25,7 +24,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
  * <p>
  *     Runs as a background thread.
  */
-public class BtConnectionListener extends Thread
+public class SelectConnectionListener extends Thread
 {
     /** app name used to connect */
     static private final String SERVICE_NAME = "BluetoothChatDemo";
@@ -34,7 +33,7 @@ public class BtConnectionListener extends Thread
     static public final UUID MY_UUID = UUID.fromString("bb303707-5a56-4536-8d07-7ead8264f6b9");
 
     /** Singleton -- only allow a single running server thread at a time. */
-    static BtConnectionListener btListener = null;
+    static SelectConnectionListener btListener = null;
 
     /**
      * Class used by other threads to coordinate
@@ -46,7 +45,7 @@ public class BtConnectionListener extends Thread
      *     another connection to accept.
      * <p> TBD: BR is separate thread from UI? (NO)
      * DEL:?
-     *     The ChatActivityBroadcastReceiver thread sends an interrupt to this thread when
+     *     The ChatBroadcastReceiver thread sends an interrupt to this thread when
      *     Bluetooth is turned off on the device so that this thread can exit.
      */
     static public class Lock
@@ -71,7 +70,7 @@ public class BtConnectionListener extends Thread
             }
             Support.trace("Starting listener...");
             listenerLock.setExitFlag(false);
-            btListener = new BtConnectionListener();
+            btListener = new SelectConnectionListener();
             btListener.start();
         }
     }

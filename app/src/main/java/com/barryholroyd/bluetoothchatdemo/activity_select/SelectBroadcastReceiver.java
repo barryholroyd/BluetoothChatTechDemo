@@ -1,4 +1,4 @@
-package com.barryholroyd.bluetoothchatdemo.select_activity;
+package com.barryholroyd.bluetoothchatdemo.activity_select;
 
 
 import android.app.Activity;
@@ -28,7 +28,7 @@ import static android.bluetooth.BluetoothAdapter.EXTRA_STATE;
  *     and goes with the Activity (retaining the RecyclerView would cause the Activity
  *     to also be retained, causing a memory leak).
  */
-public class SelectActivityBroadcastReceiver extends BroadcastReceiver
+public class SelectBroadcastReceiver extends BroadcastReceiver
 {
     /**
      * Callback called by the system when a broadcast is received.
@@ -71,13 +71,13 @@ public class SelectActivityBroadcastReceiver extends BroadcastReceiver
                         ActivityTracker.ActivityState state = ActivityTracker.getState();
                         if (    (state == ActivityTracker.ActivityState.STARTED) ||
                                 (state == ActivityTracker.ActivityState.RESUMED)) {
-                            BtConnectionListener.startListener();
+                            SelectConnectionListener.startListener();
                         }
                         break;
                     case BluetoothAdapter.STATE_TURNING_ON:
                         break;
                     case BluetoothAdapter.STATE_OFF | BluetoothAdapter.STATE_TURNING_OFF:
-                        BtConnectionListener.stopListener();
+                        SelectConnectionListener.stopListener();
                         break;
                 }
                 break;

@@ -7,9 +7,9 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 
-import com.barryholroyd.bluetoothchatdemo.ApplicationGlobalState;
-import com.barryholroyd.bluetoothchatdemo.chat_activity.ChatActivity;
-import com.barryholroyd.bluetoothchatdemo.select_activity.SelectActivity;
+import com.barryholroyd.bluetoothchatdemo.support.ApplicationGlobalState;
+import com.barryholroyd.bluetoothchatdemo.activity_chat.ChatActivity;
+import com.barryholroyd.bluetoothchatdemo.activity_select.SelectActivity;
 import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
@@ -18,7 +18,7 @@ import java.lang.reflect.Method;
 import java.util.Locale;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-import static com.barryholroyd.bluetoothchatdemo.select_activity.BtConnectionListener.MY_UUID;
+import static com.barryholroyd.bluetoothchatdemo.activity_select.SelectConnectionListener.MY_UUID;
 
 /**
  * Bluetooth "chat" client connection set up.
@@ -47,7 +47,7 @@ public class BluetoothClient
     }
 
     /**
-     * Create a connection to a remote Bluetooth server and then pass it to ChatActivityServer
+     * Create a connection to a remote Bluetooth server and then pass it to ChatServer
      * to run the chat session. This thread exits after spawning the communication thread.
      *
      * The check to ensure that Bluetooth is enabled is done before starting this worker thread.
@@ -142,7 +142,7 @@ public class BluetoothClient
         btdevice = null;
     }
 
-    /** Local method to close the socket if it hasn't been passed to ChatActivityServer yet. */
+    /** Local method to close the socket if it hasn't been passed to ChatServer yet. */
     private void closeSocket(BluetoothSocket socket) {
         btdevice = null;
         try   {
