@@ -32,7 +32,7 @@ import static com.barryholroyd.bluetoothchatdemo.activity_select.SelectConnectio
 public class BluetoothClient
 {
     /** client socket */
-    private static BluetoothSocket mSocket = null;
+    private static BluetoothSocket btSocket = null;
 
     /** remote Bluetooth device */
     private static BluetoothDevice btdevice;
@@ -40,9 +40,9 @@ public class BluetoothClient
     /** Constructor for initialization. */
     public BluetoothClient(BluetoothDevice _btdevice) {
         btdevice = _btdevice;
-        if ((mSocket != null) && mSocket.isConnected()) {
+        if ((btSocket != null) && btSocket.isConnected()) {
             Support.userMessage("Dropping current connection...");
-            closeSocket(mSocket);
+            closeSocket(btSocket);
         }
     }
 
@@ -67,9 +67,9 @@ public class BluetoothClient
         Support.userMessage("Connecting...");
 
         try{
-            mSocket = btdevice.createRfcommSocketToServiceRecord( MY_UUID );
+            btSocket = btdevice.createRfcommSocketToServiceRecord( MY_UUID );
             Support.trace("Attempting main approach to connect...");
-            mSocket.connect( );
+            btSocket.connect( );
         } catch ( IOException ioe ) {
             Support.trace(String.format(Locale.US, "Client IOException: %s", ioe.getMessage()));
 
@@ -86,30 +86,30 @@ public class BluetoothClient
             try {
                 Method m = btdevice.getClass().getMethod("createRfcommSocket",
                         int.class);
-                mSocket = (BluetoothSocket) m.invoke(btdevice, 1);
-                mSocket.connect();
+                btSocket = (BluetoothSocket) m.invoke(btdevice, 1);
+                btSocket.connect();
                 Support.trace(String.format(Locale.US,
-                        "Client connection ready: %#x", mSocket.hashCode()));
+                        "Client connection ready: %#x", btSocket.hashCode()));
 
             } catch (IOException ioe2) {
-                if (mSocket == null) {
+                if (btSocket == null) {
                     Support.error("Client connection exception: <null>");
                 }
                 else {
                     Support.error(String.format(Locale.US,
-                            "Client connection exception: %#x", mSocket.hashCode()));
+                            "Client connection exception: %#x", btSocket.hashCode()));
                 }
                 String msg = String.format(Locale.US,
                         "Could not connect to remote device %s:%s. Is %s running on it?",
                         btdevice.getName(), btdevice.getAddress(), Support.getAppLabel());
                 Support.userMessage(msg);
-                closeSocket(mSocket);
+                closeSocket(btSocket);
                 return;
             }
             catch (Exception e) {
                 String msg = String.format(Locale.US, "Exception: %s", e.getMessage());
                 Support.userMessage(msg);
-                closeSocket(mSocket);
+                closeSocket(btSocket);
                 return;
             }
         }
@@ -121,7 +121,7 @@ public class BluetoothClient
         Context c = ActivityTracker.getAppContext();
         if (c == null) {
             Support.userMessage("Could not start chat -- foreground Activity is gone.");
-            closeSocket(mSocket);
+            closeSocket(btSocket);
             return;
         }
 
@@ -129,10 +129,10 @@ public class BluetoothClient
         Activity a = SelectActivity.getActivity();
         if (a == null) {
             Support.userMessage("Internal (temporary) error: could not get Activity.");
-            closeSocket(mSocket);
+            closeSocket(btSocket);
             return;
         }
-        ((ApplicationGlobalState)  a.getApplication()).setBtSocket(mSocket);
+        ((ApplicationGlobalState)  a.getApplication()).setBtSocket(btSocket);
 
         // Pass control to the chat Activity.
         Intent intent = new Intent(c, ChatActivity.class);
@@ -142,13 +142,13 @@ public class BluetoothClient
         btdevice = null;
     }
 
-    /** Local method to close the socket if it hasn't been passed to ChatServer yet. */
-    private void closeSocket(BluetoothSocket socket) {
+    /** Local method to close the btSocket if it hasn't been passed to ChatServer yet. */
+    private void closeSocket(BluetoothSocket btSocket) {
         btdevice = null;
         try   {
-            if (socket != null) {
-                Support.trace("Closing the client socket...");
-                socket.close();
+            if (btSocket != null) {
+                Support.trace("Closing the client btSocket...");
+                btSocket.close();
             }
         }
         catch (IOException ioe) {

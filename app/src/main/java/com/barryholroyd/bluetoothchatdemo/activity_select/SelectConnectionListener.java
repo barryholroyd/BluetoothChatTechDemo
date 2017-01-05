@@ -114,18 +114,24 @@ public class SelectConnectionListener extends Thread
         }
 
         //noinspection InfiniteLoopStatement
-        while (true) {
+//        while (true) {
             BluetoothSocket btSocket = null;
-            try {
                 if (!BluetoothUtils.isEnabled()) {
                     Support.userMessage("Connection dropped.");
                     return;
                 }
                 Support.trace("Server: waiting for a new connection to accept...");
 
+            try {
                 btSocket = btServerSocket.accept();
+            }
+            catch (IOException ioe) {
+                Support.exception("Listener connection IO exception", ioe); // TBD:
+                // TBD: handle this error better.
+                return;
+            }
 
-                BluetoothDevice btdevice;
+            BluetoothDevice btdevice;
                 if (btSocket == null) {
                     Support.fatalError("Failed to get Bluetooth socket.");
                     Support.userMessage("*** Failed to get Bluetooth socket."); // TBD:
@@ -135,7 +141,11 @@ public class SelectConnectionListener extends Thread
                     btdevice = btSocket.getRemoteDevice();
                 }
 
-                // Make the Bluetooth socket available to ChatActivity.
+                /*
+                 * Make the Bluetooth socket available to ChatActivity.
+                 * ChatActivity is responsible for closing it.
+                 * TBD: check client version.
+                 */
                 SelectActivity.getApplicationGlobalState().setBtSocket(btSocket);
 
                 // Start communications.
@@ -171,20 +181,21 @@ public class SelectConnectionListener extends Thread
 //                    }
 //                    listenerLock.setChatDone(false);
 //                }
-            } catch (IOException ioe) {
-                Support.exception("Listener connection IO exception", ioe); // TBD:
-            }
-            finally {
-                try {
-                    if (btSocket != null) {
-                        btSocket.close();
-                    }
-                }
-                catch (IOException ioe2){
-                    Support.exception("Server connection IO exception #2", ioe2); // TBD:
-                }
-                SelectActivity.getApplicationGlobalState().setBtSocket(null);
-            }
-        }
+//            }
+//            catch (IOException ioe) {
+//                Support.exception("Listener connection IO exception", ioe); // TBD:
+//            }
+            // DEL:
+//            finally {
+//                try {
+//                    if (btSocket != null) {
+//                        btSocket.close();
+//                    }
+//                }
+//                catch (IOException ioe2){
+//                    Support.exception("Server connection IO exception #2", ioe2); // TBD:
+//                }
+//            }
+//        }
     }
 }

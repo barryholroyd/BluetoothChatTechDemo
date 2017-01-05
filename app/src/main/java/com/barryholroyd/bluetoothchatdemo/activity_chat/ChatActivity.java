@@ -80,6 +80,7 @@ public class ChatActivity extends ActivityTracker
         configureScrollBars();
 
         btsocket = ((ApplicationGlobalState) getApplication()).getBtSocket();
+        Support.trace(String.format("### 1. btsocket: %s", (btsocket == null) ? "NULL" : btsocket.toString()));
 
         /*
          * Callback to exit this activity; used by ChatServer when it has an error.
@@ -130,6 +131,7 @@ public class ChatActivity extends ActivityTracker
             }
             Support.trace("Starting chat server...");
             try {
+                Support.trace(String.format("### 2. btsocket: %s", (btsocket == null) ? "NULL" : btsocket.toString()));
                 chatServer = new ChatServer(btsocket, handler);
                 chatServer.start();
             }
