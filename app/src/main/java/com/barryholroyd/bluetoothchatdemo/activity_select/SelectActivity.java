@@ -115,13 +115,7 @@ public class SelectActivity extends ActivityTracker
         rvmPaired         = new RecyclerViewManager(this, R.id.rv_paired);
         rvmDiscovered     = new RecyclerViewManager(this, R.id.rv_discovered);
 
-        /*
-         * Ensure Bluetooth is enabled; if not, ask the user for permission.
-         * Bluetooth configuration and starting the "server" worker thread
-         * both occur here if Bluetooth is already enabled; if it isn't,
-         * they are started in onActivityResult() if and only if the user
-         * allows Bluetooth to be enabled.
-         */
+        //Ensure Bluetooth is enabled; if not, ask the user for permission.
         if (BluetoothUtils.isEnabled()) {
             refreshPaired();
             refreshDiscovered();
@@ -183,7 +177,7 @@ public class SelectActivity extends ActivityTracker
 
     /** Handle result of request to user to enable Bluetooth. */
     @Override
-    protected void onActivityResult( int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case RT_BT_ENABLED:
                 if (resultCode == RESULT_OK) {

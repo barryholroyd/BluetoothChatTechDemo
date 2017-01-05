@@ -72,7 +72,8 @@ public class SelectConnectionListener extends Thread
             btListener.start();
         }
         else {
-            Support.userMessage("Must turn on Bluetooth.");
+            Support.trace(
+                    "Not starting select listener because Bluetooth is not currently enabled.");
         }
     }
 

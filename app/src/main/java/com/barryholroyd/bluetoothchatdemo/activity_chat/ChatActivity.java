@@ -54,9 +54,6 @@ public class ChatActivity extends ActivityTracker
     /** Handler providing callback to exit this Activity. */
     static Handler handler = null;
 
-    /** Singleton implementation. */
-    private ChatActivity() {}
-
     /**
      * Display the chat window for the user, get the BluetoothSocket stored in
      * ApplicationGlobalState by BluetoothClient or SelectConnectionListener, configure a
