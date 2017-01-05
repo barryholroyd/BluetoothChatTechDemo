@@ -67,6 +67,12 @@ public class Support {
         log(msg);
     }
 
+    /**
+     * Log an exception with a customized string.
+     */
+    public static void exception(String s, Exception e) {
+        Support.error(String.format(Locale.US, "%s: %s", s, e.getMessage()));
+    }
     /** Basic logging for the app. */
     private static void log(String msg) {
         Log.d("BLUETOOTH_CHAT_DEMO", msg);
@@ -77,17 +83,10 @@ public class Support {
      * and log it.
      */
     public static void userMessage(String msg) {
-        log(msg);
+        log("User message: " + msg);
         if (toaster == null)
             init();
         Toaster.display(msg);
-    }
-
-    /**
-     * Log an exception with a customized string.
-     */
-    public static void exception(String s, Exception e) {
-        Support.error(String.format(Locale.US, "%s: %s", s, e.getMessage()));
     }
 }
 

@@ -35,31 +35,32 @@ public class SelectConnectionListener extends Thread
     /** Singleton -- only allow a single running server thread at a time. */
     static private SelectConnectionListener btListener = null;
 
-    /**
-     * Class used by other threads to coordinate
-     * with this server thread.
-     * <p>
-     *     The server thread waits on this lock after accepting a connection and initiating
-     *     a ChatActivity activity. The ChatActivity thread then notifies this thread, via
-     *     the Lock instance, when it is done, so that the server can resume waiting for
-     *     another connection to accept.
-     * <p> TBD: BR is separate thread from UI? (NO)
-     * DEL:?
-     *     The ChatBroadcastReceiver thread sends an interrupt to this thread when
-     *     Bluetooth is turned off on the device so that this thread can exit.
-     */
-    static public class Lock
-    {
-        private boolean condition = false;
-        private boolean exitFlag = false;
-
-        boolean isChatDone() { return condition; }
-        public void setChatDone(boolean _condition) { condition = _condition; }
-
-        boolean getExitFlag() { return exitFlag; }
-        void setExitFlag(boolean _exitFlag) { exitFlag = _exitFlag; }
-    }
-    public static final Lock listenerLock = new Lock();
+    // DEL:
+//    /**
+//     * Class used by other threads to coordinate
+//     * with this server thread.
+//     * <p>
+//     *     The server thread waits on this lock after accepting a connection and initiating
+//     *     a ChatActivity activity. The ChatActivity thread then notifies this thread, via
+//     *     the Lock instance, when it is done, so that the server can resume waiting for
+//     *     another connection to accept.
+//     * <p> TBD: BR is separate thread from UI? (NO)
+//     * DEL:?
+//     *     The ChatBroadcastReceiver thread sends an interrupt to this thread when
+//     *     Bluetooth is turned off on the device so that this thread can exit.
+//     */
+//    static public class Lock
+//    {
+//        private boolean condition = false;
+//        private boolean exitFlag = false;
+//
+//        boolean isChatDone() { return condition; }
+//        public void setChatDone(boolean _condition) { condition = _condition; }
+//
+//        boolean getExitFlag() { return exitFlag; }
+//        void setExitFlag(boolean _exitFlag) { exitFlag = _exitFlag; }
+//    }
+//    public static final Lock listenerLock = new Lock();
 
     public static void startListener() {
         if (BluetoothUtils.isEnabled()) {
@@ -67,7 +68,8 @@ public class SelectConnectionListener extends Thread
                 throw new IllegalStateException("Attempt to create a second running listener.");
             }
             Support.trace("Starting listener...");
-            listenerLock.setExitFlag(false);
+            // DEL:
+//            listenerLock.setExitFlag(false);
             btListener = new SelectConnectionListener();
             btListener.start();
         }
@@ -82,7 +84,8 @@ public class SelectConnectionListener extends Thread
                 throw new IllegalStateException("Attempt to stop a non-existent listener.");
             }
             Support.trace("Stopping listener...");
-            listenerLock.setExitFlag(true);
+        // DEL:
+//            listenerLock.setExitFlag(true);
             btListener.interrupt();
             btListener = null;
     }
@@ -122,7 +125,7 @@ public class SelectConnectionListener extends Thread
 
                 btSocket = btServerSocket.accept();
 
-                BluetoothDevice btdevice = null;
+                BluetoothDevice btdevice;
                 if (btSocket == null) {
                     Support.fatalError("Failed to get Bluetooth socket.");
                     Support.userMessage("*** Failed to get Bluetooth socket."); // TBD:
@@ -145,30 +148,31 @@ public class SelectConnectionListener extends Thread
                 intent.addFlags(FLAG_ACTIVITY_NEW_TASK); // required since an App Context is used
                 c.startActivity(intent);
 
-                /*
-                 * Wait for the ChatActivity to complete. Exit this thread if Bluetooth
-                 * is turned off.
-                 */
-                synchronized (listenerLock) {
-                    while (!listenerLock.isChatDone()) {
-                        try {
-                            Support.trace("Server: entering wait()...");
-                            listenerLock.wait();
-                            Support.trace("Server: resuming after wait()...");
-                        } catch (InterruptedException ioe) {
-                            Support.trace("Server: InterruptedException caught...");
-                            if (listenerLock.getExitFlag()) {
-                                Support.trace("Server: exiting...");
-                                listenerLock.setExitFlag(false);
-                                return;
-                            }
-                            Support.exception("Server: spurious interrupt exception while waiting on server lock", ioe);
-                        }
-                    }
-                    listenerLock.setChatDone(false);
-                }
+                // TBD: not needed
+//                /*
+//                 * Wait for the ChatActivity to complete. Exit this thread if Bluetooth
+//                 * is turned off.
+//                 */
+//                synchronized (listenerLock) {
+//                    while (!listenerLock.isChatDone()) {
+//                        try {
+//                            Support.trace("Listener: entering wait()...");
+//                            listenerLock.wait();
+//                            Support.trace("Listener: resuming after wait()...");
+//                        } catch (InterruptedException ioe) {
+//                            Support.trace("Listener: InterruptedException caught...");
+//                            if (listenerLock.getExitFlag()) {
+//                                Support.trace("Listener: exiting...");
+//                                listenerLock.setExitFlag(false);
+//                                return;
+//                            }
+//                            Support.exception("Listener: spurious interrupt exception while waiting on server lock", ioe);
+//                        }
+//                    }
+//                    listenerLock.setChatDone(false);
+//                }
             } catch (IOException ioe) {
-                Support.exception("Server connection IO exception", ioe); // TBD:
+                Support.exception("Listener connection IO exception", ioe); // TBD:
             }
             finally {
                 try {

@@ -61,6 +61,7 @@ public class ChatServer extends Thread
     public ChatServer(BluetoothSocket _btSocket, Handler handler) throws ChatServerException {
         btSocket = _btSocket;
         caHandler = handler;
+        Support.trace(String.format("* 1. btSocket connected: %b", btSocket.isConnected()));
         if (btSocket == null) {
             throw new ChatServerException("Null Bluetooth socket.");
         }
@@ -92,6 +93,7 @@ public class ChatServer extends Thread
                 }
             }
         };
+        Support.trace(String.format("* 2. btSocket connected: %b", btSocket.isConnected()));
     }
 
     /**
@@ -139,12 +141,15 @@ public class ChatServer extends Thread
      */
     @Override
     public void run() {
+        Support.trace(String.format("* 3. btSocket connected: %b", btSocket.isConnected()));
         while (true) {
             byte[] bytes = new byte[BUFSIZE];
             Support.trace("Waiting to read input...");
             try {
                 //noinspection ResultOfMethodCallIgnored
+                Support.trace(String.format("* 4a. btSocket connected: %b", btSocket.isConnected()));
                 btIn.read(bytes, 0, BUFSIZE);
+                Support.trace(String.format("* 4b. btSocket connected: %b", btSocket.isConnected()));
             }
             catch (ClosedByInterruptException ioe) {
                 // ChatActivity sends an interrupt when it wants to kill this server thread.
@@ -153,6 +158,8 @@ public class ChatServer extends Thread
             }
             catch (IOException ioe) {
                 Support.trace("Closing the connection...");
+                Support.exception("IOException during read", ioe);
+                Support.trace(String.format("* 5. btSocket connected: %b", btSocket.isConnected()));
                 try {
                     btSocket.close();
                 } catch (IOException ioe2) {

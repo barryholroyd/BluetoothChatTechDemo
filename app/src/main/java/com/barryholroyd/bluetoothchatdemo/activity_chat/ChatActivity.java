@@ -21,7 +21,8 @@ import com.barryholroyd.bluetoothchatdemo.support.Support;
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
-import static com.barryholroyd.bluetoothchatdemo.activity_select.SelectConnectionListener.listenerLock;
+// DEL:
+//import static com.barryholroyd.bluetoothchatdemo.activity_select.SelectConnectionListener.listenerLock;
 
 /**
  * Display the Chat view for the user and manage the sending/receiving of text.
@@ -90,10 +91,11 @@ public class ChatActivity extends ActivityTracker
             public void handleMessage(Message message) {
                 if (message.what == FINISH) {
                     Support.trace("Exiting ChatActivity...");
-                    synchronized (listenerLock) {
-                        listenerLock.setChatDone(true);
-                        listenerLock.notifyAll();
-                    }
+                    // DEL:
+//                    synchronized (listenerLock) {
+//                        listenerLock.setChatDone(true);
+//                        listenerLock.notifyAll();
+//                    }
                     finish();
                 }
                 else {
