@@ -34,6 +34,8 @@ public class ChatServer extends Thread
     /** Bluetooth socket to be read and written. */
     private static BluetoothSocket btSocket;
 
+
+
     /** Handler message: display incoming chat text. */
     private static final int CHATTEXT = 1;
 
@@ -51,17 +53,6 @@ public class ChatServer extends Thread
 
     /** Bluetooth output stream. */
     private static OutputStream btOut;
-
-    // DEL:
-    public static void closeStream() {
-        Support.trace("@@@ Closing input stream...");
-        try {
-            btIn.close();
-        }
-        catch (Exception e) {
-            Support.exception("@@@ Exception closing input stream", e);
-        }
-    }
 
     /**
      * Constructor -- set up IO and UI handler.
@@ -154,7 +145,6 @@ public class ChatServer extends Thread
      */
     @Override
     public void run() {
-        boolean sleeptest = false;
         Support.trace(String.format("* 3. btSocket connected: %b", btSocket.isConnected()));
         while (true) {
             byte[] bytes = new byte[BUFSIZE];
@@ -163,10 +153,7 @@ public class ChatServer extends Thread
                 //noinspection ResultOfMethodCallIgnored
                 Support.trace(String.format("* 4a. btSocket connected: %b", btSocket.isConnected()));
                 Support.trace(String.format("CHAT SERVER THREAD IS INTERRUPTED (ME1): %b", interrupted()));
-                if (!sleeptest)
-                    btIn.read(bytes, 0, BUFSIZE);
-                else
-                    sleep(4000);
+                btIn.read(bytes, 0, BUFSIZE);
                 Support.trace(String.format("* 4b. btSocket connected: %b", btSocket.isConnected()));
                 Support.trace(String.format("CHAT SERVER THREAD IS INTERRUPTED (ME2): %b", interrupted()));
             }
@@ -195,10 +182,8 @@ public class ChatServer extends Thread
                 Support.exception("*** CHAT SERVER EXCEPTION: ", e);
             }
             Support.trace(String.format("CHAT SERVER THREAD IS INTERRUPTED (ME5): %b", interrupted()));
-            if (!sleeptest) {
-                Message m = uiHandler.obtainMessage(CHATTEXT, bytes);
-                uiHandler.sendMessage(m);
-            }
+            Message m = uiHandler.obtainMessage(CHATTEXT, bytes);
+            uiHandler.sendMessage(m);
         }
     }
 
@@ -219,6 +204,25 @@ public class ChatServer extends Thread
                     "Could not write message: %s", ioe.getMessage()));
         }
     }
+
+    /**
+     * TBD:
+     * See: http://stackoverflow.com/questions/6579539/how-to-unblock-inputstream-read-on-android
+     */
+    static void closeStream() {
+        Support.trace("@@@ Closing ChatServer input stream..."); // DEL:
+        if (btIn == null) {
+            throw new IllegalStateException("Bluetooth input stream already closed.");
+        }
+        try {
+            btIn.close();
+        }
+        catch (Exception e) {
+            Support.exception("@@@ Exception closing input stream", e); // TBD:
+        }
+    }
+
+
 }
 
 class ChatServerException extends Exception {

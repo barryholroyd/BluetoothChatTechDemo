@@ -142,18 +142,20 @@ public class ChatActivity extends ActivityTracker
     }
 
     public static void stopChatServer() {
-        Support.trace("*** NOT *** Stopping chat server...");
+//        Support.trace("*** NOT *** Stopping chat server..."); // DEL:
 
-//        if (chatServer == null) {
-//            throw new IllegalStateException(
-//                    "Attempt to stop a non-existent chat server.");
-//        }
-//        Support.trace("Stopping chat server...");
-//        // TBD: listenerLock.setExitFlag(true);
-//        chatServer.interrupt();
-//        Support.trace(String.format("CHAT SERVER THREAD IS INTERRUPTED: %b",
-//                chatServer.isInterrupted()));
-//        chatServer = null;
+        if (chatServer == null) {
+            throw new IllegalStateException(
+                    "Attempt to stop a non-existent chat server.");
+        }
+        Support.trace("Stopping chat server...");
+
+//        chatServer.interrupt(); // DEL:
+        ChatServer.closeStream(); // TBD: http://stackoverflow.com/questions/6579539/how-to-unblock-inputstream-read-on-android
+
+        Support.trace(String.format("CHAT SERVER THREAD IS INTERRUPTED: %b",
+                chatServer.isInterrupted()));
+        chatServer = null;
     }
 
     /**
@@ -216,21 +218,21 @@ public class ChatActivity extends ActivityTracker
      */
     @SuppressWarnings("UnusedParameters")
     public void clickDone(View v) {
-        // DEL:
-        if (chatServer == null) {
-            throw new IllegalStateException(
-                    "Attempt to stop a non-existent chat server.");
-        }
-        Support.trace("Stopping chat server...");
-        // TBD: listenerLock.setExitFlag(true);
-        ChatServer.closeStream(); // TBD:
-        chatServer.interrupt();
-        Support.trace(String.format("CHAT SERVER THREAD IS INTERRUPTED: %b",
-                chatServer.isInterrupted()));
-        chatServer = null;
-
-
-
+//        // DEL:
+//        if (chatServer == null) {
+//            throw new IllegalStateException(
+//                    "Attempt to stop a non-existent chat server.");
+//        }
+//        Support.trace("Stopping chat server...");
+//        // TBD: listenerLock.setExitFlag(true);
+//        ChatServer.closeStream(); // TBD:
+//        chatServer.interrupt();
+//        Support.trace(String.format("CHAT SERVER THREAD IS INTERRUPTED: %b",
+//                chatServer.isInterrupted()));
+//        chatServer = null;
+//
+//
+//
         finish();
     }
 }

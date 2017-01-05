@@ -35,6 +35,9 @@ public class SelectConnectionListener extends Thread
     /** Singleton -- only allow a single running server thread at a time. */
     static private SelectConnectionListener btListener = null;
 
+    static private BluetoothServerSocket btServerSocket = null;
+
+
     // DEL:
 //    /**
 //     * Class used by other threads to coordinate
@@ -80,14 +83,33 @@ public class SelectConnectionListener extends Thread
     }
 
     public static void stopListener() {
-            if (btListener == null) {
-                throw new IllegalStateException("Attempt to stop a non-existent listener.");
-            }
-            Support.trace("Stopping listener...");
-        // DEL:
+        if (btListener == null) { // TBD: don't need to check btListener?
+            throw new IllegalStateException("Attempt to stop a non-existent listener.");
+        }
+        Support.trace("Stopping listener...");
+    // DEL:
 //            listenerLock.setExitFlag(true);
-            btListener.interrupt();
-            btListener = null;
+//            btListener.interrupt();
+        closeSocket();
+        btListener = null; // TBD: don't need to check btListener?
+    }
+
+    /**
+     * Close the listening BluetoothServerSocket. Per the BluetoothServerSocket
+     * reference page, its close() method must be used to abort its accept() method
+     * (the worker thread's interrupt() method is ignored).
+     */
+    private static void closeSocket() {
+        Support.trace("@@@ Closing BluetoothServerSocket input stream..."); // DEL:
+        if (btServerSocket == null) {
+            throw new IllegalStateException("Bluetooth server socket already closed.");
+        }
+        try {
+            btServerSocket.close();
+        }
+        catch (Exception e) {
+            Support.exception("@@@ Exception closing input stream", e); // TBD:
+        }
     }
 
     /**
@@ -95,7 +117,6 @@ public class SelectConnectionListener extends Thread
      * to run the chat session.
      */
     public void run() {
-        BluetoothServerSocket btServerSocket = null;
 
         try {
             Support.trace("Creating new server socket...");
@@ -115,48 +136,52 @@ public class SelectConnectionListener extends Thread
 
         //noinspection InfiniteLoopStatement
 //        while (true) {
-            BluetoothSocket btSocket = null;
-                if (!BluetoothUtils.isEnabled()) {
-                    Support.userMessage("Connection dropped.");
-                    return;
-                }
-                Support.trace("Server: waiting for a new connection to accept...");
+        BluetoothSocket btSocket = null;
+        if (!BluetoothUtils.isEnabled()) {
+            Support.userMessage("Connection dropped.");
+            return;
+        }
+        Support.trace("Server: waiting for a new connection to accept...");
 
-            try {
-                btSocket = btServerSocket.accept();
-            }
-            catch (IOException ioe) {
-                Support.exception("Listener connection IO exception", ioe); // TBD:
-                // TBD: handle this error better.
-                return;
-            }
+        try {
+            btSocket = btServerSocket.accept();
+        }
+        catch (IOException ioe) {
+            // TBD: caused by closing the BluetoothServerSocket.
+            Support.trace("Listener: exiting...");
+            Support.exception("Listener connection IO exception", ioe); // TBD:
+            // TBD: this should never happen.
+            if (btSocket != null)
+                throw new IllegalStateException("btSocket is non-null");
+            return;
+        }
 
-            BluetoothDevice btdevice;
-                if (btSocket == null) {
-                    Support.fatalError("Failed to get Bluetooth socket.");
-                    Support.userMessage("*** Failed to get Bluetooth socket."); // TBD:
-                    return;
-                }
-                else {
-                    btdevice = btSocket.getRemoteDevice();
-                }
+        BluetoothDevice btdevice;
+        if (btSocket == null) {
+            Support.fatalError("Failed to get Bluetooth socket.");
+            Support.userMessage("*** Failed to get Bluetooth socket."); // TBD:
+            return;
+        }
+        else {
+            btdevice = btSocket.getRemoteDevice();
+        }
 
-                /*
-                 * Make the Bluetooth socket available to ChatActivity.
-                 * ChatActivity is responsible for closing it.
-                 * TBD: check client version.
-                 */
-                SelectActivity.getApplicationGlobalState().setBtSocket(btSocket);
+        /*
+         * Make the Bluetooth socket available to ChatActivity.
+         * ChatActivity is responsible for closing it.
+         * TBD: check client version.
+         */
+        SelectActivity.getApplicationGlobalState().setBtSocket(btSocket);
 
-                // Start communications.
-                Support.userMessage("Connected!");
+        // Start communications.
+        Support.userMessage("Connected!");
 
-                // Pass control to the chat Activity.
-                Context c = ActivityTracker.getAppContext();
-                Intent intent = new Intent(c, ChatActivity.class);
-                intent.putExtra(ChatActivity.BUNDLE_KEY_BTDEVICE, btdevice);
-                intent.addFlags(FLAG_ACTIVITY_NEW_TASK); // required since an App Context is used
-                c.startActivity(intent);
+        // Pass control to the chat Activity.
+        Context c = ActivityTracker.getAppContext();
+        Intent intent = new Intent(c, ChatActivity.class);
+        intent.putExtra(ChatActivity.BUNDLE_KEY_BTDEVICE, btdevice);
+        intent.addFlags(FLAG_ACTIVITY_NEW_TASK); // required since an App Context is used
+        c.startActivity(intent);
 
                 // TBD: not needed
 //                /*

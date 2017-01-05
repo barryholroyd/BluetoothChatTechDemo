@@ -67,6 +67,7 @@ public class BluetoothClient
         Support.userMessage("Connecting...");
 
         try{
+            // TBD: btSocket was null when N7 client to S7, Done from N7 side (?), then S7 as client to N7 (?).
             btSocket = btdevice.createRfcommSocketToServiceRecord( MY_UUID );
             Support.trace("Attempting main approach to connect...");
             btSocket.connect( );
