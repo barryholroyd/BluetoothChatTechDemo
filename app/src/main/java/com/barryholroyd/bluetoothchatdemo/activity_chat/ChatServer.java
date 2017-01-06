@@ -140,16 +140,14 @@ public class ChatServer extends Thread
      * Run read/display loop.
      * <p>
      *     When the connection is closed, exit the loop and tell the running ChatActivity
-     *     to exit, returning control to the original SelectActivity.
+     *     to exit, returning control to the original ChooserActivity.
      * <p>
      *     Sending this thread an interrupt won't have any effect. To interrupt the read(),
      *     the btIn input stream needs to be closed. This is due to an apparent bug in
      *     Android.
      *
-     * @see <a href="http://stackoverflow.com/questions/6579539/how-to-unblock-inputstream-read-on-android">
-     *     How to unblock InputStream.read() on Android?</a>
+     * @see <a href="http://stackoverflow.com/questions/6579539/how-to-unblock-inputstream-read-on-android">How to unblock InputStream.read() on Android?</a>
      * @see #stopServer()
-     *     TBD: check links in javadocs
      */
     @Override
     public void run() {
@@ -214,10 +212,8 @@ public class ChatServer extends Thread
      *     Android.
      *
      * @see #run()
-     *     TBD: check link in javadocs
      */
     static void stopServer() {
-        Support.trace("++++++++ in stopServer()");
         if (btIn == null) {
             throw new IllegalStateException("Bluetooth input stream already closed.");
         }

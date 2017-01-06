@@ -15,7 +15,7 @@
         android:theme="@style/AppTheme"
         android:name=".support.ApplicationGlobalState"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name="com.barryholroyd.bluetoothchatdemo.activity_select.SelectActivity">
+        <activity android:name="com.barryholroyd.bluetoothchatdemo.activity_chooser.ChooserActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

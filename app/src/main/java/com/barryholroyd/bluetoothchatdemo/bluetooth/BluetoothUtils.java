@@ -5,8 +5,8 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 
-import com.barryholroyd.bluetoothchatdemo.activity_select.SelectActivity;
-import com.barryholroyd.bluetoothchatdemo.activity_select.SelectBroadcastReceiver;
+import com.barryholroyd.bluetoothchatdemo.activity_chooser.ChooserActivity;
+import com.barryholroyd.bluetoothchatdemo.activity_chooser.ChooserBroadcastReceiver;
 import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
@@ -36,7 +36,7 @@ public class BluetoothUtils {
      * Bluetooth must be turned on.
      * <p>
      *     When new devices are discovered, a broadcast is sent.
-     *     See {@link SelectBroadcastReceiver#onReceive}.
+     *     See {@link ChooserBroadcastReceiver#onReceive}.
      */
     public static void startDiscovery() {
         getBluetoothAdapter().startDiscovery();
@@ -56,7 +56,7 @@ public class BluetoothUtils {
      */
     public static void requestDiscoverable() {
         // Only do this once.
-        if (SelectActivity.getApplicationGlobalState().isAppInitialized())
+        if (ChooserActivity.getApplicationGlobalState().isAppInitialized())
             return;
         Intent discoverableIntent = new
                 Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);

@@ -21,7 +21,7 @@ import static android.bluetooth.BluetoothAdapter.EXTRA_STATE;
  *     logging of various Bluetooth events.
  * <p>
  *     This needs to be registered and unregistered at the beginning and end of each
- *     SelectActivity life cycle because it uses a RecyclerView adapter and that comes
+ *     ChooserActivity life cycle because it uses a RecyclerView adapter and that comes
  *     and goes with the Activity (retaining the RecyclerView would cause the Activity
  *     to also be retained, causing a memory leak).
  */

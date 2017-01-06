@@ -1,4 +1,4 @@
-package com.barryholroyd.bluetoothchatdemo.activity_select;
+package com.barryholroyd.bluetoothchatdemo.activity_chooser;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -18,32 +18,32 @@ import java.lang.reflect.Method;
 import java.util.Locale;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-import static com.barryholroyd.bluetoothchatdemo.activity_select.SelectConnectionListener.MY_UUID;
+import static com.barryholroyd.bluetoothchatdemo.activity_chooser.ChooserListener.MY_UUID;
 
 /**
  * Bluetooth "chat" client connection set up.
  * <p>
  *     Given a remote device, create a connection to it and then call start
- *     ChatActivity to run a chat session.
+ *     ChatActivity to connect a chat session.
  * <p>
  *     This was originally a worker thread, but since only one connection is
  *     allowed at a time that only introduced a lot of complexity, so I now
  *     do the connection set up on the main thread and make the user wait.
  */
-public class SelectClient
+public class ChooserClient
 {
     /** Client socket. ChatServer is responsible for closing it. */
     private static BluetoothSocket btSocket = null;
 
     /**
      * Create a connection to a remote Bluetooth server and then pass it to ChatServer
-     * to run the chat session. This thread exits after spawning the communication thread.
+     * to connect the chat session. This thread exits after spawning the communication thread.
      *
      * The check to ensure that Bluetooth is enabled is done before starting this worker thread.
      *
      * @param btdevice remote Bluetooth device.
      */
-    static public void run(BluetoothDevice btdevice) {
+    static public void connect(BluetoothDevice btdevice) {
         if ((btSocket != null) && btSocket.isConnected()) {
             Support.userMessage("Dropping current connection...");
             closeSocket(btSocket);
@@ -63,7 +63,6 @@ public class SelectClient
         Support.userMessage("Connecting...");
 
         try{
-            // TBD: Hit connect to remote device twice rapidly on S7 --"Dropping current connection... then crash, null btdevice exception.
             btSocket = btdevice.createRfcommSocketToServiceRecord( MY_UUID );
             Support.trace("Attempting main approach to connect...");
             btSocket.connect( );
@@ -108,7 +107,7 @@ public class SelectClient
         }
 
         // Make the Bluetooth socket available to other components.
-        Activity a = SelectActivity.getActivity();
+        Activity a = ChooserActivity.getActivity();
         if (a == null) {
             Support.userMessage("Internal (temporary) error: could not get Activity.");
             closeSocket(btSocket);

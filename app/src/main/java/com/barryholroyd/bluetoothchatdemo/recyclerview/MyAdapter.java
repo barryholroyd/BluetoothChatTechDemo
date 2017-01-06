@@ -9,7 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.barryholroyd.bluetoothchatdemo.R;
-import com.barryholroyd.bluetoothchatdemo.activity_select.SelectClient;
+import com.barryholroyd.bluetoothchatdemo.activity_chooser.ChooserClient;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothUtils;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothDevices;
@@ -94,7 +94,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             }
 
             // Set up a Bluetooth client connection to the remote device.
-            SelectClient.run(btdevice);
+            ChooserClient.connect(btdevice);
         }
     }
 }

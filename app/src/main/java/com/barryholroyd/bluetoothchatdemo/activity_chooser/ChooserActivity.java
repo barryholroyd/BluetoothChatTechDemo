@@ -1,4 +1,4 @@
-package com.barryholroyd.bluetoothchatdemo.activity_select;
+package com.barryholroyd.bluetoothchatdemo.activity_chooser;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -32,12 +32,12 @@ import java.util.Set;
 
 /**
  * Display client UI to initiate connection requests and fork off a worker
- * thread to listen for incoming connection requests. Use SelectClient
- * and SelectConnectionListener, respectively, to perform the actual connect, then
+ * thread to listen for incoming connection requests. Use ChooserClient
+ * and ChooserListener, respectively, to perform the actual connect, then
  * instantiate ChatActivity to manage the chat session. ChatActivity uses
  * ChatServer to send and receive text over the Bluetooth connection.
  */
-public class SelectActivity extends ActivityTracker
+public class ChooserActivity extends ActivityTracker
 {
     // Global state is stored at the app level.
     private static ApplicationGlobalState ags;
@@ -52,30 +52,30 @@ public class SelectActivity extends ActivityTracker
 
     /**
      * All code in this app, except for code in ChatActivity and ChatServer (which is
-     * only called by ChatActivity) executes while SelectActivity should be present and
-     * available, with one caveat: SelectClient and SelectConnectionListener classes are both
+     * only called by ChatActivity) executes while ChooserActivity should be present and
+     * available, with one caveat: ChooserClient and ChooserListener classes are both
      * extensions of Thread so that they can set up connections in the background. In both
-     * the cases it is possible (although not likely) that the SelectActivity instance will
-     * be gone by the time they need it. For that reason, we route requests for the SelectActivity
+     * the cases it is possible (although not likely) that the ChooserActivity instance will
+     * be gone by the time they need it. For that reason, we route requests for the ChooserActivity
      * instance through ActivityTracker, which tracks the creation and destruction of
      * Activities in this app.
      *
-     * @return the current SelectActivity instance if it exists; else null.
+     * @return the current ChooserActivity instance if it exists; else null.
      */
-    private static SelectActivity getSelectActivity() {
+    private static ChooserActivity getSelectActivity() {
         Activity a = getActivity(); // from ActivityTracker
 
-        // This should only happen if this method is called from SelectActivity's onCreate() method.
+        // This should only happen if this method is called from ChooserActivity's onCreate() method.
         if (a == null) {
             throw new IllegalStateException(
-                    "Attempt to access uninitialized SelectActivity instance.");
+                    "Attempt to access uninitialized ChooserActivity instance.");
         }
-        if (! (a instanceof SelectActivity)) {
+        if (! (a instanceof ChooserActivity)) {
             String msg = String.format(
                     "Unexpected Activity type: %s", a.getClass().getSimpleName());
             throw new IllegalStateException(msg);
         }
-        return (SelectActivity) a;
+        return (ChooserActivity) a;
     }
 
     /** Get the "Discovered" RecyclerViewManager. */
@@ -98,7 +98,7 @@ public class SelectActivity extends ActivityTracker
         ags = (ApplicationGlobalState) getApplication();
 
         // Display the "client" interface.
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_chooser);
 
         rvmPaired         = new RecyclerViewManager(this, R.id.rv_paired);
         rvmDiscovered     = new RecyclerViewManager(this, R.id.rv_discovered);
@@ -119,10 +119,10 @@ public class SelectActivity extends ActivityTracker
     @Override
     public void onStart() {
         super.onStart();
-        BluetoothBroadcastReceivers.registerBroadcastReceiver(this, new SelectBroadcastReceiver());
+        BluetoothBroadcastReceivers.registerBroadcastReceiver(this, new ChooserBroadcastReceiver());
         BluetoothUtils.requestDiscoverable();
         // Start listening for incoming connections.
-        SelectConnectionListener.startListener();
+        ChooserListener.startListener();
     }
 
     @Override
@@ -130,7 +130,7 @@ public class SelectActivity extends ActivityTracker
         super.onStop();
         BluetoothBroadcastReceivers.unregisterBroadcastReceiver(this);
         // Stop listening for incoming connections.
-        SelectConnectionListener.stopListener();
+        ChooserListener.stopListener();
     }
 
     /**
@@ -174,7 +174,7 @@ public class SelectActivity extends ActivityTracker
                     /* Only make this request once. */
                     if (ags.isAppInitialized())
                         BluetoothUtils.requestDiscoverable();
-                    // SelectConnectionListener is started by SelectBroadcastReceiver.
+                    // ChooserListener is started by ChooserBroadcastReceiver.
                     return;
                 }
                 break;
@@ -186,7 +186,7 @@ public class SelectActivity extends ActivityTracker
      * <p>
      *     When new devices are discovered, a broadcast is sent out. The "Discovered" RecyclerView
      *     is updated by the BroadcastReceiver.
-     *     See {@link SelectBroadcastReceiver#onReceive}.
+     *     See {@link ChooserBroadcastReceiver#onReceive}.
      */
     private void refreshDiscovered() {
         MyAdapter myAdapter = rvmDiscovered.getAdapter();

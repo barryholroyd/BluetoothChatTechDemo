@@ -1,4 +1,4 @@
-package com.barryholroyd.bluetoothchatdemo.activity_select;
+package com.barryholroyd.bluetoothchatdemo.activity_chooser;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
@@ -20,11 +20,11 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
  *  * Bluetooth "chat" server connection set up.
  * <p>
  *     Listen for an incoming connection request, accept it and then call start
- *     ChatActivity to run a chat session.
+ *     ChatActivity to connect a chat session.
  * <p>
  *     Runs as a background thread.
  */
-public class SelectConnectionListener extends Thread
+public class ChooserListener extends Thread
 {
     /** app name used to connect */
     static private final String SERVICE_NAME = "BluetoothChatDemo";
@@ -37,7 +37,7 @@ public class SelectConnectionListener extends Thread
     static void startListener() {
         if (BluetoothUtils.isEnabled()) {
             Support.trace("Starting listener...");
-            (new SelectConnectionListener()).start();
+            (new ChooserListener()).start();
         }
         else {
             Support.trace(
@@ -52,7 +52,7 @@ public class SelectConnectionListener extends Thread
 
     /**
      * Accept a connection from a remote Bluetooth client and then pass it to ChatActivity
-     * to run the chat session.
+     * to connect the chat session.
      */
     public void run() {
         try {
@@ -60,7 +60,6 @@ public class SelectConnectionListener extends Thread
             btServerSocket = BluetoothUtils.getBluetoothAdapter().
                     listenUsingRfcommWithServiceRecord(SERVICE_NAME, MY_UUID);
         } catch (IOException e) {
-            // TBD: does fatalError work? If not, just always also throw an exception.
             Support.fatalError("Failed to get Bluetooth server socket.");
             return;
         }
@@ -90,31 +89,23 @@ public class SelectConnectionListener extends Thread
             return;
         }
 
-        BluetoothDevice btdevice;
-        // TBD: test fatalError
         if (btSocket == null) {
             Support.fatalError("Failed to get Bluetooth socket.");
-            Support.userMessage("*** Failed to get Bluetooth socket."); // TBD:
-            return;
         }
         else {
-            btdevice = btSocket.getRemoteDevice();
+            /*
+             * Pass control to the ChatActivity.
+             * Make the Bluetooth socket available to ChatActivity.
+             * ChatActivity is responsible for closing it.
+             */
+            Support.userMessage("Connected!");
+            ChooserActivity.getApplicationGlobalState().setBtSocket(btSocket);
+            Context c = ActivityTracker.getAppContext();
+            Intent intent = new Intent(c, ChatActivity.class);
+            intent.putExtra(ChatActivity.BUNDLE_KEY_BTDEVICE, btSocket.getRemoteDevice());
+            intent.addFlags(FLAG_ACTIVITY_NEW_TASK); // required since an App Context is used
+            c.startActivity(intent);
         }
-
-        /*
-         * Make the Bluetooth socket available to ChatActivity.
-         * ChatActivity is responsible for closing it.
-         */
-        SelectActivity.getApplicationGlobalState().setBtSocket(btSocket);
-
-        Support.userMessage("Connected!");
-
-        // Pass control to the chat Activity.
-        Context c = ActivityTracker.getAppContext();
-        Intent intent = new Intent(c, ChatActivity.class);
-        intent.putExtra(ChatActivity.BUNDLE_KEY_BTDEVICE, btdevice);
-        intent.addFlags(FLAG_ACTIVITY_NEW_TASK); // required since an App Context is used
-        c.startActivity(intent);
     }
 
     /**

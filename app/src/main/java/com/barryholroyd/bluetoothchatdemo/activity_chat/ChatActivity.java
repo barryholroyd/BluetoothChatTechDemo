@@ -46,7 +46,7 @@ public class ChatActivity extends ActivityTracker
     /** Only allow a single running server thread at a time. */
     static ChatServer chatServer = null;
 
-    /** Bluetooth socket passed in from SelectActivity via static hook in app. */
+    /** Bluetooth socket passed in from ChooserActivity via static hook in app. */
     static BluetoothSocket btsocket = null;
 
     /** Handler providing callback to exit this Activity. */
@@ -54,7 +54,7 @@ public class ChatActivity extends ActivityTracker
 
     /**
      * Display the chat window for the user, get the BluetoothSocket stored in
-     * ApplicationGlobalState by SelectClient or SelectConnectionListener, configure a
+     * ApplicationGlobalState by ChooserClient or ChooserListener, configure a
      * callback Handler to exit the Activity is requested by the worker thread and
      * then start the ChatServer worker thread to handle the actual reads and writes
      * from the connection.
@@ -194,7 +194,7 @@ public class ChatActivity extends ActivityTracker
     }
 
     /**
-     * Cancel the connection if it exists, then exit the ChatActivity. The original SelectActivity
+     * Cancel the connection if it exists, then exit the ChatActivity. The original ChooserActivity
      * will then be brought into the foreground from the back stack.
      *
      * @param v the View the user clicked on.

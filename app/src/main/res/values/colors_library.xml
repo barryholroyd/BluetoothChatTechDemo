@@ -1,72 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Basic Library of Colors -->
 
+<!-- Basic Library of Colors -->
+
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- TRANSPARENT -->
     <color name="transparent">#00000000</color>
 
     <!-- BLUE -->
-    <!-- Material Design -->
-    <!-- Material Design -->
     <color name="blue_light_4">#c5e9ec</color>
     <color name="blue_cyan">#00bcd4</color>		<!-- Material Design -->
     <color name="blue_deep">#FF000066</color>
     <color name="blue_sky">#66ccff</color>
     <color name="blue_teal" tools:ignore="UnusedResources">#009688</color>		<!-- Material Design -->
-    <!-- Material Design -->
-    <!-- Material Design -->
-    <!-- Material Design -->
     <color name="blue_teal_app_bar" tools:ignore="UnusedResources">#009688</color>
 
     <!-- BROWN -->
-    <!-- Material Design -->
     <color name="brown_2" tools:ignore="UnusedResources">#49332B</color>
     <color name="brown_deep_1" tools:ignore="UnusedResources">#5D4037</color>	<!-- Material Design -->
     <color name="brown_deep_2" tools:ignore="UnusedResources">#241A16</color>
     <color name="brown_light_1" tools:ignore="UnusedResources">#8D6E63</color>	<!-- Material Design -->
 
     <!-- GREEN -->
-    <!-- Material Design -->
     <color name="green_bright_2" tools:ignore="UnusedResources">#66FF33</color>
-    <!-- Material Design -->
     <color name="green_deep_2" tools:ignore="UnusedResources">#1B5E20</color>	<!-- Material Design -->
     <color name="green_light_1" tools:ignore="UnusedResources">#8BC34A</color>	<!-- Material Design -->
     <color name="green_light_2" tools:ignore="UnusedResources">#66BB6A</color>	<!-- Material Design -->
     <color name="green_light_4">#a3f79b</color>
-    <!-- Material Design -->
     <color name="green_olive" tools:ignore="UnusedResources">#465c18</color>
 
     <!-- GREY -->
     <color name="grey" tools:ignore="UnusedResources">#9E9E9E</color>		<!-- Material Design -->
     <color name="grey_blue" tools:ignore="UnusedResources">#607D8B</color>	<!-- Material Design -->
 
-    <!-- ORANGE -->
-    <!-- Material Design -->
-    <!-- Material Design -->
-
     <!-- PURPLE -->
-    <!-- Material Design -->
     <color name="purple_medium" tools:ignore="UnusedResources">#965e9f</color>	<!-- Material Design -->
-    <!-- Material Design -->
     <color name="purple_deep_2" tools:ignore="UnusedResources">#FF993399</color>
     <color name="purple_light_1" tools:ignore="UnusedResources">#deb9e4</color>	<!-- Material Design -->
     <color name="purple_light_2" tools:ignore="UnusedResources">#e392f1</color>	<!-- Material Design -->
     <color name="purple_indigo">#3F51B5</color>	<!-- Material Design -->
 
     <!-- RED -->
-    <!-- Material Design -->
-    <!-- Material Design -->
-    <!-- Material Design -->
     <color name="red_pink_light" tools:ignore="UnusedResources">#FFCCCC</color>		<!-- Material Design -->
 
     <!-- YELLOW -->
-    <!-- Material Design -->
     <color name="yellow_2" tools:ignore="UnusedResources">#FFFF00</color>
-    <!-- Material Design -->
     <color name="yellow_dirty_1" tools:ignore="UnusedResources">#AAAA00</color>
     <color name="yellow_light_1" tools:ignore="UnusedResources">#FFFFD7</color>
 
-
+    <!-- MISCELLANEOUS -->
     <color name="WHITE" tools:ignore="UnusedResources">#FFFFFFFF</color>
     <color name="BLACK" tools:ignore="UnusedResources">#FF000000</color>
     <color name="BLUE" tools:ignore="UnusedResources">#FF2196F3</color>
