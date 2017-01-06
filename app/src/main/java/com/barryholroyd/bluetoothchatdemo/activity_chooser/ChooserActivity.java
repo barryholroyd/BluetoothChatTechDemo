@@ -20,7 +20,10 @@ import com.barryholroyd.bluetoothchatdemo.support.Support;
 import java.util.Set;
 
 /*
- * TBD: Run code analyzer (e.g., Handlers should be static?)
+ * BUG: clicking on remote device twice rapidly from Samsung
+ * TBD: test thoroughly, including turning off BT and walking out-of-range.
+ * TBD: brief code review
+ * TBD: finish up comments.
  * TBD: clean out TBDs, etc.
  * TBD: turn off tracing.
  */
