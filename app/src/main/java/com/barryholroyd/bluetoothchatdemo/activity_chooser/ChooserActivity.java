@@ -20,13 +20,8 @@ import com.barryholroyd.bluetoothchatdemo.support.Support;
 import java.util.Set;
 
 /*
- * Clean up
  * TBD: Run code analyzer (e.g., Handlers should be static?)
  * TBD: clean out TBDs, etc.
- *
- * Look and feel
- *
- * Closure
  * TBD: turn off tracing.
  */
 

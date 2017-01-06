@@ -19,6 +19,7 @@ import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothBroadcastReceivers;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.ref.WeakReference;
 import java.util.Locale;
 
 /**
@@ -49,8 +50,8 @@ public class ChatActivity extends ActivityTracker
     /** Bluetooth socket passed in from ChooserActivity via static hook in app. */
     static BluetoothSocket btsocket = null;
 
-    /** Handler providing callback to exit this Activity. */
-    static Handler handler = null;
+    /** Handler providing callback to exit the current ChatActivity instance. */
+    static ChatActivityHandler handler = null;
 
     /**
      * Display the chat window for the user, get the BluetoothSocket stored in
@@ -79,25 +80,11 @@ public class ChatActivity extends ActivityTracker
         btsocket = ((ApplicationGlobalState) getApplication()).getBtSocket();
 
         /*
-         * Callback to exit this activity; used by ChatServer when it has an error.
-         * Must (re-)initialize each time so that finish() references the correct
-         * ChatActivity instance.
+         * We create a static ChatActivityHandler class and pass it a WeakReference to the
+         * current ChatActivity instance to avoid possible memory leaks.
          */
-        handler = new Handler() { // TBD: inspector thinks this might leak memory ...?
-            @Override
-            public void handleMessage(Message message) {
-                if (message.what == FINISH) {
-                    Support.trace("Exiting chat activity...");
-                    finish();
-                }
-                else {
-                    String msg = String.format(Locale.US,
-                            "Unexpected message type in ChatActivity: %d.",
-                            message.what);
-                    throw new IllegalStateException(msg);
-                }
-            }
-        };
+        WeakReference<ChatActivity> wrca = new WeakReference<>(this);
+        handler = new ChatActivityHandler(wrca);
     }
 
     @Override
@@ -203,4 +190,51 @@ public class ChatActivity extends ActivityTracker
     public void clickDone(View v) {
         finish();
     }
+
+    /*
+     * An instance of this Handler is passed to the ChatServer instance so that
+     * it can contact the current ChatActivity instance to tell it to exit (e.g.,
+     * when the server's connection goes away because the remote end exited).
+     *
+     * If we were to define this as an anonymous inner class, it could cause a
+     * memory leak since its continued existence could prevent the containing
+     * ChatActivity instance from being released. In order to prevent that,
+     * we define a new inner static class, ChatActivityHandler, and instantiate that.
+     *
+     * We put the ChatActivityHandler instance on a static hook because the static method
+     * startChatServer() needs to use it. That could result in a very small
+     * memory leak since the ChatActivityHandler instance itself can outlive the ChatActivity
+     * instance. However, it isn't very large and there will never be more than
+     * one of it (since each new ChatActivity instance will overwrite it), so that
+     * is acceptable.
+     *
+     * We pass the ChatActivity instance in to the ChatActivityHandler instance as a WeakReference;
+     * that way it will disappear if the ChatActivity instance itself goes away.
+     */
+    static class ChatActivityHandler extends Handler
+    {
+        WeakReference<ChatActivity> wrca;
+
+        ChatActivityHandler(WeakReference<ChatActivity> _wrca) {
+            wrca = _wrca;
+        }
+
+        @Override
+        public void handleMessage(Message message) {
+            if (message.what == FINISH) {
+                Support.trace("Exiting chat activity...");
+                ChatActivity ca = wrca.get();
+                if (ca != null) {
+                    ca.finish();
+                }
+            }
+            else {
+                String msg = String.format(Locale.US,
+                        "Unexpected message type in ChatActivity: %d.",
+                        message.what);
+                throw new IllegalStateException(msg);
+            }
+        }
+    }
+
 }
