@@ -63,7 +63,7 @@ public class Support {
     }
 
     /** External access to logging -- leave on in production. */
-    public static void error(String msg) {
+    private static void error(String msg) {
         log(msg);
     }
 

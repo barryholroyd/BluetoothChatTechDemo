@@ -7,7 +7,6 @@ import android.os.Message;
 import android.view.Gravity;
 import android.widget.Toast;
 
-import static android.widget.Toast.LENGTH_LONG;
 import static android.widget.Toast.LENGTH_SHORT;
 
 /**

@@ -28,7 +28,7 @@ import java.util.Locale;
  *     to the remote app.
  */
 
-public class ChatServer extends Thread
+class ChatServer extends Thread
 {
     /** Bluetooth socket to be read and written. */
     private static BluetoothSocket btSocket;

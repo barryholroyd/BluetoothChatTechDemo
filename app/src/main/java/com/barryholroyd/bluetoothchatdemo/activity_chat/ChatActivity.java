@@ -45,13 +45,13 @@ public class ChatActivity extends ActivityTracker
     public TextView getTextViewReceive()  { return tvTextReceive; }
 
     /** Only allow a single running server thread at a time. */
-    static ChatServer chatServer = null;
+    private static ChatServer chatServer = null;
 
     /** Bluetooth socket passed in from ChooserActivity via static hook in app. */
-    static BluetoothSocket btsocket = null;
+    private static BluetoothSocket btsocket = null;
 
     /** Handler providing callback to exit the current ChatActivity instance. */
-    static ChatActivityHandler handler = null;
+    private static ChatActivityHandler handler = null;
 
     /**
      * Display the chat window for the user, get the BluetoothSocket stored in
@@ -221,7 +221,7 @@ public class ChatActivity extends ActivityTracker
      */
     static class ChatActivityHandler extends Handler
     {
-        WeakReference<ChatActivity> wrca;
+        final WeakReference<ChatActivity> wrca;
 
         ChatActivityHandler(WeakReference<ChatActivity> _wrca) {
             wrca = _wrca;

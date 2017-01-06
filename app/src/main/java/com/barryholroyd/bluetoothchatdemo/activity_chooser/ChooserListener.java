@@ -1,6 +1,5 @@
 package com.barryholroyd.bluetoothchatdemo.activity_chooser;
 
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
@@ -24,7 +23,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
  * <p>
  *     Runs as a background thread.
  */
-public class ChooserListener extends Thread
+class ChooserListener extends Thread
 {
     /** app name used to connect */
     static private final String SERVICE_NAME = "BluetoothChatDemo";
@@ -72,7 +71,7 @@ public class ChooserListener extends Thread
 
         // Server socket. ChatServer is responsible for closing it.
         //noinspection InfiniteLoopStatement
-        BluetoothSocket btSocket = null;
+        BluetoothSocket btSocket;
 
         if (!BluetoothUtils.isEnabled()) {
             Support.userMessage("Connection dropped.");
