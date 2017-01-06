@@ -17,10 +17,6 @@
             android:layout_height="wrap_content"
             android:id="@+id/connected_to"
             />
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            >
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
@@ -43,11 +39,6 @@
                     android:hint="@string/text_to_send"
                     android:background="@color/color_interactive" />
             </LinearLayout>
-        </FrameLayout>
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            >
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
@@ -73,7 +64,6 @@
                     android:id="@+id/text_receive"
                     />
             </LinearLayout>
-        </FrameLayout>
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

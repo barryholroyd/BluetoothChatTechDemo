@@ -41,6 +41,8 @@ public class ChatBroadcastReceiver extends BroadcastReceiver
             case BluetoothAdapter.ACTION_STATE_CHANGED:
                 switch (intent.getExtras().getInt(EXTRA_STATE)) {
                     case BluetoothAdapter.STATE_ON:
+                        // TBD:
+                        Support.trace("### Calling startChatServer() from ChatBroadcastReceiver.onReceive()...");
                         ChatActivity.startChatServer();
                         break;
                     case BluetoothAdapter.STATE_TURNING_ON:

@@ -91,6 +91,8 @@ public class ChatActivity extends ActivityTracker
     public void onStart() {
         super.onStart();
         BluetoothBroadcastReceivers.registerBroadcastReceiver(this, new ChatBroadcastReceiver());
+        // TBD:
+        Support.trace("### Calling startChatServer() from ChatActivity.onStart()...");
         startChatServer();
     }
 
@@ -101,11 +103,17 @@ public class ChatActivity extends ActivityTracker
         stopChatServer();
     }
 
+    /**
+     * Start a new chat server in the background to read input from the remote device
+     * for the current chat session.
+     * TBD: can be called more than once... how?
+     */
     public static void startChatServer() {
         if (BluetoothUtils.isEnabled()) {
             if (chatServer != null) {
-                throw new IllegalStateException(
-                        "Attempt to create a second running chat server.");
+                // DEL:
+                throw new IllegalStateException("START CHAT SERVER EXCEPTION");
+                // TBD: return;
             }
             Support.trace("Starting chat server...");
             try {
