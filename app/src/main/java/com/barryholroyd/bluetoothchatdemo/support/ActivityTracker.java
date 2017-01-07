@@ -7,34 +7,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import java.util.Locale;
-import java.util.Stack;
-
-/*
- * ********************************************************************************
- * IMPORTANT
- * ********************************************************************************
- * This implementation uses a stack to track the creation and destruction of
- * Activities. Unfortunately, that approach doesn't work as current implemented.
- * When Activity A starts Activity B, the sequence is as follows.
- *   A.onPause()
- *   B.onCreate(), B.onStart(), B.onResume()
- *   A.onStop()
- * Since registration/deregistration of the Activity in this class occurs in
- * onStart() and onStop(), respectively, any attempt by B in the current sequence
- * above to get "the current Activity" will result in it obtaining A, not B.
- *
- * This could be addressed by providing a method to actively assess the above
- * situation and return the correct Activity, but that is getting pretty sticky
- * and may not be the best overall approach, archictecturally.
- * ********************************************************************************
- */
 
 /**
  * Registry to track the creation and destruction of Activities.
- * <p>
- *     ActivityTracker tracks the lifetime of each Activity instance (mirroring,
- *     to some degree, the task's back stack). It can be queried to get the
- *     current Activity as well as the state of the current Activity.
  * <p>
  *    It is particularly useful for support methods which need an Activity instance
  *    or Context instance but which don't care about which specific Activity
@@ -53,150 +28,94 @@ import java.util.Stack;
  *     state transitions, will all automatically be tracked and made available
  *     to other classes.
  * <p>
- *     Note: This is a more powerful system than BluetoothChatDemo probably needs,
- *     but is it a good demonstration of how Activity instance management can be
- *     thoroughly and cleanly handled.
+ *     Notes:
+ *       o This uses static hooks and so will not work correctly if multiple instances of
+ *         the same Activity class are created.
+ *       o This is a more powerful system than BluetoothChatDemo probably needs,
+ *         but is it a good demonstration of how Activity instance management can
+ *         be thoroughly and cleanly handled.
  */
 abstract public class ActivityTracker extends AppCompatActivity
 {
     /** The four possible states of an Activity. */
-    public enum ActivityState { CREATED, STARTED, RESUMED }
-
-    /** The stack of Activities. This basically mirrors the task's back stack. */
-    private static final Stack<ActivityInfo> stack = new Stack<>();
+    public enum ActivityState { NONE, CREATED, STARTED, RESUMED }
 
     /** Application Context instance. */
-    @SuppressLint("StaticFieldLeak") // not a leak -- this is the app's context
+    // not a leak -- this is the app's context
+    @SuppressLint("StaticFieldLeak")
     private static Context appContext = null;
 
-    /**
-     * Activity instance and state storage.
-     * <p>
-     *    Maintained by Activity life cycle callbacks.
+    // not a leak -- this is set and unset in onCreate() and onDestroy(), respectively.
+    @SuppressLint("StaticFieldLeak")
+    private static Activity a = null;
+
+    private static ActivityState state = ActivityState.NONE;
+
+    /*
+     * Getters.
      */
-    private class ActivityInfo
-    {
-        private final Activity a;
-        private ActivityState state;
-
-        @SuppressWarnings("SameParameterValue")
-        ActivityInfo(Activity _a, ActivityState _state) {
-            a = _a;
-            state = _state;
-
-            throw new RuntimeException("NOT USABLE IN CURRENT FOR -- SEE HEADER COMMENTS.");
-        }
-
-	    // Getters and Setters
-        Activity getActivity() { return a; }
-        ActivityState getState() { return state; }
-        void setState(ActivityState _state) { state = _state; }
-    }
-
-    /**
-     * Get the currently running Activity.
-     *
-     * @return the current Activity instance, if there is one.
-     */
-    public static Activity getActivity() {
-        if (stack.empty())
-            return null;
-        return stack.peek().getActivity();
-    }
-
-    /**
-     * Get the state of the currently running Activity.
-     *
-     * @return the current Activity's state, if there is one.
-     */
-    @SuppressWarnings("unused")
-    public static ActivityState getState() {
-        if (stack.empty())
-            return null;
-        return stack.peek().getState();
-    }
-
-    /**
-     * The the Application's Context instance.
-     * <p>
-     *     This is useful when we want to have a Context which doesn't depend on the
-     *     life cycle of Activities.
-     *
-     * @return the Application's Context instance.
-     */
+    public static Activity getActivity()   { return a; }
+    public static Context getContext()     { return a; }
+    public static ActivityState getState() { return state; }
     public static Context getAppContext() { return appContext; }
 
-    /**
-     * The the Activity's Context instance.
-     *
-     * @return the Activity's Context instance.
+    /*
+     * Setters.
      */
-    public static Context getContext() {
-        if (stack.empty())
-            return null;
-        return stack.peek().getActivity();
-    }
+    void setState(ActivityState _state)    { state = _state; }
 
-    /**
-     * Register an Activity so that it can be used from worker threads.
-     *
-     * @param savedInstanceState standard Bundle argument
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 	    trace("onCreate");
-        if (appContext == null)
-            appContext = getApplicationContext();
-        stack.push(new ActivityInfo(this, ActivityState.CREATED));
+        if (appContext != null) {
+            // Multiple instances not supported. See block comment at beginning of this file.
+            throw new IllegalStateException(String.format(Locale.US,
+                    "Attempted to create multiple instances of %s.",
+                    this.getClass().getSimpleName()));
+        }
+        appContext = getApplicationContext();
+
+        // Register an Activity so that it can be used from worker threads.
+        a = this;
     }
   
     @Override
     protected void onStart(){
         super.onStart();
 	    trace("onStart");
-        stack.peek().setState(ActivityState.STARTED);
+        setState(ActivityState.STARTED);
     }
   
     @Override
     protected void onResume(){
         super.onResume();
 	    trace("onResume");
-        stack.peek().setState(ActivityState.RESUMED);
+        setState(ActivityState.RESUMED);
     }
   
     @Override
     protected void onPause(){
         super.onPause();
 	    trace("onPause");
-        stack.peek().setState(ActivityState.STARTED);
+        setState(ActivityState.STARTED);
     }
   
     @Override
     protected void onStop(){
         super.onStop();
 	    trace("onStop");
-        stack.peek().setState(ActivityState.CREATED);
+        setState(ActivityState.CREATED);
     }
-  
-    /**
-     * Unregister the Activity just before it is destroyed.
-     */
+
     @Override
     protected void onDestroy(){
         super.onDestroy();
         trace("onDestroy");
-        if (stack.empty()) {
-                throw new IllegalStateException(String.format(Locale.US,
-                "Unexpected empty stack when trying to pop Activity: %s",
-                    getClass()));
-        }
-        ActivityInfo ai = stack.pop();
-        if (!ai.getActivity().equals(this)) {
-            throw new IllegalStateException(String.format(Locale.US,
-  	        "Bad activity popped from the stack: %s",
-                getClass()));
-        }
+
+        // Unregister the Activity just before it is destroyed.
+        a = null;
+        state = ActivityState.NONE;
     }
 
     @Override
@@ -205,6 +124,11 @@ abstract public class ActivityTracker extends AppCompatActivity
         trace("finalize");
     }
 
+    /**
+     * Internal trace() method. Output depends on Support.trace().
+     *
+     * @param label
+     */
     private void trace(String label) {
         String s = String.format(Locale.US, "ActivityTrace [%s:%#x]: %s",
                 this.getClass().getSimpleName(),
