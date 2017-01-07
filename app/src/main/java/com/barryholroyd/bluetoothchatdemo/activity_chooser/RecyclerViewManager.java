@@ -1,8 +1,10 @@
-package com.barryholroyd.bluetoothchatdemo.recyclerview;
+package com.barryholroyd.bluetoothchatdemo.activity_chooser;
 
 import android.app.Activity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+
+import com.barryholroyd.bluetoothchatdemo.activity_chooser.RecyclerViewAdapter;
 
 /**
  * A generalized manager for RecyclerViews, to handle both the "discovered"
@@ -10,7 +12,7 @@ import android.support.v7.widget.RecyclerView;
  */
 public class RecyclerViewManager
 {
-    private final MyAdapter mAdapter;
+    private final RecyclerViewAdapter mAdapter;
 
     /**
      * Constructor that provides standard RecyclerView initialization.
@@ -27,7 +29,7 @@ public class RecyclerViewManager
         mRecyclerView.setLayoutManager(new LinearLayoutManager(a));
 
         // Set the adapter. It is the same for both RecyclerViews.
-        mAdapter = new MyAdapter();
+        mAdapter = new RecyclerViewAdapter();
         mRecyclerView.setAdapter(mAdapter);
     }
 
@@ -36,6 +38,6 @@ public class RecyclerViewManager
      *
      * @return the RecyclerView's adapter.
      */
-    public MyAdapter getAdapter() { return mAdapter; }
+    public RecyclerViewAdapter getAdapter() { return mAdapter; }
 }
 

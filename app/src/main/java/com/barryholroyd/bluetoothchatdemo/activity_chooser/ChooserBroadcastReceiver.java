@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothBroadcastReceivers;
-import com.barryholroyd.bluetoothchatdemo.recyclerview.MyAdapter;
 
 import static android.bluetooth.BluetoothAdapter.EXTRA_STATE;
 
@@ -38,24 +37,26 @@ public class ChooserBroadcastReceiver extends BroadcastReceiver
 
         String action = intent.getAction();
         switch (action) {
-            case BluetoothDevice.ACTION_FOUND:
+            case BluetoothDevice.ACTION_FOUND: // device found by startDiscovery()
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 // Do not add to the discovered list if the device has already been paired.
                 if (ChooserActivity.getRvmPaired().getAdapter()
                         .getDevices().getDevice(device.getAddress()) != null)
                     break;
-                MyAdapter myAdapterDiscovered = ChooserActivity.getRvmDiscovered().getAdapter();
-                myAdapterDiscovered.getDevices().addNoDup(device);
-                myAdapterDiscovered.notifyDataSetChanged();
+                RecyclerViewAdapter recyclerViewAdapterDiscovered = ChooserActivity.getRvmDiscovered().getAdapter();
+                recyclerViewAdapterDiscovered.getDevices().addNoDup(device);
+                recyclerViewAdapterDiscovered.notifyDataSetChanged();
                 break;
-            case BluetoothAdapter.ACTION_STATE_CHANGED:
+            case BluetoothAdapter.ACTION_STATE_CHANGED: // Bluetooth state change
                 switch (intent.getExtras().getInt(EXTRA_STATE)) {
                     case BluetoothAdapter.STATE_ON:
+                        ChooserActivity.refreshUI(false, true);
                         ChooserListener.startListener();
                         break;
                     case BluetoothAdapter.STATE_TURNING_ON:
                         break;
                     case BluetoothAdapter.STATE_OFF | BluetoothAdapter.STATE_TURNING_OFF:
+                        ChooserActivity.refreshUI(true, false);
                         ChooserListener.stopListener();
                         break;
                 }

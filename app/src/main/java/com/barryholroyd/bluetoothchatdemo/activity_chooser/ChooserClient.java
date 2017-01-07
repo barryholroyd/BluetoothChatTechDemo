@@ -4,13 +4,11 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
 import android.content.Intent;
 
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothUtils;
 import com.barryholroyd.bluetoothchatdemo.support.ApplicationGlobalState;
 import com.barryholroyd.bluetoothchatdemo.activity_chat.ChatActivity;
-import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.io.IOException;
@@ -32,8 +30,8 @@ import static com.barryholroyd.bluetoothchatdemo.activity_chooser.ChooserListene
  */
 public class ChooserClient
 {
-    /** Client socket. ChatServer is responsible for closing it. */
-    private static BluetoothSocket btSocket = null;
+    /** Chat client socket. ChatServer is responsible for closing it. */
+    private static BluetoothSocket btChatSocket = null;
 
     /**
      * Create a connection to a remote Bluetooth server and then pass it to ChatServer
@@ -43,10 +41,10 @@ public class ChooserClient
      *
      * @param btdevice remote Bluetooth device.
      */
-    static public void connect(BluetoothDevice btdevice) {
-        if ((btSocket != null) && btSocket.isConnected()) {
+    static void connect(Activity a, BluetoothDevice btdevice) {
+        if ((btChatSocket != null) && btChatSocket.isConnected()) {
             Support.userMessage("Dropping current connection...");
-            closeSocket(btSocket);
+            closeSocket(btChatSocket);
         }
 
         /*
@@ -57,80 +55,71 @@ public class ChooserClient
         final BluetoothAdapter mBluetoothAdapter = BluetoothUtils.getBluetoothAdapter();
         if (mBluetoothAdapter.isDiscovering()) {
             mBluetoothAdapter.cancelDiscovery();
-            Support.trace("Client cancelling discovery...");
+            Support.userMessage("Cancelling discovery to connect...");
         }
 
         Support.userMessage("Connecting...");
 
+        /*
+         * Try to create a bt socket by providing an SDP UUID -- that will be used to
+         * select a channel.
+         *
+         * Unfortunately there appears to be a bug in Bluetooth library implementation.
+         *   See: https://code.google.com/p/android/issues/detail?id=41415.
+         *
+         * The workaround is to call createRfcommSocket() -- that accepts an explicit
+         * channel # (in this case, '1') to use.
+         */
         try{
-            btSocket = btdevice.createRfcommSocketToServiceRecord( MY_UUID );
+            btChatSocket = btdevice.createRfcommSocketToServiceRecord( MY_UUID );
             Support.trace("Attempting main approach to connect...");
-            btSocket.connect( );
+            btChatSocket.connect( );
         } catch ( IOException ioe ) {
             /*
-             * This is a workaround for a bug in Google's Bluetooth library implementation.
-             *   See: https://code.google.com/p/android/issues/detail?id=41415.
-             * I'm not sure why this works, but from a look at the source code for
-             * BluetoothDevice, the direct call to createRfcommSocket() effectively bypasses
-             * the use of the UUID to select a channel -- createRfcommSocket() simply uses
-             * the channel number passed in, in this case, '1'.
+             * TBD: when is this used?
+             * TBD: could multithread this for multiple chats?
              */
-            Support.trace("***** Attempting alternate approach to connect..."); // TBD: when is this used?
+            Support.trace("***** Attempting alternate approach to connect...");
             try {
                 Method m = btdevice.getClass().getMethod("createRfcommSocket", int.class);
-                btSocket = (BluetoothSocket) m.invoke(btdevice, 1);
-                btSocket.connect();
+                btChatSocket = (BluetoothSocket) m.invoke(btdevice, 1);
+                btChatSocket.connect();
             } catch (IOException ioe2) {
                 String msg = String.format(Locale.US,
                         "Could not connect to remote device %s:%s. Is %s running on it?",
                         btdevice.getName(), btdevice.getAddress(), Support.getAppLabel());
                 Support.userMessage(msg);
-                closeSocket(btSocket);
+                closeSocket(btChatSocket);
                 return;
             }
             catch (Exception e) {
                 String msg = String.format(Locale.US, "Exception: %s", e.getMessage());
                 Support.userMessage(msg);
-                closeSocket(btSocket);
+                closeSocket(btChatSocket);
                 return;
             }
         }
 
         Support.userMessage("Connected!");
 
-        // Get a valid Context.
-        Context c = ActivityTracker.getAppContext();
-        if (c == null) {
-            Support.userMessage("Could not start chat -- foreground Activity is gone.");
-            closeSocket(btSocket);
-            return;
-        }
-
-        // Make the Bluetooth socket available to other components.
-        Activity a = ChooserActivity.getActivity();
-        if (a == null) {
-            Support.userMessage("Internal (temporary) error: could not get Activity.");
-            closeSocket(btSocket);
-            return;
-        }
-        ((ApplicationGlobalState)  a.getApplication()).setBtSocket(btSocket);
+        ((ApplicationGlobalState)  a.getApplication()).setBtSocket(btChatSocket);
 
         // Pass control to the chat Activity.
-        Intent intent = new Intent(c, ChatActivity.class);
+        Intent intent = new Intent(a, ChatActivity.class);
         intent.putExtra(ChatActivity.BUNDLE_KEY_BTDEVICE, btdevice);
         intent.addFlags(FLAG_ACTIVITY_NEW_TASK); // required since an App Context is used
-        c.startActivity(intent);
+        a.startActivity(intent);
     }
 
-    /** Local method to close the btSocket if it hasn't been passed to ChatServer yet. */
-    static private void closeSocket(BluetoothSocket btSocket) {
+    /** Local method to close the btChatSocket if it hasn't been passed to ChatServer yet. */
+    static private void closeSocket(BluetoothSocket btChatSocket) {
         try   {
-            if (btSocket != null) {
-                btSocket.close();
+            if (btChatSocket != null) {
+                btChatSocket.close();
             }
         }
         catch (IOException ioe) {
-            Support.exception("Failed to close client's btSocket", ioe);
+            Support.exception("Failed to close client's btChatSocket", ioe);
         }
     }
 }

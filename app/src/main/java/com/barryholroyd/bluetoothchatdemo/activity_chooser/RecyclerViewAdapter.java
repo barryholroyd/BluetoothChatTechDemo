@@ -1,4 +1,4 @@
-package com.barryholroyd.bluetoothchatdemo.recyclerview;
+package com.barryholroyd.bluetoothchatdemo.activity_chooser;
 
 import android.bluetooth.BluetoothDevice;
 import android.support.v7.widget.RecyclerView;
@@ -9,8 +9,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.barryholroyd.bluetoothchatdemo.R;
-import com.barryholroyd.bluetoothchatdemo.activity_chooser.ChooserClient;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothUtils;
+import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothDevices;
 
@@ -20,7 +20,7 @@ import java.util.Locale;
  * RecyclerView adapter used for displaying both the list of discovered devices
  * and the list of paired devices.
  */
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
+public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.MyViewHolder> {
     private final BluetoothDevices bluetoothDevices = new BluetoothDevices();
 
     /**
@@ -31,8 +31,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
      *     on that row.
      */
     class MyViewHolder extends RecyclerView.ViewHolder {
-        public final TextView mTvText;
-        public final TextView mTvMac;
+        final TextView mTvText;
+        final TextView mTvMac;
         MyViewHolder(LinearLayout ll) {
             super(ll);
             mTvMac  = (TextView) ll.findViewById(R.id.row_mac);
@@ -94,7 +94,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             }
 
             // Set up a Bluetooth client connection to the remote device.
-            ChooserClient.connect(btdevice);
+            ChooserClient.connect(ActivityTracker.getActivity(), btdevice);
         }
     }
 }
