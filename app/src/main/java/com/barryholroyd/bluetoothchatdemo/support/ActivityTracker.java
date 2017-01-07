@@ -9,6 +9,26 @@ import android.support.v7.app.AppCompatActivity;
 import java.util.Locale;
 import java.util.Stack;
 
+/*
+ * ********************************************************************************
+ * IMPORTANT
+ * ********************************************************************************
+ * This implementation uses a stack to track the creation and destruction of
+ * Activities. Unfortunately, that approach doesn't work as current implemented.
+ * When Activity A starts Activity B, the sequence is as follows.
+ *   A.onPause()
+ *   B.onCreate(), B.onStart(), B.onResume()
+ *   A.onStop()
+ * Since registration/deregistration of the Activity in this class occurs in
+ * onStart() and onStop(), respectively, any attempt by B in the current sequence
+ * above to get "the current Activity" will result in it obtaining A, not B.
+ *
+ * This could be addressed by providing a method to actively assess the above
+ * situation and return the correct Activity, but that is getting pretty sticky
+ * and may not be the best overall approach, archictecturally.
+ * ********************************************************************************
+ */
+
 /**
  * Registry to track the creation and destruction of Activities.
  * <p>
@@ -63,6 +83,8 @@ abstract public class ActivityTracker extends AppCompatActivity
         ActivityInfo(Activity _a, ActivityState _state) {
             a = _a;
             state = _state;
+
+            throw new RuntimeException("NOT USABLE IN CURRENT FOR -- SEE HEADER COMMENTS.");
         }
 
 	    // Getters and Setters
