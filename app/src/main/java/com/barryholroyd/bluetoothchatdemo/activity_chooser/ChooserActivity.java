@@ -26,6 +26,7 @@ import java.util.Set;
  * Bug: when paired, not refreshing paired.
  * Not Fixed
  *   BUG: ActivityTracker: old Activity still running when new one starts; causes exception!
+ *   TBD: Use LocalBroadcastManager.
  * TBD: test thoroughly, including
  *   TBD: turning off BT
  *   TBD: walking out-of-range.

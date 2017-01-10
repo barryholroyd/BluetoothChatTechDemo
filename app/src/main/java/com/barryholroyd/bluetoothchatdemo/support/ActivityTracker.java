@@ -4,12 +4,17 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+
+import com.barryholroyd.bluetoothchatdemo.activity_chat.ChatActivity;
 
 import java.util.Locale;
 
 /**
  * Registry to track the creation and destruction of Activities.
+ * TBD: update comments.
  * <p>
  *    It is particularly useful for support methods which need an Activity instance
  *    or Context instance but which don't care about which specific Activity
@@ -40,12 +45,12 @@ abstract public class ActivityTracker extends AppCompatActivity
     /** The four possible states of an Activity. */
     public enum ActivityState { NONE, CREATED, STARTED, RESUMED }
 
-    /** Application Context instance. */
-    // not a leak -- this is the app's context
+    // Application Context instance.
+    // Not a leak -- this is the app's context.
     @SuppressLint("StaticFieldLeak")
     private static Context appContext = null;
 
-    // not a leak -- this is set and unset in onCreate() and onDestroy(), respectively.
+    // Not a leak -- this is set and unset in onCreate() and onDestroy(), respectively.
     @SuppressLint("StaticFieldLeak")
     private static Activity a = null;
 
@@ -62,7 +67,25 @@ abstract public class ActivityTracker extends AppCompatActivity
     /*
      * Setters.
      */
-    void setState(ActivityState _state)    { state = _state; }
+    private void setState(ActivityState _state)    { state = _state; }
+
+    /*
+     * Handler
+     */
+    public static final int BLUETOOTH_OFF = 1;
+    public static final int BLUETOOTH_ON  = 2;
+    private static Handler handler = new ActivityTrackerHandler();
+    public Handler getHandler() { return handler; }
+    private static class ActivityTrackerHandler extends Handler
+    {
+        @Override
+        public void handleMessage(Message message) {
+            String msg = String.format(Locale.US,
+                    "Missing handler for %s.",
+                    this.getClass().getSimpleName());
+            throw new IllegalStateException(msg);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +99,7 @@ abstract public class ActivityTracker extends AppCompatActivity
         }
         appContext = getApplicationContext();
 
-        // Register an Activity so that it can be used from worker threads.
+        // Register the Activity so that it can be used from worker threads.
         a = this;
     }
   
@@ -127,7 +150,7 @@ abstract public class ActivityTracker extends AppCompatActivity
     /**
      * Internal trace() method. Output depends on Support.trace().
      *
-     * @param label
+     * @param label leader string to be printed
      */
     private void trace(String label) {
         String s = String.format(Locale.US, "ActivityTrace [%s:%#x]: %s",
