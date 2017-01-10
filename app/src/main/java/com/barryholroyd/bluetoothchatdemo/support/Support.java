@@ -18,20 +18,18 @@ public class Support {
 
     /** Initialization */
     public static void init(Context c) {
-        synchronized (Support.class){
-            if (toaster == null) {
-                toaster = new Toaster();
+        Context ac = c.getApplicationContext();
+        if (toaster == null) {
+            toaster = new Toaster(ac);
+        }
+        if (appLabel == null) {
+            PackageManager pm = ac.getPackageManager();
+            try {
+                ApplicationInfo ai = pm.getApplicationInfo(ac.getPackageName(), 0);
+                appLabel = (String) pm.getApplicationLabel(ai);
             }
-            Context ac = c.getApplicationContext();
-            if (appLabel == null) {
-                PackageManager pm = ac.getPackageManager();
-                try {
-                    ApplicationInfo ai = pm.getApplicationInfo(ac.getPackageName(), 0);
-                    appLabel = (String) pm.getApplicationLabel(ai);
-                }
-                catch (PackageManager.NameNotFoundException nnfe) {
-                    throw new SupportException("Could not get package name.");
-                }
+            catch (PackageManager.NameNotFoundException nnfe) {
+                throw new SupportException("Could not get package name.");
             }
         }
     }
@@ -55,7 +53,7 @@ public class Support {
     }
 
     /** External access to logging -- leave on in production. */
-    private static void error(String msg) {
+    public static void error(String msg) {
         log(msg);
     }
 

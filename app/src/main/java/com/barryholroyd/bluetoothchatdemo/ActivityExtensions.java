@@ -15,7 +15,4 @@ public interface ActivityExtensions {
      * @param state indicates that Bluetooth was just turned on or off.
      */
     void onBluetoothToggle(BluetoothToggle state);
-
-    /** Return the app's Context. */
-    Context getAppContext();
 }

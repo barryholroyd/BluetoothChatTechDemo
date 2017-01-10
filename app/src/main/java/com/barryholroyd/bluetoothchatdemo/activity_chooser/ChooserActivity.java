@@ -104,7 +104,7 @@ public class ChooserActivity extends AppCompatActivity implements ActivityExtens
      *
      * @return the app's Context instance.
      */
-    public Context getAppContext() { return getApplicationContext(); }
+    public static Context getAppContext() { return ca.getApplicationContext(); }
 
     /** Get the "Discovered" RecyclerViewManager for the current ChooserActivity instance. */
     RecyclerViewManager  getRvmDiscovered() { return rvmDiscovered; }

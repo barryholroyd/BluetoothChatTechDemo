@@ -66,7 +66,7 @@ public class ChatActivity extends AppCompatActivity implements ActivityExtension
      *
      * @return the app's Context instance.
      */
-    public Context getAppContext() { return getApplicationContext(); }
+    public static Context getAppContext() { return ca.getApplicationContext(); } // DEL: ?
 
     /**
      * Display the chat window for the user, get the BluetoothSocket stored in

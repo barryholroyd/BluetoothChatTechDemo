@@ -1,5 +1,6 @@
 package com.barryholroyd.bluetoothchatdemo.activity_chooser;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
@@ -7,7 +8,6 @@ import android.content.Intent;
 
 import com.barryholroyd.bluetoothchatdemo.activity_chat.ChatActivity;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothUtils;
-import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.io.IOException;
@@ -63,19 +63,18 @@ class ChooserListener extends Thread
             btServerSocket = BluetoothUtils.getBluetoothAdapter().
                     listenUsingRfcommWithServiceRecord(SERVICE_NAME, MY_UUID);
         } catch (IOException e) {
-            Support.fatalError("Failed to get Bluetooth server socket.");
+            reportError("Failed to get Bluetooth server socket.");
             return;
         }
 
         // to keep the compiler happy
         if (btServerSocket == null) {
-            Support.fatalError("Failed to get Bluetooth server socket.");
-            return;
+            reportError("Failed to get Bluetooth server socket.");
         }
 
         // Server socket. ChatServer is responsible for closing it.
         //noinspection InfiniteLoopStatement
-        BluetoothSocket btSocket;
+        BluetoothSocket btChooserSocket;
 
         if (!BluetoothUtils.isEnabled()) {
             Support.userMessage("Connection dropped.");
@@ -84,7 +83,7 @@ class ChooserListener extends Thread
         Support.trace("Server: waiting for a new connection to accept...");
 
         try {
-            btSocket = btServerSocket.accept();
+            btChooserSocket = btServerSocket.accept();
         }
         catch (IOException ioe) {
             // Caused by closing the BluetoothServerSocket.
@@ -92,8 +91,8 @@ class ChooserListener extends Thread
             return;
         }
 
-        if (btSocket == null) {
-            Support.fatalError("Failed to get Bluetooth socket.");
+        if (btChooserSocket == null) {
+            reportError("Failed to get Bluetooth socket.");
         }
         else {
             /*
@@ -102,12 +101,23 @@ class ChooserListener extends Thread
              * ChatActivity is responsible for closing it.
              */
             Support.userMessage("Connected!");
-            ChooserActivity.getApplicationGlobalState().setBtChatSocket(btSocket);
-            Context c = ActivityTracker.getAppContext();
-            Intent intent = new Intent(c, ChatActivity.class);
-            intent.putExtra(ChatActivity.BUNDLE_KEY_BTDEVICE, btSocket.getRemoteDevice());
+            ChooserActivity.getApplicationGlobalState().setBtChatSocket(btChooserSocket);
+            Context ac = ChooserActivity.getAppContext();
+            Intent intent = new Intent(ac, ChatActivity.class);
+            intent.putExtra(ChatActivity.BUNDLE_KEY_BTDEVICE, btChooserSocket.getRemoteDevice());
             intent.addFlags(FLAG_ACTIVITY_NEW_TASK); // required since an App Context is used
-            c.startActivity(intent);
+            ac.startActivity(intent);
+        }
+    }
+
+    private static void reportError(String msg) {
+        Activity a = ChooserActivity.getActivity();
+        if (a == null) {
+            Support.error(msg);
+            throw new IllegalStateException("reportError: " + msg);
+        }
+        else {
+            Support.fatalError(a, msg);
         }
     }
 

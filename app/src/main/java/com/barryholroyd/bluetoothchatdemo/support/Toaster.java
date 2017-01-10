@@ -24,8 +24,12 @@ class Toaster {
      * <p>
      *     Create a Handler to tbe main thread so that we can use the
      *     Toaster from background threads.
+     *
+     * @param c standard Context
      */
-    Toaster() {
+    Toaster(Context c) {
+        // Make sure we have the Application's Context.
+        final Context ac = c.getApplicationContext();
         mHandler = new Handler(Looper.getMainLooper()) {
             /**
              * Create and show a toast (on the main thread).
@@ -33,7 +37,6 @@ class Toaster {
              */
             @Override
             public void handleMessage(Message message) {
-                Context ac = ActivityTracker.getAppContext();
                 if (message.what == TOAST) {
                     String msg = (String) message.obj;
                     final Toast toast = Toast.makeText(ac, msg, LENGTH_SHORT);
