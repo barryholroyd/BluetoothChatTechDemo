@@ -52,17 +52,18 @@ abstract public class ActivityTracker extends AppCompatActivity
 
     // Not a leak -- this is set and unset in onCreate() and onDestroy(), respectively.
     @SuppressLint("StaticFieldLeak")
-    private static Activity a = null;
+    private static ActivityTracker activityTracker = null;
 
     private static ActivityState state = ActivityState.NONE;
 
     /*
      * Getters.
      */
-    public static Activity getActivity()   { return a; }
-    public static Context getContext()     { return a; }
-    public static ActivityState getState() { return state; }
-    public static Context getAppContext() { return appContext; }
+    public static Activity getActivity()               { return activityTracker; }
+    public static ActivityTracker getActivityTracker() { return activityTracker; }
+    public static Context getContext()                 { return activityTracker; }
+    public static ActivityState getState()             { return state; }
+    public static Context getAppContext()              { return appContext; }
 
     /*
      * Setters.
@@ -71,20 +72,37 @@ abstract public class ActivityTracker extends AppCompatActivity
 
     /*
      * Handler
+     * DEL: ?
      */
-    public static final int BLUETOOTH_OFF = 1;
-    public static final int BLUETOOTH_ON  = 2;
-    private static Handler handler = new ActivityTrackerHandler();
-    public Handler getHandler() { return handler; }
-    private static class ActivityTrackerHandler extends Handler
-    {
-        @Override
-        public void handleMessage(Message message) {
-            String msg = String.format(Locale.US,
-                    "Missing handler for %s.",
-                    this.getClass().getSimpleName());
-            throw new IllegalStateException(msg);
-        }
+//    public static final int BLUETOOTH_OFF = 1;
+//    public static final int BLUETOOTH_ON  = 2;
+//    private static Handler handler = new ActivityTrackerHandler();
+//    public Handler getHandler() { return handler; }
+//    private static class ActivityTrackerHandler extends Handler
+//    {
+//        @Override
+//        public void handleMessage(Message message) {
+//            String msg = String.format(Locale.US,
+//                    "Missing handler for %s.",
+//                    this.getClass().getSimpleName());
+//            throw new IllegalStateException(msg);
+//        }
+//    }
+
+    /** Enum for Bluetooth being turned on or off. */
+    public enum BluetoothToggle { BT_OFF, BT_ON }
+
+    /**
+     * Override this to handle Bluetooth on/off (e.g., when the
+     * user turns Bluetooth on/off via Android Settings).
+     *
+     * @param state 0=off, 1=on
+     */
+    public void onBluetoothToggle(BluetoothToggle state) {
+        String msg = String.format(Locale.US,
+            "Missing onBluetoothToggle implementation for %s.",
+            this.getClass().getSimpleName());
+        throw new IllegalStateException(msg);
     }
 
     @Override
@@ -100,7 +118,7 @@ abstract public class ActivityTracker extends AppCompatActivity
         appContext = getApplicationContext();
 
         // Register the Activity so that it can be used from worker threads.
-        a = this;
+        activityTracker = this;
     }
   
     @Override
@@ -137,7 +155,7 @@ abstract public class ActivityTracker extends AppCompatActivity
         trace("onDestroy");
 
         // Unregister the Activity just before it is destroyed.
-        a = null;
+        activityTracker = null;
         state = ActivityState.NONE;
     }
 

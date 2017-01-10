@@ -208,8 +208,7 @@ class ChatServer extends Thread
      * can exit.
      * <p>
      *     Sending this thread an interrupt won't have any effect. To interrupt the read(),
-     *     the btIn input stream needs to be closed. This is due to an apparent bug in
-     *     Android.
+     *     the btIn input stream needs to be closed.
      *
      * @see #run()
      */

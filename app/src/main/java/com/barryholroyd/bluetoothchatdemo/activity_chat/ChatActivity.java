@@ -45,6 +45,7 @@ public class ChatActivity extends ActivityTracker
     public TextView getTextViewReceive()  { return tvTextReceive; }
 
     /** Only allow a single running server thread at a time. */
+    // HERE: move this into ChatServer, like Chooser does it?
     private static ChatServer chatServer = null;
 
     /** Bluetooth socket passed in from ChooserActivity via static hook in app. */
@@ -91,7 +92,6 @@ public class ChatActivity extends ActivityTracker
     public void onStart() {
         super.onStart();
         BluetoothBroadcastReceivers.registerBroadcastReceiver(this, new ChatBroadcastReceiver());
-        // TBD:
         Support.trace("### Calling startChatServer() from ChatActivity.onStart()...");
         startChatServer();
     }
@@ -101,6 +101,24 @@ public class ChatActivity extends ActivityTracker
         super.onStop();
         BluetoothBroadcastReceivers.unregisterBroadcastReceiver(this);
         stopChatServer();
+    }
+
+    /**
+     * Handle Bluetooth on/off from Broadcast Receiver.
+     *
+     * @param state Bluetooth turned on / off.
+     */
+    public void onBluetoothToggle(ActivityTracker.BluetoothToggle state) {
+        switch (state) {
+            case BT_ON:
+                Support.trace("### Calling startChatServer() from onBluetoothToggle()...");
+                ChatActivity.startChatServer();
+                break;
+            case BT_OFF:
+                ChatActivity.stopChatServer();
+                finish();
+                break;
+        }
     }
 
     /**

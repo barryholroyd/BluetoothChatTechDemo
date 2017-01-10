@@ -34,6 +34,12 @@ import java.util.Set;
  * TBD: finish up comments.
  * TBD: clean out TBDs, etc.
  * TBD: turn off tracing.
+ *
+ * TBD: overview.html: For both Activities, their background network threads are
+ * controlled by onStart() and onStop(). In both cases, the network threads are
+ * implemented as Singletons controlled by static start()/stop() methods.
+ * Changes to Bluetooth settings (on/off) are
+ * caught by their respective BroadcastReceivers, which do xxx.
  */
 
 /**
@@ -42,6 +48,9 @@ import java.util.Set;
  * and ChooserListener, respectively, to perform the actual connect, then
  * instantiate ChatActivity to manage the chat session. ChatActivity uses
  * ChatServer to send and receive text over the Bluetooth connection.
+ *
+ * We will never need more than one ChooserClient and one ChooseListener
+ * and will never allow more than once ChatClient and associated ChatServer.
  */
 public class ChooserActivity extends ActivityTracker
 {
@@ -137,8 +146,6 @@ public class ChooserActivity extends ActivityTracker
     public void onStop() {
         super.onStop();
         BluetoothBroadcastReceivers.unregisterBroadcastReceiver(this);
-
-        // Stop listening for incoming connections.
         ChooserListener.stopListener();
     }
 
@@ -180,6 +187,26 @@ public class ChooserActivity extends ActivityTracker
                 if (resultCode == RESULT_OK) {
                     refreshUI(false, true);
                 }
+                break;
+        }
+    }
+
+    /**
+     * Handle Bluetooth on/off from Broadcast Receiver.
+     *
+     * @param state Bluetooth turned on / off.
+     */
+    public void onBluetoothToggle(ActivityTracker.BluetoothToggle state) {
+        switch (state) {
+            case BT_ON:
+                ChooserActivity.refreshUI(false, true);
+                ChooserListener.startListener();
+                Support.userMessage("Bluetooth on: BluetoothChatDemo ready.");
+                break;
+            case BT_OFF:
+                ChooserActivity.refreshUI(true, false);
+                ChooserListener.stopListener();
+                Support.userMessage("Bluetooth off: BluetoothChatDemo paused.");
                 break;
         }
     }

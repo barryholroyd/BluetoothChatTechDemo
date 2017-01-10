@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothBroadcastReceivers;
+import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 
 import static android.bluetooth.BluetoothAdapter.EXTRA_STATE;
 
@@ -48,17 +49,18 @@ public class ChooserBroadcastReceiver extends BroadcastReceiver
                 recyclerViewAdapterDiscovered.notifyDataSetChanged();
                 break;
             case BluetoothAdapter.ACTION_STATE_CHANGED: // Bluetooth state change
-                switch (intent.getExtras().getInt(EXTRA_STATE)) {
-                    case BluetoothAdapter.STATE_ON:
-                        ChooserActivity.refreshUI(false, true);
-                        ChooserListener.startListener();
-                        break;
-                    case BluetoothAdapter.STATE_TURNING_ON:
-                        break;
-                    case BluetoothAdapter.STATE_OFF | BluetoothAdapter.STATE_TURNING_OFF:
-                        ChooserActivity.refreshUI(true, false);
-                        ChooserListener.stopListener();
-                        break;
+                ActivityTracker at = ChooserActivity.getActivityTracker();
+                if (at != null) {
+                    switch (intent.getExtras().getInt(EXTRA_STATE)) {
+                        case BluetoothAdapter.STATE_ON:
+                            at.onBluetoothToggle(ActivityTracker.BluetoothToggle.BT_ON);
+                            break;
+                        case BluetoothAdapter.STATE_TURNING_ON:
+                            break;
+                        case BluetoothAdapter.STATE_OFF | BluetoothAdapter.STATE_TURNING_OFF:
+                            at.onBluetoothToggle(ActivityTracker.BluetoothToggle.BT_OFF);
+                            break;
+                    }
                 }
                 break;
         }

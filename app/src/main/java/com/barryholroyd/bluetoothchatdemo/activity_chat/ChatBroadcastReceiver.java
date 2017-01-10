@@ -39,21 +39,18 @@ public class ChatBroadcastReceiver extends BroadcastReceiver
         String action = intent.getAction();
         switch (action) {
             case BluetoothAdapter.ACTION_STATE_CHANGED:
-                switch (intent.getExtras().getInt(EXTRA_STATE)) {
-                    case BluetoothAdapter.STATE_ON:
-                        // TBD:
-                        Support.trace("### Calling startChatServer() from ChatBroadcastReceiver.onReceive()...");
-                        ChatActivity.startChatServer();
-                        break;
-                    case BluetoothAdapter.STATE_TURNING_ON:
-                        break;
-                    case BluetoothAdapter.STATE_OFF | BluetoothAdapter.STATE_TURNING_OFF:
-                        ChatActivity.stopChatServer();
-                        Support.userMessage("No Bluetooth... exiting chat");
-                        Activity a = ActivityTracker.getActivity();
-                        if (a != null) a.finish();
-                        else throw new IllegalStateException("Missing activity.");
-                        break;
+                ActivityTracker at = ChatActivity.getActivityTracker();
+                if (at != null) {
+                    switch (intent.getExtras().getInt(EXTRA_STATE)) {
+                        case BluetoothAdapter.STATE_ON:
+                            at.onBluetoothToggle(ActivityTracker.BluetoothToggle.BT_ON);
+                            break;
+                        case BluetoothAdapter.STATE_TURNING_ON:
+                            break;
+                        case BluetoothAdapter.STATE_OFF | BluetoothAdapter.STATE_TURNING_OFF:
+                            at.onBluetoothToggle(ActivityTracker.BluetoothToggle.BT_OFF);
+                            break;
+                    }
                 }
                 break;
         }

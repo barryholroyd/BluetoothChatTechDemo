@@ -16,12 +16,12 @@ import java.util.UUID;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 /**
- *  * Bluetooth "chat" server connection set up.
+ *  * Bluetooth listener to receive incoming connection requests.
  * <p>
  *     Listen for an incoming connection request, accept it and then call start
  *     ChatActivity to connect a chat session.
  * <p>
- *     Runs as a background thread.
+ *     Runs as a background thread. We only ever need one of these.
  */
 class ChooserListener extends Thread
 {
@@ -31,12 +31,15 @@ class ChooserListener extends Thread
     /** UUID generated at: https://www.uuidgenerator.net/. Used by both client and server code. */
     static final UUID MY_UUID = UUID.fromString("bb303707-5a56-4536-8d07-7ead8264f6b9");
 
+    static private ChooserListener chooserListener = null;
+
     static private BluetoothServerSocket btServerSocket = null;
 
     static void startListener() {
         if (BluetoothUtils.isEnabled()) {
             Support.trace("Starting listener...");
-            (new ChooserListener()).start();
+            chooserListener = new ChooserListener();
+            chooserListener.start();
         }
         else {
             Support.trace(
@@ -47,6 +50,7 @@ class ChooserListener extends Thread
     static void stopListener() {
         Support.trace("Stopping listener...");
         closeSocket();
+        chooserListener = null;
     }
 
     /**

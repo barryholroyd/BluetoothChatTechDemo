@@ -104,7 +104,10 @@ public class ChooserClient
 
         ((ApplicationGlobalState)  a.getApplication()).setBtSocket(btChatSocket);
 
-        // Pass control to the chat Activity.
+        /*
+          * Pass control to the chat Activity.
+          * ChooserListener will be stopped by ChooserActivity.onStop().
+          */
         Intent intent = new Intent(a, ChatActivity.class);
         intent.putExtra(ChatActivity.BUNDLE_KEY_BTDEVICE, btdevice);
         intent.addFlags(FLAG_ACTIVITY_NEW_TASK); // required since an App Context is used
