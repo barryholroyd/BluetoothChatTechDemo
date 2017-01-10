@@ -239,8 +239,6 @@ class ChatServer extends Thread
         chatServer = null;
     }
 
-
-
     /**
      * Close the input stream so that its read() method throws an exception and the thread
      * can exit.

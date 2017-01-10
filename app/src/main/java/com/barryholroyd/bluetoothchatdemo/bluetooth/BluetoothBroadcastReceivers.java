@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
@@ -22,7 +23,8 @@ import static android.bluetooth.BluetoothAdapter.EXTRA_STATE;
  * Register and unregister Broadcast Receivers for Bluetooth events.
  */
 
-public class BluetoothBroadcastReceivers {
+public class BluetoothBroadcastReceivers
+{
     private static final HashMap<Context, BroadcastReceiver> broadcastReceivers = new HashMap<>();
     /**
      * Register a Bluetooth broadcast receiver.
@@ -50,7 +52,7 @@ public class BluetoothBroadcastReceivers {
      *
      * @param c the current Activity's Context.
      */
-    static public void unregisterBroadcastReceiver(Context c) {
+    public static void unregisterBroadcastReceiver(Context c) {
         Support.trace(String.format("Unregistering Broadcast Receiver for: %s",
                 c.getClass().getSimpleName()));
         BroadcastReceiver mReceiver = broadcastReceivers.get(c);

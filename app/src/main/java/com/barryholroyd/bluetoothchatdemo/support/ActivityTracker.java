@@ -109,13 +109,9 @@ abstract public class ActivityTracker extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 	    trace("onCreate");
-        if (appContext != null) {
-            // Multiple instances not supported. See block comment at beginning of this file.
-            throw new IllegalStateException(String.format(Locale.US,
-                    "Attempted to create multiple instances of %s.",
-                    this.getClass().getSimpleName()));
+        if (appContext == null) {
+            appContext = getApplicationContext();
         }
-        appContext = getApplicationContext();
 
         // Register the Activity so that it can be used from worker threads.
         activityTracker = this;

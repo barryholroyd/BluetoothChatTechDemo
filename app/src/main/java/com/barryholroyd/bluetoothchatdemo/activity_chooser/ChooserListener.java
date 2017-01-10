@@ -118,6 +118,7 @@ class ChooserListener extends Thread
      */
     private static void closeSocket() {
         if (btServerSocket == null) {
+            // Bug: rotate device while "turn on BT screen is shown".
             throw new IllegalStateException("Bluetooth server socket already closed.");
         }
         try {

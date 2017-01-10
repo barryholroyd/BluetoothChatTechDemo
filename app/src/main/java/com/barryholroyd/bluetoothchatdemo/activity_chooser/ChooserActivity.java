@@ -18,24 +18,38 @@ import com.barryholroyd.bluetoothchatdemo.support.Support;
 import java.util.Set;
 
 /*
+ * Tests
+ *   Ask BT on
+ *     o Leave off
+ *     o Later, turn on
+ *   Rotate device
+ *     BT on request dialog
+ *     Chooser
+ *     Chat
+ *   Toggle BT
+ *     o Chooser
+ *       o On
+ *       o Off
+ *     o Chat
+ *       o On
+ *       o Off
+ *   Devices discovery
+ *     o when paired, paired screen updated?
+ *   Disconnect, re-connect
+ *     o From each end.
+ *     o Walk out of range.
+ *   Check
+ *     o Memory and threads, after rotations, connect/disconnect, etc.
+ *
  * Fixed
  * BUG: clicking on remote device twice rapidly from Samsung
- * Bug: not asking to be discoverable. TEST: BT on/off when app started; BT toggled on/off.
- * Test
- * BUG: rotate N7 -- died. (chat screen?)
- * Bug: when paired, not refreshing paired.
- * Not Fixed
- *   BUG: ActivityTracker: old Activity still running when new one starts; causes exception!
- *   TBD: Use LocalBroadcastManager.
- * TBD: test thoroughly, including
- *   TBD: turning off BT
- *   TBD: walking out-of-range.
  * TBD: brief code review
  * TBD: finish up comments.
  * TBD: clean out TBDs, etc.
  * TBD: turn off tracing.
- *
- * TBD: overview.html: For both Activities, their background network threads are
+ * TBD: Update overview.html:
+ * Design parameter: can only have a single chat going at once.
+ * For both Activities, their background network threads are
  * controlled by onStart() and onStop(). In both cases, the network threads are
  * implemented as Singletons controlled by static start()/stop() methods.
  * Changes to Bluetooth settings (on/off) are
