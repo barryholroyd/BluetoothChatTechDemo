@@ -3,15 +3,17 @@ package com.barryholroyd.bluetoothchatdemo.activity_chooser;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import com.barryholroyd.bluetoothchatdemo.ActivityExtensions;
 import com.barryholroyd.bluetoothchatdemo.support.ApplicationGlobalState;
 import com.barryholroyd.bluetoothchatdemo.R;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothDevices;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothUtils;
-import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothBroadcastReceivers;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
@@ -68,11 +70,8 @@ import java.util.Set;
  * We will never need more than one ChooserClient and one ChooseListener
  * and will never allow more than once ChatClient and associated ChatServer.
  */
-public class ChooserActivity extends ActivityTracker
+public class ChooserActivity extends AppCompatActivity implements ActivityExtensions
 {
-    // Global state is stored at the app level.
-    private static ApplicationGlobalState ags;
-    public  static ApplicationGlobalState getApplicationGlobalState() { return ags; }
 
     /** Request codes for onActivityResult(). */
     private static final int RT_BT_ENABLED = 1;
@@ -81,50 +80,45 @@ public class ChooserActivity extends ActivityTracker
     private RecyclerViewManager rvmDiscovered;
     private RecyclerViewManager rvmPaired;
 
+    // This Activity.
+    private static ChooserActivity ca = null;
+    // Global state is stored at the app level.
+    private static ApplicationGlobalState ags;
+
     /**
-     * All code in this app, except for code in ChatActivity and ChatServer (which is
-     * only called by ChatActivity) executes while ChooserActivity should be present and
-     * available, with one caveat: ChooserClient and ChooserListener classes are both
-     * extensions of Thread so that they can set up connections in the background. In both
-     * the cases it is possible (although not likely) that the ChooserActivity instance will
-     * be gone by the time they need it. For that reason, we route requests for the ChooserActivity
-     * instance through ActivityTracker, which tracks the creation and destruction of
-     * Activities in this app.
+     * Get the Application instance to use for storing global state.
+     *
+     * @return handle to the Application.
+     */
+    public  static ApplicationGlobalState getApplicationGlobalState() { return ags; }
+
+    /**
+     * Get the current Activity instance.
      *
      * @return the current ChooserActivity instance if it exists; else null.
      */
-    private static ChooserActivity getChooserActivity() {
-        Activity a = getActivity(); // from ActivityTracker
+    public static ChooserActivity getActivity() { return ca; }
 
-        // This should only happen if this method is called from ChooserActivity's onCreate() method.
-        if (a == null) {
-            throw new IllegalStateException(
-                    "Attempt to access uninitialized ChooserActivity instance.");
-        }
-        if (! (a instanceof ChooserActivity)) {
-            String msg = String.format(
-                    "Unexpected Activity type: %s", a.getClass().getSimpleName());
-            throw new IllegalStateException(msg);
-        }
-        return (ChooserActivity) a;
-    }
+    /**
+     * Get the app's Context instance.
+     *
+     * @return the app's Context instance.
+     */
+    public Context getAppContext() { return getApplicationContext(); }
 
     /** Get the "Discovered" RecyclerViewManager for the current ChooserActivity instance. */
-    public static RecyclerViewManager  getRvmDiscovered(){
-        return getChooserActivity().rvmDiscovered;
-    }
+    RecyclerViewManager  getRvmDiscovered() { return rvmDiscovered; }
 
     /** Get the "Paired" RecyclerViewManager for the current ChooserActivity instance. */
-    public static RecyclerViewManager  getRvmPaired()    {
-        return getChooserActivity().rvmPaired;
-    }
+    RecyclerViewManager  getRvmPaired() { return rvmPaired; }
 
     /** Display client interface, initialize Bluetooth, start server worker thread. */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ags = (ApplicationGlobalState) getApplication();
+        ca = this;
+        ags = (ApplicationGlobalState) getApplication(); //TBD: need this?
 
         // Display the "client" interface.
         setContentView(R.layout.activity_chooser);
@@ -163,6 +157,12 @@ public class ChooserActivity extends ActivityTracker
         super.onStop();
         BluetoothBroadcastReceivers.unregisterBroadcastReceiver(this);
         ChooserListener.stopListener();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ca = null;
     }
 
     /**
@@ -212,15 +212,15 @@ public class ChooserActivity extends ActivityTracker
      *
      * @param state Bluetooth turned on / off.
      */
-    public void onBluetoothToggle(ActivityTracker.BluetoothToggle state) {
+    public void onBluetoothToggle(BluetoothToggle state) {
         switch (state) {
             case BT_ON:
-                ChooserActivity.refreshUI(false, true);
+                refreshUI(false, true);
                 ChooserListener.startListener();
                 Support.userMessage("Bluetooth on: BluetoothChatDemo ready.");
                 break;
             case BT_OFF:
-                ChooserActivity.refreshUI(true, false);
+                refreshUI(true, false);
                 ChooserListener.stopListener();
                 Support.userMessage("Bluetooth off: BluetoothChatDemo paused.");
                 break;
@@ -237,7 +237,7 @@ public class ChooserActivity extends ActivityTracker
      * @param requestDiscoverable if true, ask the user if they would like the app
      *                            to be discoverable.
      */
-    static void refreshUI(boolean clearRequest, boolean requestDiscoverable) {
+    void refreshUI(boolean clearRequest, boolean requestDiscoverable) {
         refreshPaired(clearRequest);
         refreshDiscovered(clearRequest);
 
@@ -249,10 +249,10 @@ public class ChooserActivity extends ActivityTracker
     /**
      * Find and display devices which are already paired with this one.
      */
-    static void refreshPaired(boolean clearRequest) {
+    void refreshPaired(boolean clearRequest) {
         Set<BluetoothDevice> pairedDevices = BluetoothUtils.getPairedDevices();
         if (pairedDevices.size() > 0) {
-            RecyclerViewAdapter recyclerViewAdapter = ChooserActivity.getRvmPaired().getAdapter();
+            RecyclerViewAdapter recyclerViewAdapter = getRvmPaired().getAdapter();
             BluetoothDevices btds = recyclerViewAdapter.getDevices();
             btds.clear();
             if (!clearRequest) {
@@ -271,8 +271,8 @@ public class ChooserActivity extends ActivityTracker
      *     is updated by the BroadcastReceiver.
      *     See {@link ChooserBroadcastReceiver#onReceive}.
      */
-    static void refreshDiscovered(boolean clearRequest) {
-        RecyclerViewAdapter recyclerViewAdapter = ChooserActivity.getRvmDiscovered().getAdapter();
+    void refreshDiscovered(boolean clearRequest) {
+        RecyclerViewAdapter recyclerViewAdapter = getRvmDiscovered().getAdapter();
         BluetoothDevices btds = recyclerViewAdapter.getDevices();
         btds.clear();
         if (!clearRequest) {

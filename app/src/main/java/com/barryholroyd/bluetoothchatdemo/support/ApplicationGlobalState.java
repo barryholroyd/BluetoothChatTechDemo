@@ -17,7 +17,7 @@ public class ApplicationGlobalState extends Application
      * BluetoothSocket to be passed from ChooserActivity to ChatActivity.
      * BluetoothSockets are not parcelable, so they can't be passed as Intent extras.
      */
-    private BluetoothSocket btSocket;
+    private BluetoothSocket btChatSocket;
 
     /** True after the first instance of ChooserActivity has been created and initialized. */
     private boolean appInitialized = false;
@@ -25,8 +25,8 @@ public class ApplicationGlobalState extends Application
     /*
      * Getters and setters.
      */
-    public BluetoothSocket getBtSocket() { return btSocket; }
-    public void setBtSocket(BluetoothSocket _btSocket) { btSocket = _btSocket; }
+    public BluetoothSocket getBtChatSocket() { return btChatSocket; }
+    public void setBtChatSocket(BluetoothSocket _btChatSocket) { btChatSocket = _btChatSocket; }
 
     public boolean isAppInitialized()  { return appInitialized; }
     public void setAppInitialized() { appInitialized = true; }

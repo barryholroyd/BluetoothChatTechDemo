@@ -2,18 +2,20 @@ package com.barryholroyd.bluetoothchatdemo.activity_chat;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.barryholroyd.bluetoothchatdemo.ActivityExtensions;
 import com.barryholroyd.bluetoothchatdemo.support.ApplicationGlobalState;
 import com.barryholroyd.bluetoothchatdemo.R;
-import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothBroadcastReceivers;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
@@ -29,7 +31,7 @@ import java.util.Locale;
  *     "received" text field. This works cleanly because ChatServer is only used by
  *     ChatActivity.
  */
-public class ChatActivity extends ActivityTracker
+public class ChatActivity extends AppCompatActivity implements ActivityExtensions
 {
     private EditText etTextSend;
     private TextView tvTextReceive;
@@ -44,10 +46,27 @@ public class ChatActivity extends ActivityTracker
     public TextView getTextViewReceive()  { return tvTextReceive; }
 
     /** Bluetooth socket passed in from ChooserActivity via static hook in app. */
-    private static BluetoothSocket btsocket = null;
+    private static BluetoothSocket btChatSocket = null;
 
     /** Handler providing callback to exit the current ChatActivity instance. */
     private static ChatActivityHandler handler = null;
+
+    // This Activity.
+    private static ChatActivity ca = null;
+
+    /**
+     * Get the current Activity instance.
+     *
+     * @return the current ChatActivity instance if it exists; else null.
+     */
+    public static ChatActivity getActivity() { return ca; }
+
+    /**
+     * Get the app's Context instance.
+     *
+     * @return the app's Context instance.
+     */
+    public Context getAppContext() { return getApplicationContext(); }
 
     /**
      * Display the chat window for the user, get the BluetoothSocket stored in
@@ -62,6 +81,8 @@ public class ChatActivity extends ActivityTracker
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        ca = this;
+
         Intent intent = getIntent();
         BluetoothDevice btdevice = intent.getParcelableExtra(BUNDLE_KEY_BTDEVICE);
 
@@ -73,7 +94,7 @@ public class ChatActivity extends ActivityTracker
 
         configureScrollBars();
 
-        btsocket = ((ApplicationGlobalState) getApplication()).getBtSocket();
+        btChatSocket = retrieveBtChatSocket();
 
         /*
          * We create a static ChatActivityHandler class and pass it a WeakReference to the
@@ -83,12 +104,16 @@ public class ChatActivity extends ActivityTracker
         handler = new ChatActivityHandler(wrca);
     }
 
+    private BluetoothSocket retrieveBtChatSocket() {
+        return ((ApplicationGlobalState) getApplication()).getBtChatSocket();
+    }
+
     @Override
     public void onStart() {
         super.onStart();
         BluetoothBroadcastReceivers.registerBroadcastReceiver(this, new ChatBroadcastReceiver());
         Support.trace("### Calling startChatServer() from ChatActivity.onStart()...");
-        ChatServer.startChatServer(btsocket, handler);
+        ChatServer.startChatServer(btChatSocket, handler);
     }
 
     @Override
@@ -98,16 +123,22 @@ public class ChatActivity extends ActivityTracker
         ChatServer.stopChatServer();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ca = null;
+    }
+
     /**
      * Handle Bluetooth on/off from Broadcast Receiver.
      *
      * @param state Bluetooth turned on / off.
      */
-    public void onBluetoothToggle(ActivityTracker.BluetoothToggle state) {
+    public void onBluetoothToggle(BluetoothToggle state) {
         switch (state) {
             case BT_ON:
                 Support.trace("### Calling startChatServer() from onBluetoothToggle()...");
-                ChatServer.startChatServer(btsocket, handler);
+                ChatServer.startChatServer(btChatSocket, handler);
                 break;
             case BT_OFF:
                 ChatServer.stopChatServer();

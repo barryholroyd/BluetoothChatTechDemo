@@ -7,8 +7,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.barryholroyd.bluetoothchatdemo.ActivityExtensions;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothBroadcastReceivers;
-import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 
 import static android.bluetooth.BluetoothAdapter.EXTRA_STATE;
 
@@ -36,32 +36,33 @@ public class ChooserBroadcastReceiver extends BroadcastReceiver
     public void onReceive(Context context, Intent intent) {
         BluetoothBroadcastReceivers.Log.logAction(context, intent);
 
+        ChooserActivity ca = ChooserActivity.getActivity();
+        if (ca == null)
+            return;
+
         String action = intent.getAction();
         switch (action) {
             case BluetoothDevice.ACTION_FOUND: // device found by startDiscovery()
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 // Do not add to the discovered list if the device has already been paired.
-                if (ChooserActivity.getRvmPaired().getAdapter()
-                        .getDevices().getDevice(device.getAddress()) != null)
-                    break;
-                RecyclerViewAdapter recyclerViewAdapterDiscovered = ChooserActivity.getRvmDiscovered().getAdapter();
-                recyclerViewAdapterDiscovered.getDevices().addNoDup(device);
-                recyclerViewAdapterDiscovered.notifyDataSetChanged();
+                if (ca.getRvmPaired().getAdapter()
+                        .getDevices().getDevice(device.getAddress()) == null) {
+                    RecyclerViewAdapter recyclerViewAdapterDiscovered = ca.getRvmDiscovered().getAdapter();
+                    recyclerViewAdapterDiscovered.getDevices().addNoDup(device);
+                    recyclerViewAdapterDiscovered.notifyDataSetChanged();
+                }
                 break;
             case BluetoothAdapter.ACTION_STATE_CHANGED: // Bluetooth state change
-                ActivityTracker at = ChooserActivity.getActivityTracker();
-                if (at != null) {
-                    switch (intent.getExtras().getInt(EXTRA_STATE)) {
-                        case BluetoothAdapter.STATE_ON:
-                            at.onBluetoothToggle(ActivityTracker.BluetoothToggle.BT_ON);
-                            break;
-                        case BluetoothAdapter.STATE_TURNING_ON:
-                            break;
-                        case BluetoothAdapter.STATE_OFF | BluetoothAdapter.STATE_TURNING_OFF:
-                            at.onBluetoothToggle(ActivityTracker.BluetoothToggle.BT_OFF);
-                            break;
+                switch (intent.getExtras().getInt(EXTRA_STATE)) {
+                    case BluetoothAdapter.STATE_ON:
+                        ca.onBluetoothToggle(ActivityExtensions.BluetoothToggle.BT_ON);
+                        break;
+                    case BluetoothAdapter.STATE_TURNING_ON:
+                        break;
+                    case BluetoothAdapter.STATE_OFF | BluetoothAdapter.STATE_TURNING_OFF:
+                        ca.onBluetoothToggle(ActivityExtensions.BluetoothToggle.BT_OFF);
+                        break;
                     }
-                }
                 break;
         }
     }

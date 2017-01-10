@@ -102,7 +102,7 @@ public class ChooserClient
 
         Support.userMessage("Connected!");
 
-        ((ApplicationGlobalState)  a.getApplication()).setBtSocket(btChatSocket);
+        saveBtChatSocket(a, btChatSocket);
 
         /*
           * Pass control to the chat Activity.
@@ -124,6 +124,10 @@ public class ChooserClient
         catch (IOException ioe) {
             Support.exception("Failed to close client's btChatSocket", ioe);
         }
+    }
+
+    static private void saveBtChatSocket(Activity a, BluetoothSocket btChatSocket) {
+        ((ApplicationGlobalState)  a.getApplication()).setBtChatSocket(btChatSocket);
     }
 }
 
