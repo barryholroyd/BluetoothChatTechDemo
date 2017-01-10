@@ -7,9 +7,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.barryholroyd.bluetoothchatdemo.ActivityExtensions;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothBroadcastReceivers;
-import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
-import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import static android.bluetooth.BluetoothAdapter.EXTRA_STATE;
 
@@ -36,21 +35,23 @@ public class ChatBroadcastReceiver extends BroadcastReceiver
     @Override
     public void onReceive(Context context, Intent intent) {
         BluetoothBroadcastReceivers.Log.logAction(context, intent);
+
+        ChatActivity ca = ChatActivity.getActivity();
+        if (ca == null)
+            return;
+
         String action = intent.getAction();
         switch (action) {
             case BluetoothAdapter.ACTION_STATE_CHANGED:
-                ActivityTracker at = ChatActivity.getActivityTracker();
-                if (at != null) {
-                    switch (intent.getExtras().getInt(EXTRA_STATE)) {
-                        case BluetoothAdapter.STATE_ON:
-                            at.onBluetoothToggle(ActivityTracker.BluetoothToggle.BT_ON);
-                            break;
-                        case BluetoothAdapter.STATE_TURNING_ON:
-                            break;
-                        case BluetoothAdapter.STATE_OFF | BluetoothAdapter.STATE_TURNING_OFF:
-                            at.onBluetoothToggle(ActivityTracker.BluetoothToggle.BT_OFF);
-                            break;
-                    }
+                switch (intent.getExtras().getInt(EXTRA_STATE)) {
+                    case BluetoothAdapter.STATE_ON:
+                        ca.onBluetoothToggle(ActivityExtensions.BluetoothToggle.BT_ON);
+                        break;
+                    case BluetoothAdapter.STATE_TURNING_ON:
+                        break;
+                    case BluetoothAdapter.STATE_OFF | BluetoothAdapter.STATE_TURNING_OFF:
+                        ca.onBluetoothToggle(ActivityExtensions.BluetoothToggle.BT_OFF);
+                        break;
                 }
                 break;
         }

@@ -17,12 +17,12 @@ public class Support {
     private static final boolean traceEnabled = true;
 
     /** Initialization */
-    private static void init() {
+    public static void init(Context c) {
         synchronized (Support.class){
             if (toaster == null) {
                 toaster = new Toaster();
             }
-            Context ac = ActivityTracker.getAppContext();
+            Context ac = c.getApplicationContext();
             if (appLabel == null) {
                 PackageManager pm = ac.getPackageManager();
                 try {
@@ -37,24 +37,16 @@ public class Support {
     }
 
     /** Display a Dialog to the user indicating a fatal error, then exit the app. */
-    public static void fatalError(String msg) {
-        String s = String.format(Locale.US, "Fatal Error: %s", msg);
-        Support.error("*** " + s);
-        // Get the currently running Activity.
-        Activity a = ActivityTracker.getActivity();
-        if (a == null)
+    public static void fatalError(Activity a, String msg) {
+        if (a == null) {
+            String s = String.format(Locale.US, "Fatal error: %s", msg);
             throw new SupportException(s);
-        FatalErrorDialog
-            .newInstance(msg)
-            .show(a.getFragmentManager(), "error_dialog");
+        }
+        FatalErrorDialog.newInstance(msg).show(a.getFragmentManager(), "error_dialog");
     }
 
     /** Return the app label as defined in the manifest. */
-    public static String getAppLabel() {
-        if (appLabel == null)
-            init();
-        return appLabel;
-    }
+    public static String getAppLabel() { return appLabel; }
 
     /** External access to logging -- turn off in production. */
     public static void trace(String msg) {
@@ -85,8 +77,6 @@ public class Support {
      */
     public static void userMessage(String msg) {
         log("User message: " + msg);
-        if (toaster == null)
-            init();
         Toaster.display(msg);
     }
 }

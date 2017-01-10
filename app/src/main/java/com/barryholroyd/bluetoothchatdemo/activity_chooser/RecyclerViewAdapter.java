@@ -10,11 +10,11 @@ import android.widget.TextView;
 
 import com.barryholroyd.bluetoothchatdemo.R;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothUtils;
-import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
-import com.barryholroyd.bluetoothchatdemo.support.Support;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothDevices;
 
 import java.util.Locale;
+
+import static com.barryholroyd.bluetoothchatdemo.support.Support.userMessage;
 
 /**
  * RecyclerView adapter used for displaying both the list of discovered devices
@@ -84,17 +84,18 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             String mac = (String) tvMac.getText();
             BluetoothDevice btdevice = bluetoothDevices.getDevice(mac);
             if (btdevice == null) {
-                Support.fatalError(String.format(Locale.US, "Device missing: %s", mac));
+                String msg = String.format(Locale.US, "Device missing: %s", mac);
+                throw new IllegalStateException(msg);
             }
 
             /* Check for Bluetooth... it may have been turned off. */
             if (!BluetoothUtils.isEnabled()) {
-                Support.userMessage("Bluetooth must be turned on.");
+                userMessage("Bluetooth must be turned on.");
                 return;
             }
 
             // Set up a Bluetooth client connection to the remote device.
-            ChooserClient.connect(ActivityTracker.getActivity(), btdevice);
+            ChooserClient.connect(ChooserActivity.getActivity(), btdevice);
         }
     }
 }

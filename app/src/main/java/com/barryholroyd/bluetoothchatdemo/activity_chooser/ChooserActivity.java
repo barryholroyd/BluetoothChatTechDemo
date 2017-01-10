@@ -117,6 +117,9 @@ public class ChooserActivity extends AppCompatActivity implements ActivityExtens
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Support.init(this);
+        BluetoothUtils.init(this);
+
         ca = this;
         ags = (ApplicationGlobalState) getApplication(); //TBD: need this?
 
@@ -146,7 +149,7 @@ public class ChooserActivity extends AppCompatActivity implements ActivityExtens
         refreshPaired(false);
 
         BluetoothBroadcastReceivers.registerBroadcastReceiver(this, new ChooserBroadcastReceiver());
-        BluetoothUtils.requestDiscoverable();
+        BluetoothUtils.requestDiscoverable(this);
 
         // Start listening for incoming connections.
         ChooserListener.startListener();
@@ -243,7 +246,7 @@ public class ChooserActivity extends AppCompatActivity implements ActivityExtens
 
         /* Only make this request once per application run. */
         if (requestDiscoverable)
-            BluetoothUtils.requestDiscoverable();
+            BluetoothUtils.requestDiscoverable(this);
     }
 
     /**

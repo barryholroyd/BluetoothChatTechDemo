@@ -7,7 +7,6 @@ import android.os.Message;
 import android.widget.TextView;
 
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothUtils;
-import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.io.IOException;
@@ -15,6 +14,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
+
+import static com.barryholroyd.bluetoothchatdemo.activity_chat.ChatActivity.getActivity;
 
 /**
  * Bluetooth communications: send and receive text over a Bluetooth connection.
@@ -127,7 +128,7 @@ class ChatServer extends Thread
         }
 
         // The current Activity should be an instance of ChatActivity.
-        ChatActivity ca = (ChatActivity) ActivityTracker.getActivity();
+        ChatActivity ca = getActivity();
         if (ca == null) {
             String msg = String.format(Locale.US,
                     "Internal error -- could not display incoming chat message: %s", text);
