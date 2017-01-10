@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import com.barryholroyd.bluetoothchatdemo.support.ApplicationGlobalState;
 import com.barryholroyd.bluetoothchatdemo.R;
-import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothUtils;
 import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothBroadcastReceivers;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
@@ -43,10 +42,6 @@ public class ChatActivity extends ActivityTracker
 
     /** Getter for "receive" TextView in ChatActivity. */
     public TextView getTextViewReceive()  { return tvTextReceive; }
-
-    /** Only allow a single running server thread at a time. */
-    // HERE: move this into ChatServer, like Chooser does it?
-    private static ChatServer chatServer = null;
 
     /** Bluetooth socket passed in from ChooserActivity via static hook in app. */
     private static BluetoothSocket btsocket = null;
@@ -93,14 +88,14 @@ public class ChatActivity extends ActivityTracker
         super.onStart();
         BluetoothBroadcastReceivers.registerBroadcastReceiver(this, new ChatBroadcastReceiver());
         Support.trace("### Calling startChatServer() from ChatActivity.onStart()...");
-        startChatServer();
+        ChatServer.startChatServer(btsocket, handler);
     }
 
     @Override
     public void onStop() {
         super.onStop();
         BluetoothBroadcastReceivers.unregisterBroadcastReceiver(this);
-        stopChatServer();
+        ChatServer.stopChatServer();
     }
 
     /**
@@ -112,46 +107,13 @@ public class ChatActivity extends ActivityTracker
         switch (state) {
             case BT_ON:
                 Support.trace("### Calling startChatServer() from onBluetoothToggle()...");
-                ChatActivity.startChatServer();
+                ChatServer.startChatServer(btsocket, handler);
                 break;
             case BT_OFF:
-                ChatActivity.stopChatServer();
+                ChatServer.stopChatServer();
                 finish();
                 break;
         }
-    }
-
-    /**
-     * Start a new chat server in the background to read input from the remote device
-     * for the current chat session.
-     * TBD: can be called more than once... how?
-     */
-    public static void startChatServer() {
-        if (BluetoothUtils.isEnabled()) {
-            if (chatServer != null) {
-                // DEL:
-                throw new IllegalStateException("START CHAT SERVER EXCEPTION");
-                // TBD: return;
-            }
-            Support.trace("Starting chat server...");
-            try {
-                chatServer = new ChatServer(btsocket, handler);
-                chatServer.start();
-            }
-            catch (ChatServerException cse) {
-                throw new IllegalStateException("Could not start chat server.");
-            }
-        }
-    }
-
-    public static void stopChatServer() {
-        if (chatServer == null) {
-            throw new IllegalStateException(
-                    "Attempt to stop a non-existent chat server.");
-        }
-        Support.trace("Stopping chat server...");
-        ChatServer.stopServer();
-        chatServer = null;
     }
 
     /**

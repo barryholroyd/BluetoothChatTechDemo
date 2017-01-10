@@ -6,6 +6,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.widget.TextView;
 
+import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothUtils;
 import com.barryholroyd.bluetoothchatdemo.support.ActivityTracker;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
@@ -33,8 +34,6 @@ class ChatServer extends Thread
     /** Bluetooth socket to be read and written. */
     private static BluetoothSocket btSocket;
 
-
-
     /** Handler message: display incoming chat text. */
     private static final int CHATTEXT = 1;
 
@@ -52,6 +51,9 @@ class ChatServer extends Thread
 
     /** Bluetooth output stream. */
     private static OutputStream btOut;
+
+    /** Only allow a single running server thread at a time. */
+    private static ChatServer chatServer = null;
 
     /**
      * Constructor -- set up IO and UI handler.
@@ -202,6 +204,42 @@ class ChatServer extends Thread
                     "Could not write message: %s", ioe.getMessage()));
         }
     }
+
+    /**
+     * Start a new chat server in the background to read input from the remote device
+     * for the current chat session.
+     * TBD: can be called more than once... how?
+     */
+    public static void startChatServer(BluetoothSocket btsocket,
+                                       ChatActivity.ChatActivityHandler handler) {
+        if (BluetoothUtils.isEnabled()) {
+            if (chatServer != null) {
+                // DEL:
+                throw new IllegalStateException("START CHAT SERVER EXCEPTION");
+                // TBD: return;
+            }
+            Support.trace("Starting chat server...");
+            try {
+                chatServer = new ChatServer(btsocket, handler);
+                chatServer.start();
+            }
+            catch (ChatServerException cse) {
+                throw new IllegalStateException("Could not start chat server.");
+            }
+        }
+    }
+
+    public static void stopChatServer() {
+        if (chatServer == null) {
+            throw new IllegalStateException(
+                    "Attempt to stop a non-existent chat server.");
+        }
+        Support.trace("Stopping chat server...");
+        ChatServer.stopServer();
+        chatServer = null;
+    }
+
+
 
     /**
      * Close the input stream so that its read() method throws an exception and the thread

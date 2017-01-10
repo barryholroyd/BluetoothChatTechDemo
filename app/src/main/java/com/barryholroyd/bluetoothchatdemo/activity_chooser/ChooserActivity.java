@@ -39,7 +39,9 @@ import java.util.Set;
  * controlled by onStart() and onStop(). In both cases, the network threads are
  * implemented as Singletons controlled by static start()/stop() methods.
  * Changes to Bluetooth settings (on/off) are
- * caught by their respective BroadcastReceivers, which do xxx.
+ * caught by their respective BroadcastReceivers, which use onBluetoothToggle()
+ * callbacks to also start and stop the background threads.
+ * This also ensures everything necessary has been initialized
  */
 
 /**
