@@ -41,16 +41,27 @@ class ChooserListener extends Thread
             chooserListener = new ChooserListener();
             chooserListener.start();
         }
-        else {
-            Support.trace(
-                    "Not starting select listener because Bluetooth is not currently enabled.");
-        }
     }
-
+    /**
+     * Close the listening BluetoothServerSocket. Per the BluetoothServerSocket
+     * reference page, its close() method must be used to abort its accept() method
+     * (the worker thread's interrupt() method is ignored).
+     */
     static void stopListener() {
+        // btServerSocket can be null if Bluetooth wasn't turned on when the app was started.
+        if (btServerSocket == null)
+            return;
+
         Support.trace("Stopping listener...");
-        closeSocket();
-        chooserListener = null;
+        try {
+                btServerSocket.close();
+        }
+        catch (Exception e) {
+            Support.exception("Exception attempting to close Bluetooth server socket", e);
+        }
+        finally {
+            btServerSocket = null;
+        }
     }
 
     /**
@@ -77,7 +88,7 @@ class ChooserListener extends Thread
         BluetoothSocket btChooserSocket;
 
         if (!BluetoothUtils.isEnabled()) {
-            Support.userMessage("Connection dropped.");
+            Support.userMessageLong("Connection dropped.");
             return;
         }
         Support.trace("Server: waiting for a new connection to accept...");
@@ -100,7 +111,7 @@ class ChooserListener extends Thread
              * Make the Bluetooth socket available to ChatActivity.
              * ChatActivity is responsible for closing it.
              */
-            Support.userMessage("Connected!");
+            Support.userMessageLong("Connected!");
             ChooserActivity.getApplicationGlobalState().setBtChatSocket(btChooserSocket);
             Context ac = ChooserActivity.getAppContext();
             Intent intent = new Intent(ac, ChatActivity.class);
@@ -118,24 +129,6 @@ class ChooserListener extends Thread
         }
         else {
             Support.fatalError(a, msg);
-        }
-    }
-
-    /**
-     * Close the listening BluetoothServerSocket. Per the BluetoothServerSocket
-     * reference page, its close() method must be used to abort its accept() method
-     * (the worker thread's interrupt() method is ignored).
-     */
-    private static void closeSocket() {
-        if (btServerSocket == null) {
-            // Bug: rotate device while "turn on BT screen is shown".
-            throw new IllegalStateException("Bluetooth server socket already closed.");
-        }
-        try {
-            btServerSocket.close();
-        }
-        catch (Exception e) {
-            Support.exception("Exception attempting to close Bluetooth server socket", e);
         }
     }
 }

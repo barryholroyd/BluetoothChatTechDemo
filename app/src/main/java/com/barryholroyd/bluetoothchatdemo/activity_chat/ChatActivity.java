@@ -7,13 +7,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.barryholroyd.bluetoothchatdemo.ActivityExtensions;
+import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothUtils;
+import com.barryholroyd.bluetoothchatdemo.support.ActivityPrintStates;
 import com.barryholroyd.bluetoothchatdemo.support.ApplicationGlobalState;
 import com.barryholroyd.bluetoothchatdemo.R;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothBroadcastReceivers;
@@ -31,7 +32,7 @@ import java.util.Locale;
  *     "received" text field. This works cleanly because ChatServer is only used by
  *     ChatActivity.
  */
-public class ChatActivity extends AppCompatActivity implements ActivityExtensions
+public class ChatActivity extends ActivityPrintStates implements ActivityExtensions
 {
     private EditText etTextSend;
     private TextView tvTextReceive;
@@ -134,6 +135,7 @@ public class ChatActivity extends AppCompatActivity implements ActivityExtension
      *
      * @param state Bluetooth turned on / off.
      */
+    // DEL: ?
     public void onBluetoothToggle(BluetoothToggle state) {
         switch (state) {
             case BT_ON:
@@ -147,10 +149,20 @@ public class ChatActivity extends AppCompatActivity implements ActivityExtension
         }
     }
 
-    /**
-     * Configure scrollbars for the text receive TextView.
-     * For some reason, this doesn't seem to be configurable from XML.
-     */
+    public void onBluetoothToggle() {
+        if (BluetoothUtils.isEnabled()) {
+            Support.trace("### Calling startChatServer() from onBluetoothToggle()...");
+            ChatServer.startChatServer(btChatSocket, handler);
+        }
+        else {
+            ChatServer.stopChatServer();
+            finish();
+        }
+    }
+        /**
+         * Configure scrollbars for the text receive TextView.
+         * For some reason, this doesn't seem to be configurable from XML.
+         */
     private void configureScrollBars() {
         TextView receive = (TextView) findViewById(R.id.text_receive);
         receive.setHorizontallyScrolling(true);
@@ -185,12 +197,12 @@ public class ChatActivity extends AppCompatActivity implements ActivityExtension
         }
         catch (UnsupportedEncodingException uee) {
             String msg = String.format(Locale.US, "Unsupported encoding: %s", uee.getMessage());
-            Support.userMessage(msg);
+            Support.userMessageLong(msg);
             return;
         }
 
         if (bytes.length > ChatServer.BUFSIZE) {
-            Support.userMessage(String.format(Locale.US,
+            Support.userMessageLong(String.format(Locale.US,
                     "Message is too long (%d). Maximum length is %d.",
                     bytes.length, ChatServer.BUFSIZE));
             return;

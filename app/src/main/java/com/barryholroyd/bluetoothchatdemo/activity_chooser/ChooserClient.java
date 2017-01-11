@@ -43,7 +43,7 @@ public class ChooserClient
      */
     static void connect(Activity a, BluetoothDevice btdevice) {
         if ((btChatSocket != null) && btChatSocket.isConnected()) {
-            Support.userMessage("Dropping current connection...");
+            Support.userMessageShort("Dropping current connection...");
             closeSocket(btChatSocket);
         }
 
@@ -55,10 +55,10 @@ public class ChooserClient
         final BluetoothAdapter mBluetoothAdapter = BluetoothUtils.getBluetoothAdapter();
         if (mBluetoothAdapter.isDiscovering()) {
             mBluetoothAdapter.cancelDiscovery();
-            Support.userMessage("Cancelling discovery to connect...");
+            Support.userMessageShort("Cancelling discovery to connect...");
         }
 
-        Support.userMessage("Connecting...");
+        Support.userMessageShort("Connecting...");
 
         /*
          * Try to create a bt socket by providing an SDP UUID -- that will be used to
@@ -77,9 +77,9 @@ public class ChooserClient
         } catch ( IOException ioe ) {
             /*
              * TBD: when is this used?
-             * TBD: could multithread this for multiple chats?
              */
             Support.trace("***** Attempting alternate approach to connect...");
+            Support.userMessageLong("***** Attempting alternate approach to connect..."); // DEL:
             try {
                 Method m = btdevice.getClass().getMethod("createRfcommSocket", int.class);
                 btChatSocket = (BluetoothSocket) m.invoke(btdevice, 1);
@@ -88,19 +88,19 @@ public class ChooserClient
                 String msg = String.format(Locale.US,
                         "Could not connect to remote device %s:%s. Is %s running on it?",
                         btdevice.getName(), btdevice.getAddress(), Support.getAppLabel());
-                Support.userMessage(msg);
+                Support.userMessageLong(msg);
                 closeSocket(btChatSocket);
                 return;
             }
             catch (Exception e) {
                 String msg = String.format(Locale.US, "Exception: %s", e.getMessage());
-                Support.userMessage(msg);
+                Support.userMessageLong(msg);
                 closeSocket(btChatSocket);
                 return;
             }
         }
 
-        Support.userMessage("Connected!");
+        Support.userMessageLong("Connected!");
 
         saveBtChatSocket(a, btChatSocket);
 

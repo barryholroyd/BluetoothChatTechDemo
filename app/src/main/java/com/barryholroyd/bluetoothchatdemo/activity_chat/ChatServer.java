@@ -24,7 +24,7 @@ import static com.barryholroyd.bluetoothchatdemo.activity_chat.ChatActivity.getA
  *     always to the ChatActivity. Its constructor accepts an initialized Bluetooth btSocket,
  *     creates input and output streams from it, then starts running in the background to
  *     read incoming data on the input stream; incoming data is then sent to the UI thread
- *     for display to the user.
+ *     for displayShort to the user.
  * <p>
  *     A static writeChat() method is provided for the UI thread to use to write data out
  *     to the remote app.
@@ -35,7 +35,7 @@ class ChatServer extends Thread
     /** Bluetooth socket to be read and written. */
     private static BluetoothSocket btSocket;
 
-    /** Handler message: display incoming chat text. */
+    /** Handler message: displayShort incoming chat text. */
     private static final int CHATTEXT = 1;
 
     /** Buffer size for both input and output. */
@@ -101,7 +101,7 @@ class ChatServer extends Thread
     }
 
     /**
-     * Convert the incoming message into a text string and display it.
+     * Convert the incoming message into a text string and displayShort it.
      * Called by the UI handler.
      *
      * @param m the Message containing the text to be displayed.
@@ -123,7 +123,7 @@ class ChatServer extends Thread
         }
         catch (UnsupportedEncodingException uee) {
             String msg = String.format(Locale.US, "Unsupported encoding: %s", uee.getMessage());
-            Support.userMessage(msg);
+            Support.userMessageLong(msg);
             return;
         }
 
@@ -131,8 +131,8 @@ class ChatServer extends Thread
         ChatActivity ca = getActivity();
         if (ca == null) {
             String msg = String.format(Locale.US,
-                    "Internal error -- could not display incoming chat message: %s", text);
-            Support.userMessage(msg);
+                    "Internal error -- could not displayShort incoming chat message: %s", text);
+            Support.userMessageLong(msg);
             return;
         }
         TextView tv = ca.getTextViewReceive();
@@ -140,7 +140,7 @@ class ChatServer extends Thread
     }
 
     /**
-     * Run read/display loop.
+     * Run read/displayShort loop.
      * <p>
      *     When the connection is closed, exit the loop and tell the running ChatActivity
      *     to exit, returning control to the original ChooserActivity.
@@ -201,7 +201,7 @@ class ChatServer extends Thread
             btOut.write(bytes, 0, bytes.length);
         }
         catch (IOException ioe) {
-            Support.userMessage(String.format(Locale.US,
+            Support.userMessageLong(String.format(Locale.US,
                     "Could not write message: %s", ioe.getMessage()));
         }
     }

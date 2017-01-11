@@ -71,11 +71,20 @@ public class Support {
 
     /**
      * Send the user a message via a Toast, from either the foreground or background,
-     * and log it.
+     * and log it. The display will be for a short duration.
      */
-    public static void userMessage(String msg) {
+    public static void userMessageShort(String msg) {
         log("User message: " + msg);
-        Toaster.display(msg);
+        Toaster.displayShort(msg);
+    }
+
+    /**
+     * Send the user a message via a Toast, from either the foreground or background,
+     * and log it. The display will be for a long duration.
+     */
+    public static void userMessageLong(String msg) {
+        log("User message: " + msg);
+        Toaster.displayLong(msg);
     }
 }
 

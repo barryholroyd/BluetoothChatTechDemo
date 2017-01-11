@@ -43,16 +43,18 @@ public class ChatBroadcastReceiver extends BroadcastReceiver
         String action = intent.getAction();
         switch (action) {
             case BluetoothAdapter.ACTION_STATE_CHANGED:
-                switch (intent.getExtras().getInt(EXTRA_STATE)) {
-                    case BluetoothAdapter.STATE_ON:
-                        ca.onBluetoothToggle(ActivityExtensions.BluetoothToggle.BT_ON);
-                        break;
-                    case BluetoothAdapter.STATE_TURNING_ON:
-                        break;
-                    case BluetoothAdapter.STATE_OFF | BluetoothAdapter.STATE_TURNING_OFF:
-                        ca.onBluetoothToggle(ActivityExtensions.BluetoothToggle.BT_OFF);
-                        break;
-                }
+                ca.onBluetoothToggle();
+// DEL: ?
+//                switch (intent.getExtras().getInt(EXTRA_STATE)) {
+//                    case BluetoothAdapter.STATE_ON:
+//                        ca.onBluetoothToggle(ActivityExtensions.BluetoothToggle.BT_ON);
+//                        break;
+//                    case BluetoothAdapter.STATE_TURNING_ON:
+//                        break;
+//                    case BluetoothAdapter.STATE_OFF | BluetoothAdapter.STATE_TURNING_OFF:
+//                        ca.onBluetoothToggle(ActivityExtensions.BluetoothToggle.BT_OFF);
+//                        break;
+//                }
                 break;
         }
     }

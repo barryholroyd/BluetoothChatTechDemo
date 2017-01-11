@@ -11,10 +11,9 @@ import android.widget.TextView;
 import com.barryholroyd.bluetoothchatdemo.R;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothUtils;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothDevices;
+import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.util.Locale;
-
-import static com.barryholroyd.bluetoothchatdemo.support.Support.userMessage;
 
 /**
  * RecyclerView adapter used for displaying both the list of discovered devices
@@ -90,7 +89,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
             /* Check for Bluetooth... it may have been turned off. */
             if (!BluetoothUtils.isEnabled()) {
-                userMessage("Bluetooth must be turned on.");
+                Support.userMessageShort("Bluetooth must be turned on.");
                 return;
             }
 

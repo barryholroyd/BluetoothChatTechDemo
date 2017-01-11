@@ -1,15 +1,14 @@
 package com.barryholroyd.bluetoothchatdemo.activity_chooser;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.barryholroyd.bluetoothchatdemo.ActivityExtensions;
+import com.barryholroyd.bluetoothchatdemo.support.ActivityPrintStates;
 import com.barryholroyd.bluetoothchatdemo.support.ApplicationGlobalState;
 import com.barryholroyd.bluetoothchatdemo.R;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothDevices;
@@ -25,9 +24,13 @@ import java.util.Set;
  *     o Leave off
  *     o Later, turn on
  *   Rotate device
- *     BT on request dialog
- *     Chooser
- *     Chat
+ *     o BT on request dialog
+ *     x Chooser
+ *     o Chat BUG: restarts app.
+ *       ANS: Use Fragment and setRetainInstance.
+ *       https://developer.android.com/reference/
+ *
+ *       android/app/Fragment.html#setRetainInstance(boolean)
  *   Toggle BT
  *     o Chooser
  *       o On
@@ -70,7 +73,7 @@ import java.util.Set;
  * We will never need more than one ChooserClient and one ChooseListener
  * and will never allow more than once ChatClient and associated ChatServer.
  */
-public class ChooserActivity extends AppCompatActivity implements ActivityExtensions
+public class ChooserActivity extends ActivityPrintStates implements ActivityExtensions
 {
 
     /** Request codes for onActivityResult(). */
@@ -137,22 +140,37 @@ public class ChooserActivity extends AppCompatActivity implements ActivityExtens
             Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(intent, RT_BT_ENABLED);
         }
-
-        ags.setAppInitialized();
     }
 
     @Override
     public void onStart() {
         super.onStart();
 
-        // picks up new pairing after chat with a new remote device completes
+        // Picks up new pairing after chat with a new remote device completes.
         refreshPaired(false);
 
+        // Always register so that we can receive Bluetooth on/off broadcasts.
         BluetoothBroadcastReceivers.registerBroadcastReceiver(this, new ChooserBroadcastReceiver());
-        BluetoothUtils.requestDiscoverable(this);
 
-        // Start listening for incoming connections.
-        ChooserListener.startListener();
+        /*
+         * The following only happen if Bluetooth has been enabled already.
+         */
+        if (BluetoothUtils.isEnabled()) {
+            // Ask user if the device should be discoverable (asks only once per app lifecycle).
+            BluetoothUtils.requestDiscoverable(this);
+            // Start listening for incoming connections.
+            ChooserListener.startListener();
+        }
+        else {
+            if (ags.isAppInitialized())
+                Support.userMessageLong("Bluetooth disabled. Must enable in Android Settings to continue.");
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ags.setAppInitialized();
     }
 
     @Override
@@ -176,25 +194,25 @@ public class ChooserActivity extends AppCompatActivity implements ActivityExtens
     @SuppressWarnings("UnusedParameters")
     public void clickRefreshDiscovered(View v) {
         if (!BluetoothUtils.isEnabled()) {
-            Support.userMessage("Bluetooth must be turned on.");
+            Support.userMessageShort("Bluetooth must be turned on.");
             return;
         }
-        Support.userMessage("Refreshing list of discovered devices...");
+        Support.userMessageShort("Refreshing list of discovered devices...");
         refreshDiscovered(false);
     }
 
     /**
-     * Find and display devices which are already paired with this one.
+     * Find and displayShort devices which are already paired with this one.
      *
      * @param v the View the user clicked on.
      */
     @SuppressWarnings("UnusedParameters")
     public void clickRefreshPaired(View v) {
         if (!BluetoothUtils.isEnabled()) {
-            Support.userMessage("Bluetooth must be turned on.");
+            Support.userMessageShort("Bluetooth must be turned on.");
             return;
         }
-        Support.userMessage("Refreshing list of paired devices...");
+        Support.userMessageShort("Refreshing list of paired devices...");
         refreshPaired(false);
     }
 
@@ -206,6 +224,10 @@ public class ChooserActivity extends AppCompatActivity implements ActivityExtens
                 if (resultCode == RESULT_OK) {
                     refreshUI(false, true);
                 }
+                else {
+                    Support.userMessageLong(
+                            "Bluetooth disabled. Must enable in Android Settings to continue.");
+                }
                 break;
         }
     }
@@ -215,31 +237,45 @@ public class ChooserActivity extends AppCompatActivity implements ActivityExtens
      *
      * @param state Bluetooth turned on / off.
      */
+     // DEL: ? Modify interface def if you delete this
     public void onBluetoothToggle(BluetoothToggle state) {
         switch (state) {
             case BT_ON:
                 refreshUI(false, true);
                 ChooserListener.startListener();
-                Support.userMessage("Bluetooth on: BluetoothChatDemo ready.");
+                Support.userMessageShort("Bluetooth on: BluetoothChatDemo ready.");
                 break;
             case BT_OFF:
                 refreshUI(true, false);
                 ChooserListener.stopListener();
-                Support.userMessage("Bluetooth off: BluetoothChatDemo paused.");
+                Support.userMessageShort("Bluetooth off: BluetoothChatDemo paused.");
                 break;
         }
     }
 
-    /**
-     * Refresh the user interface when Bluetooth has been enabled.
-     * <p>
-     *     The background listener for incoming connection requests is started and stopped
-     *     by onStart() and onStop(), respectively, as well as by ChooserBroadcastReceiver
-     *     when Bluetooth is toggled.
-     *
-     * @param requestDiscoverable if true, ask the user if they would like the app
-     *                            to be discoverable.
-     */
+    public void onBluetoothToggle() {
+        if (BluetoothUtils.isEnabled()) {
+            refreshUI(false, true);
+            ChooserListener.startListener();
+            Support.userMessageShort("Bluetooth on: BluetoothChatDemo ready.");
+        }
+        else {
+            refreshUI(true, false);
+            ChooserListener.stopListener();
+            Support.userMessageShort("Bluetooth off: BluetoothChatDemo paused.");
+        }
+    }
+
+        /**
+         * Refresh the user interface when Bluetooth has been enabled.
+         * <p>
+         *     The background listener for incoming connection requests is started and stopped
+         *     by onStart() and onStop(), respectively, as well as by ChooserBroadcastReceiver
+         *     when Bluetooth is toggled.
+         *
+         * @param requestDiscoverable if true, ask the user if they would like the app
+         *                            to be discoverable.
+         */
     void refreshUI(boolean clearRequest, boolean requestDiscoverable) {
         refreshPaired(clearRequest);
         refreshDiscovered(clearRequest);
@@ -250,21 +286,19 @@ public class ChooserActivity extends AppCompatActivity implements ActivityExtens
     }
 
     /**
-     * Find and display devices which are already paired with this one.
+     * Find and displayShort devices which are already paired with this one.
      */
     void refreshPaired(boolean clearRequest) {
         Set<BluetoothDevice> pairedDevices = BluetoothUtils.getPairedDevices();
-        if (pairedDevices.size() > 0) {
-            RecyclerViewAdapter recyclerViewAdapter = getRvmPaired().getAdapter();
-            BluetoothDevices btds = recyclerViewAdapter.getDevices();
-            btds.clear();
-            if (!clearRequest) {
-                for (BluetoothDevice device : pairedDevices) {
-                    btds.add(device);
-                }
+        RecyclerViewAdapter recyclerViewAdapter = getRvmPaired().getAdapter();
+        BluetoothDevices btds = recyclerViewAdapter.getDevices();
+        btds.clear();
+        if (!clearRequest) {
+            for (BluetoothDevice device : pairedDevices) {
+                btds.add(device);
             }
-            recyclerViewAdapter.notifyDataSetChanged();
         }
+        recyclerViewAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -278,7 +312,11 @@ public class ChooserActivity extends AppCompatActivity implements ActivityExtens
         RecyclerViewAdapter recyclerViewAdapter = getRvmDiscovered().getAdapter();
         BluetoothDevices btds = recyclerViewAdapter.getDevices();
         btds.clear();
-        if (!clearRequest) {
+        if (clearRequest) {
+            RecyclerViewAdapter recyclerViewAdapterDiscovered = ca.getRvmDiscovered().getAdapter();
+            recyclerViewAdapterDiscovered.notifyDataSetChanged();
+        }
+        else {
             BluetoothUtils.startDiscovery();
         }
     }

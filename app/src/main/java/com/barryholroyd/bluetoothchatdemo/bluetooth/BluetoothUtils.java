@@ -65,11 +65,16 @@ public class BluetoothUtils
         // Only do this once.
         if (ChooserActivity.getApplicationGlobalState().isAppInitialized())
             return;
+
+        // Only ask if Bluetooth is enabled.
+        if (!BluetoothUtils.isEnabled())
+            return;
+
         Intent discoverableIntent = new
                 Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
         if (c == null) {
-            Support.userMessage("Can't make this device discoverable (no Context available).");
+            Support.userMessageLong("Can't make this device discoverable (no Context available).");
             return;
         }
         c.startActivity(discoverableIntent);
