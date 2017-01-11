@@ -150,7 +150,7 @@ class ChatServer extends Thread
      *     Android.
      *
      * @see <a href="http://stackoverflow.com/questions/6579539/how-to-unblock-inputstream-read-on-android">How to unblock InputStream.read() on Android?</a>
-     * @see #stopServer()
+     * @see #stopChatServer()
      */
     @Override
     public void run() {
@@ -208,16 +208,16 @@ class ChatServer extends Thread
 
     /**
      * Start a new chat server in the background to read input from the remote device
-     * for the current chat session.
-     * TBD: can be called more than once... how?
+     * for the current chat session. This gets called from either onStart() (when
+     * ChatActivity starts, assuming that Bluetooth is already on, which it should be)
+     * or by the Broadcast Receiver (when Bluetooth is subsequently turned off and
+     * then back on again).
      */
     public static void startChatServer(BluetoothSocket btsocket,
                                        ChatActivity.ChatActivityHandler handler) {
-        if (BluetoothUtils.isEnabled()) {
-            if (chatServer != null) {
-                // DEL:
-                throw new IllegalStateException("START CHAT SERVER EXCEPTION");
-                // TBD: return;
+        if (BluetoothUtils.isEnabled()) {   // sanity check
+            if (chatServer != null) {       // sanity check
+                throw new IllegalStateException("Chat server: already started.");
             }
             Support.trace("Starting chat server...");
             try {
@@ -225,31 +225,32 @@ class ChatServer extends Thread
                 chatServer.start();
             }
             catch (ChatServerException cse) {
-                throw new IllegalStateException("Could not start chat server.");
+                throw new IllegalStateException("Chat server: could not start.");
             }
         }
-    }
-
-    public static void stopChatServer() {
-        if (chatServer == null) {
-            throw new IllegalStateException(
-                    "Attempt to stop a non-existent chat server.");
+        else {
+            throw new IllegalStateException("Chat server: Bluetooth is not enabled.");
         }
-        Support.trace("Stopping chat server...");
-        ChatServer.stopServer();
-        chatServer = null;
     }
 
     /**
-     * Close the input stream so that its read() method throws an exception and the thread
-     * can exit.
-     * <p>
-     *     Sending this thread an interrupt won't have any effect. To interrupt the read(),
-     *     the btIn input stream needs to be closed.
-     *
-     * @see #run()
+     * Stop the background chat server.
      */
-    static void stopServer() {
+    static void stopChatServer() {
+        if (chatServer == null) {
+            throw new IllegalStateException("Chat server: not running.");
+        }
+        Support.trace("Stopping chat server...");
+
+        /**
+         * Close the input stream so that its read() method throws an exception and the thread
+         * can exit.
+         * <p>
+         *     Sending this thread an interrupt won't have any effect. To interrupt the read(),
+         *     the btIn input stream needs to be closed.
+         *
+         * @see #run()
+         */
         if (btIn == null) {
             throw new IllegalStateException("Bluetooth input stream already closed.");
         }
@@ -259,14 +260,18 @@ class ChatServer extends Thread
         catch (Exception e) {
             Support.exception("Exception attempting to close input stream", e);
         }
+        finally {
+            chatServer = null;
+        }
+    }
+
+    /**
+     * Exceptions specific to the chat server.
+     */
+    class ChatServerException extends Exception {
+        ChatServerException(String msg) {
+            super(msg);
+        }
     }
 }
 
-/**
- * Exceptions specific to the chat server.
- */
-class ChatServerException extends Exception {
-    ChatServerException(String msg) {
-        super(msg);
-    }
-}

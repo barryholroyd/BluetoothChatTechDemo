@@ -54,17 +54,6 @@ public class ChooserBroadcastReceiver extends BroadcastReceiver
                 break;
             case BluetoothAdapter.ACTION_STATE_CHANGED: // Bluetooth state change
                 ca.onBluetoothToggle();
-                // DEL:
-//                switch (intent.getExtras().getInt(EXTRA_STATE)) {
-//                    case BluetoothAdapter.STATE_ON:
-//                        ca.onBluetoothToggle(ActivityExtensions.BluetoothToggle.BT_ON);
-//                        break;
-//                    case BluetoothAdapter.STATE_TURNING_ON:
-//                        break;
-//                    case BluetoothAdapter.STATE_OFF | BluetoothAdapter.STATE_TURNING_OFF:
-//                        ca.onBluetoothToggle(ActivityExtensions.BluetoothToggle.BT_OFF);
-//                        break;
-//                    }
                 break;
         }
     }

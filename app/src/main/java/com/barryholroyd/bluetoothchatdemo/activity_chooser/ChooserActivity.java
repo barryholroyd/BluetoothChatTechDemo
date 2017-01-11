@@ -20,16 +20,15 @@ import java.util.Set;
 
 /*
  * Tests
- *   Ask BT on
- *     o Leave off
- *     o Later, turn on
+ *   Ask BT on; BUG: asked for permission twice (when I said "yes" the first time).
+ *     x Leave off
+ *     x Later, turn on
  *   Rotate device
- *     o BT on request dialog
+ *     o BT on request dialog BUG: multiple requests to turn it on
  *     x Chooser
  *     o Chat BUG: restarts app.
  *       ANS: Use Fragment and setRetainInstance.
  *       https://developer.android.com/reference/
- *
  *       android/app/Fragment.html#setRetainInstance(boolean)
  *   Toggle BT
  *     o Chooser
@@ -124,7 +123,7 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
         BluetoothUtils.init(this);
 
         ca = this;
-        ags = (ApplicationGlobalState) getApplication(); //TBD: need this?
+        ags = (ApplicationGlobalState) getApplication();
 
         // Display the "client" interface.
         setContentView(R.layout.activity_chooser);
@@ -134,7 +133,7 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
 
         //Ensure Bluetooth is enabled; if not, ask the user for permission.
         if (BluetoothUtils.isEnabled()) {
-            refreshUI(false, !ags.isAppInitialized());
+            refreshUI(false);
         }
         else {
             Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -152,9 +151,6 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
         // Always register so that we can receive Bluetooth on/off broadcasts.
         BluetoothBroadcastReceivers.registerBroadcastReceiver(this, new ChooserBroadcastReceiver());
 
-        /*
-         * The following only happen if Bluetooth has been enabled already.
-         */
         if (BluetoothUtils.isEnabled()) {
             // Ask user if the device should be discoverable (asks only once per app lifecycle).
             BluetoothUtils.requestDiscoverable(this);
@@ -222,7 +218,7 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
         switch (requestCode) {
             case RT_BT_ENABLED:
                 if (resultCode == RESULT_OK) {
-                    refreshUI(false, true);
+                    refreshUI(false);
                 }
                 else {
                     Support.userMessageLong(
@@ -232,56 +228,38 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
         }
     }
 
-    /**
-     * Handle Bluetooth on/off from Broadcast Receiver.
-     *
-     * @param state Bluetooth turned on / off.
-     */
-     // DEL: ? Modify interface def if you delete this
-    public void onBluetoothToggle(BluetoothToggle state) {
+    public void onBluetoothToggle() {
+        int state = BluetoothUtils.getBluetoothAdapter().getState();
         switch (state) {
-            case BT_ON:
-                refreshUI(false, true);
+            case BluetoothAdapter.STATE_ON:
+                refreshUI(false);
                 ChooserListener.startListener();
                 Support.userMessageShort("Bluetooth on: BluetoothChatDemo ready.");
                 break;
-            case BT_OFF:
-                refreshUI(true, false);
+            case BluetoothAdapter.STATE_OFF:
+                refreshUI(true);
                 ChooserListener.stopListener();
                 Support.userMessageShort("Bluetooth off: BluetoothChatDemo paused.");
                 break;
         }
     }
 
-    public void onBluetoothToggle() {
-        if (BluetoothUtils.isEnabled()) {
-            refreshUI(false, true);
-            ChooserListener.startListener();
-            Support.userMessageShort("Bluetooth on: BluetoothChatDemo ready.");
-        }
-        else {
-            refreshUI(true, false);
-            ChooserListener.stopListener();
-            Support.userMessageShort("Bluetooth off: BluetoothChatDemo paused.");
-        }
-    }
-
-        /**
-         * Refresh the user interface when Bluetooth has been enabled.
-         * <p>
-         *     The background listener for incoming connection requests is started and stopped
-         *     by onStart() and onStop(), respectively, as well as by ChooserBroadcastReceiver
-         *     when Bluetooth is toggled.
-         *
-         * @param requestDiscoverable if true, ask the user if they would like the app
-         *                            to be discoverable.
-         */
-    void refreshUI(boolean clearRequest, boolean requestDiscoverable) {
+    /**
+     * Refresh the user interface when Bluetooth has been enabled.
+     * <p>
+     *     The background listener for incoming connection requests is started and stopped
+     *     by onStart() and onStop(), respectively, as well as by ChooserBroadcastReceiver
+     *     when Bluetooth is toggled.
+     */
+    void refreshUI(boolean clearRequest) {
         refreshPaired(clearRequest);
         refreshDiscovered(clearRequest);
 
-        /* Only make this request once per application run. */
-        if (requestDiscoverable)
+        /*
+         * Only do this if Bluetooth is enabled and we haven't done it before
+         * in this app's lifecycle.
+         */
+        if (BluetoothUtils.isEnabled() && !ags.isAppInitialized())
             BluetoothUtils.requestDiscoverable(this);
     }
 

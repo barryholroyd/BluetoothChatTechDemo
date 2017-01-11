@@ -64,6 +64,7 @@ public class ChooserClient
          * Try to create a bt socket by providing an SDP UUID -- that will be used to
          * select a channel.
          *
+         * DEL: ?
          * Unfortunately there appears to be a bug in Bluetooth library implementation.
          *   See: https://code.google.com/p/android/issues/detail?id=41415.
          *
@@ -78,26 +79,29 @@ public class ChooserClient
             /*
              * TBD: when is this used?
              */
-            Support.trace("***** Attempting alternate approach to connect...");
-            Support.userMessageLong("***** Attempting alternate approach to connect..."); // DEL:
-            try {
-                Method m = btdevice.getClass().getMethod("createRfcommSocket", int.class);
-                btChatSocket = (BluetoothSocket) m.invoke(btdevice, 1);
-                btChatSocket.connect();
-            } catch (IOException ioe2) {
-                String msg = String.format(Locale.US,
-                        "Could not connect to remote device %s:%s. Is %s running on it?",
-                        btdevice.getName(), btdevice.getAddress(), Support.getAppLabel());
-                Support.userMessageLong(msg);
-                closeSocket(btChatSocket);
-                return;
-            }
-            catch (Exception e) {
-                String msg = String.format(Locale.US, "Exception: %s", e.getMessage());
-                Support.userMessageLong(msg);
-                closeSocket(btChatSocket);
-                return;
-            }
+            throw new IllegalStateException(String.format(
+                    "HIT ALTERNATE APPROACH CODE: %s", ioe.getMessage()));
+// DEL: ?
+//            Support.trace("***** Attempting alternate approach to connect...");
+//            Support.userMessageLong("***** Attempting alternate approach to connect..."); // DEL:
+//            try {
+//                Method m = btdevice.getClass().getMethod("createRfcommSocket", int.class);
+//                btChatSocket = (BluetoothSocket) m.invoke(btdevice, 1);
+//                btChatSocket.connect();
+//            } catch (IOException ioe2) {
+//                String msg = String.format(Locale.US,
+//                        "Could not connect to remote device %s:%s. Is %s running on it?",
+//                        btdevice.getName(), btdevice.getAddress(), Support.getAppLabel());
+//                Support.userMessageLong(msg);
+//                closeSocket(btChatSocket);
+//                return;
+//            }
+//            catch (Exception e) {
+//                String msg = String.format(Locale.US, "Exception: %s", e.getMessage());
+//                Support.userMessageLong(msg);
+//                closeSocket(btChatSocket);
+//                return;
+//            }
         }
 
         Support.userMessageLong("Connected!");

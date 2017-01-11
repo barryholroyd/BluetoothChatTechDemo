@@ -14,5 +14,5 @@ public interface ActivityExtensions {
      *
      * @param state indicates that Bluetooth was just turned on or off.
      */
-    void onBluetoothToggle(BluetoothToggle state);
+    void onBluetoothToggle();
 }

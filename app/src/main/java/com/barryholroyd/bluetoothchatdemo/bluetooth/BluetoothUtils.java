@@ -33,9 +33,9 @@ public class BluetoothUtils
         return mBluetoothAdapter;
     }
 
-    /** Check to see if Bluetooth is up and running. */
+    /** Wrapper for adapter's isEnabled(). */
     public static boolean isEnabled() {
-        return getBluetoothAdapter().isEnabled();
+        return mBluetoothAdapter.isEnabled();
     }
 
     /**
@@ -46,7 +46,7 @@ public class BluetoothUtils
      *     See {@link ChooserBroadcastReceiver#onReceive}.
      */
     public static void startDiscovery() {
-        getBluetoothAdapter().startDiscovery();
+        mBluetoothAdapter.startDiscovery();
     }
 
     /**
@@ -54,7 +54,7 @@ public class BluetoothUtils
      * Bluetooth must be turned on.
      */
     public static Set<BluetoothDevice> getPairedDevices() {
-        return getBluetoothAdapter().getBondedDevices();
+        return mBluetoothAdapter.getBondedDevices();
     }
 
     /**
@@ -67,7 +67,7 @@ public class BluetoothUtils
             return;
 
         // Only ask if Bluetooth is enabled.
-        if (!BluetoothUtils.isEnabled())
+        if (!mBluetoothAdapter.isEnabled())
             return;
 
         Intent discoverableIntent = new

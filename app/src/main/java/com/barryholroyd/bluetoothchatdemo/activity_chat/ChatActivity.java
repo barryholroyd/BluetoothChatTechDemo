@@ -1,5 +1,6 @@
 package com.barryholroyd.bluetoothchatdemo.activity_chat;
 
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
@@ -63,13 +64,6 @@ public class ChatActivity extends ActivityPrintStates implements ActivityExtensi
     public static ChatActivity getActivity() { return ca; }
 
     /**
-     * Get the app's Context instance.
-     *
-     * @return the app's Context instance.
-     */
-    public static Context getAppContext() { return ca.getApplicationContext(); } // DEL: ?
-
-    /**
      * Display the chat window for the user, get the BluetoothSocket stored in
      * ApplicationGlobalState by ChooserClient or ChooserListener, configure a
      * callback Handler to exit the Activity is requested by the worker thread and
@@ -112,9 +106,13 @@ public class ChatActivity extends ActivityPrintStates implements ActivityExtensi
     @Override
     public void onStart() {
         super.onStart();
+
+        // Always register so that we can receive Bluetooth on/off broadcasts.
         BluetoothBroadcastReceivers.registerBroadcastReceiver(this, new ChatBroadcastReceiver());
-        Support.trace("### Calling startChatServer() from ChatActivity.onStart()...");
-        ChatServer.startChatServer(btChatSocket, handler);
+
+        if (BluetoothUtils.getBluetoothAdapter().isEnabled()) {
+            ChatServer.startChatServer(btChatSocket, handler);
+        }
     }
 
     @Override
@@ -130,39 +128,23 @@ public class ChatActivity extends ActivityPrintStates implements ActivityExtensi
         ca = null;
     }
 
-    /**
-     * Handle Bluetooth on/off from Broadcast Receiver.
-     *
-     * @param state Bluetooth turned on / off.
-     */
-    // DEL: ?
-    public void onBluetoothToggle(BluetoothToggle state) {
+    public void onBluetoothToggle() {
+        int state = BluetoothUtils.getBluetoothAdapter().getState();
         switch (state) {
-            case BT_ON:
-                Support.trace("### Calling startChatServer() from onBluetoothToggle()...");
+            case BluetoothAdapter.STATE_ON:
                 ChatServer.startChatServer(btChatSocket, handler);
                 break;
-            case BT_OFF:
+            case BluetoothAdapter.STATE_OFF:
                 ChatServer.stopChatServer();
                 finish();
                 break;
         }
     }
 
-    public void onBluetoothToggle() {
-        if (BluetoothUtils.isEnabled()) {
-            Support.trace("### Calling startChatServer() from onBluetoothToggle()...");
-            ChatServer.startChatServer(btChatSocket, handler);
-        }
-        else {
-            ChatServer.stopChatServer();
-            finish();
-        }
-    }
-        /**
-         * Configure scrollbars for the text receive TextView.
-         * For some reason, this doesn't seem to be configurable from XML.
-         */
+    /**
+     * Configure scrollbars for the text receive TextView.
+     * For some reason, this doesn't seem to be configurable from XML.
+     */
     private void configureScrollBars() {
         TextView receive = (TextView) findViewById(R.id.text_receive);
         receive.setHorizontallyScrolling(true);
