@@ -100,6 +100,11 @@ class ChatServer extends Thread
         };
     }
 
+    // TBD: Adjust, per https://developer.android.com/guide/topics/connectivity/bluetooth.html
+    //   #ConnectingAsAClient.
+    // Use Messages to send text back to the caller for display.
+    // Make write() a non-static method.
+
     /**
      * Convert the incoming message into a text string and displayShort it.
      * Called by the UI handler.

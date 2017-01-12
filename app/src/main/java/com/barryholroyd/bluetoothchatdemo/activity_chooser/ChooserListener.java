@@ -83,9 +83,9 @@ class ChooserListener extends Thread
             reportError("Failed to get Bluetooth server socket.");
         }
 
-        // Server socket. ChatServer is responsible for closing it.
+        // Bluetooth socket. ChatServer is responsible for closing it.
         //noinspection InfiniteLoopStatement
-        BluetoothSocket btChooserSocket;
+        BluetoothSocket btChooserSocket = null;
 
         if (!BluetoothUtils.isEnabled()) {
             Support.userMessageLong("Connection dropped.");
@@ -97,9 +97,32 @@ class ChooserListener extends Thread
             btChooserSocket = btServerSocket.accept();
         }
         catch (IOException ioe) {
-            // Caused by closing the BluetoothServerSocket.
+            /*
+             * From https://developer.android.com/guide/topics/connectivity/
+             *      bluetooth.html#ConnectingDevices:
+             *   To abort a blocked call such as accept(), call close() on the
+             *   BluetoothServerSocket or BluetoothSocket from another thread.
+             */
             Support.trace("Listener: exiting...");
             return;
+        }
+        finally {
+            /*
+             * From https://developer.android.com/guide/topics/connectivity/
+             *      bluetooth.html#ConnectingDevices:
+             *   This method call [close()] releases the server socket and all its resources,
+             *   but doesn't close the connected BluetoothSocket that's been returned
+             *   by accept(). Unlike TCP/IP, RFCOMM allows only one connected client
+             *   per channel at a time, so in most cases, it makes sense to call close()
+             *   on the BluetoothServerSocket immediately after accepting a connected socket.
+             */
+            try {
+                if (btServerSocket != null)
+                    btServerSocket.close();
+            }
+            catch (IOException ioe) {
+                Support.trace("Listener: exiting...");
+            }
         }
 
         if (btChooserSocket == null) {
