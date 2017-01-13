@@ -23,4 +23,10 @@ public interface GlobalState {
      **/
     Activity getCurrentActivity();
     void     setCurrentActivity(Activity a);
+
+    /**
+     * Thread id for the main thread.
+     */
+    long getMainThreadId();
+    void setMainThreadId();
 }

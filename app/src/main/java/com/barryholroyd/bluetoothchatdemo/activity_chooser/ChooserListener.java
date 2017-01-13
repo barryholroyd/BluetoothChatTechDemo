@@ -136,7 +136,7 @@ class ChooserListener extends Thread
              * ChatActivity is responsible for closing it.
              */
             Support.userMessageLong("Connected!");
-            ChooserActivity.getApplicationGlobalState().setBtChatSocket(btChooserSocket);
+            Support.getGlobalState().setBtChatSocket(btChooserSocket);
             Context ac = ChooserActivity.getAppContext();
             Intent intent = new Intent(ac, ChatActivity.class);
             intent.putExtra(ChatActivity.BUNDLE_KEY_BTDEVICE, btChooserSocket.getRemoteDevice());

@@ -1,5 +1,6 @@
 package com.barryholroyd.bluetoothchatdemo.support;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -41,17 +42,21 @@ class Toaster {
              */
             @Override
             public void handleMessage(Message message) {
-                int len = LENGTH_SHORT;
-                switch (message.what) {
-                    case TOASTER_SHORT: len = LENGTH_SHORT; break;
-                    case TOASTER_LONG:  len = LENGTH_LONG;  break;
-                }
                 String msg = (String) message.obj;
-                final Toast toast = Toast.makeText(ac, msg, len);
-                toast.setGravity(Gravity.BOTTOM, 0, 100);
-                toast.show();
+                showToast(ac, msg, message.what);
             }
         };
+    }
+
+    private static void showToast(Context c, String msg, int msgId) {
+        int len = LENGTH_SHORT;
+        switch (msgId) {
+            case TOASTER_SHORT: len = LENGTH_SHORT; break;
+            case TOASTER_LONG:  len = LENGTH_LONG;  break;
+        }
+        final Toast toast = Toast.makeText(c, msg, len);
+        toast.setGravity(Gravity.BOTTOM, 0, 100);
+        toast.show();
     }
 
     /**
@@ -60,6 +65,18 @@ class Toaster {
      * @param msg message to be displayed.
      */
     private static void display(int msgId, String msg) {
+        /*
+         * For performance reasons, we use a current Activity if we are in the already on the
+         * main thread. Displaying a toast from a background thread can entail a delay of a
+         * few seconds since the request gets put on the main thread's message queue.
+         */
+        if (Thread.currentThread().getId() == Support.getGlobalState().getMainThreadId()) {
+            Activity a = Support.getGlobalState().getCurrentActivity();
+            if (a != null) {
+                showToast(a, msg, msgId);
+                return;
+            }
+        }
         if (mHandler == null) {
             throw new IllegalStateException(
                     "Toaster.displayShort() called before Toaster.init().");

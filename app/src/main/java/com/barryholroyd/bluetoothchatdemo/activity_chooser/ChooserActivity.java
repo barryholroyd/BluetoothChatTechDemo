@@ -13,39 +13,12 @@ import com.barryholroyd.bluetoothchatdemo.support.ActivityPrintStates;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothDevices;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothUtils;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothBroadcastReceivers;
+import com.barryholroyd.bluetoothchatdemo.support.GlobalState;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.util.Set;
 
 /*
- * Tests
- *   Ask BT on; BUG: asked for permission twice (when I said "yes" the first time).
- *     x Leave off
- *     x Later, turn on
- *   Rotate device
- *     o BT on request dialog BUG: multiple requests to turn it on
- *     x Chooser
- *     o Chat BUG: restarts app.
- *       ANS: Use Fragment and setRetainInstance.
- *       https://developer.android.com/reference/
- *       android/app/Fragment.html#setRetainInstance(boolean)
- *   Toggle BT
- *     o Chooser
- *       o On
- *       o Off
- *     o Chat
- *       o On
- *       o Off
- *   Devices discovery
- *     o when paired, paired screen updated?
- *   Disconnect, re-connect
- *     o From each end.
- *     o Walk out of range.
- *   Check
- *     o Memory and threads, after rotations, connect/disconnect, etc.
- *
- * Fixed
- * BUG: clicking on remote device twice rapidly from Samsung
  * TBD: brief code review
  * TBD: finish up comments.
  * TBD: clean out TBDs, etc.
@@ -111,6 +84,10 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
 
         Support.init(this);
         BluetoothUtils.init(this);
+        Support.getGlobalState().setMainThreadId();
+
+        Support.tmp(String.format("MAIN THREAD ID IS: %d",
+                Support.getGlobalState().getMainThreadId()));
 
         ca = this;
 
