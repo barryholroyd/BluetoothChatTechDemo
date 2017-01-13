@@ -39,7 +39,7 @@ class ChatServer extends Thread
     private static final int CHATTEXT = 1;
 
     /** Buffer size for both input and output. */
-    public static final int BUFSIZE = 1024;
+    static final int BUFSIZE = 1024;
 
     /** Handler for the UI thread. */
     private static Handler uiHandler = null;
@@ -53,9 +53,6 @@ class ChatServer extends Thread
     /** Bluetooth output stream. */
     private static OutputStream btOut;
 
-    /** Only allow a single running server thread at a time. */
-    private static ChatServer chatServer = null;
-
     /**
      * Constructor -- set up IO and UI handler.
      *
@@ -64,7 +61,7 @@ class ChatServer extends Thread
      * @param _btSocket Bluetooth socket to be read and written.
      * @param handler   Handler to cause the calling ChatActivity to exit.
      */
-    public ChatServer(BluetoothSocket _btSocket, Handler handler) throws ChatServerException {
+    ChatServer(BluetoothSocket _btSocket, Handler handler) throws ChatServerException {
         btSocket = _btSocket;
         caHandler = handler;
         if (btSocket == null) {
@@ -201,7 +198,7 @@ class ChatServer extends Thread
      *
      * @param bytes the buffer of bytes to write out.
      */
-    static void writeChat(byte[] bytes) {
+    void writeChat(byte[] bytes) {
         try {
             btOut.write(bytes, 0, bytes.length);
         }
@@ -212,50 +209,16 @@ class ChatServer extends Thread
     }
 
     /**
-     * Start a new chat server in the background to read input from the remote device
-     * for the current chat session. This gets called from either onStart() (when
-     * ChatActivity starts, assuming that Bluetooth is already on, which it should be)
-     * or by the Broadcast Receiver (when Bluetooth is subsequently turned off and
-     * then back on again).
-     */
-    public static void startChatServer(BluetoothSocket btsocket,
-                                       ChatActivity.ChatActivityHandler handler) {
-        if (BluetoothUtils.isEnabled()) {   // sanity check
-            if (chatServer != null) {       // sanity check
-                throw new IllegalStateException("Chat server: already started.");
-            }
-            Support.trace("Starting chat server...");
-            try {
-                chatServer = new ChatServer(btsocket, handler);
-                chatServer.start();
-            }
-            catch (ChatServerException cse) {
-                throw new IllegalStateException("Chat server: could not start.");
-            }
-        }
-        else {
-            throw new IllegalStateException("Chat server: Bluetooth is not enabled.");
-        }
-    }
-
-    /**
      * Stop the background chat server.
+     * <p>
+     *     Sending this thread an interrupt won't have any effect. Instead, the
+     *     input stream must be closed. That will cause the read() method to throw
+     *     an exception and the thread can then exit.
+     *
+     * @see #run()
      */
-    static void stopChatServer() {
-        if (chatServer == null) {
-            throw new IllegalStateException("Chat server: not running.");
-        }
-        Support.trace("Stopping chat server...");
-
-        /**
-         * Close the input stream so that its read() method throws an exception and the thread
-         * can exit.
-         * <p>
-         *     Sending this thread an interrupt won't have any effect. To interrupt the read(),
-         *     the btIn input stream needs to be closed.
-         *
-         * @see #run()
-         */
+    void stopChatServer() {
+        Support.trace("Chat Server: stopping...");
         if (btIn == null) {
             throw new IllegalStateException("Bluetooth input stream already closed.");
         }
@@ -264,9 +227,6 @@ class ChatServer extends Thread
         }
         catch (Exception e) {
             Support.exception("Exception attempting to close input stream", e);
-        }
-        finally {
-            chatServer = null;
         }
     }
 

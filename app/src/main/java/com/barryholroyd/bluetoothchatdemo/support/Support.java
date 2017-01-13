@@ -52,6 +52,8 @@ public class Support {
             log(msg);
     }
 
+    public static void tmp(String msg) { trace(msg); } // DEL: when no longer needed.
+
     /** External access to logging -- leave on in production. */
     public static void error(String msg) {
         log(msg);

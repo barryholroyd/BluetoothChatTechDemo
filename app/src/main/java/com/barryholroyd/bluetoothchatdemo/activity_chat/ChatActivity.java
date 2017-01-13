@@ -53,8 +53,12 @@ public class ChatActivity extends ActivityPrintStates implements ActivityExtensi
     /** Handler providing callback to exit the current ChatActivity instance. */
     private static ChatActivityHandler handler = null;
 
-    // This Activity.
+    /** This Activity instance. */
     private static ChatActivity ca = null;
+
+    /** Only allow a single running server thread at a time. */
+    private static ChatServer chatServer = null;
+
 
     /**
      * Get the current Activity instance.
@@ -106,20 +110,17 @@ public class ChatActivity extends ActivityPrintStates implements ActivityExtensi
     @Override
     public void onStart() {
         super.onStart();
-
         // Always register so that we can receive Bluetooth on/off broadcasts.
         BluetoothBroadcastReceivers.registerBroadcastReceiver(this, new ChatBroadcastReceiver());
-
-        if (BluetoothUtils.getBluetoothAdapter().isEnabled()) {
-            ChatServer.startChatServer(btChatSocket, handler);
-        }
+        startChatServer(btChatSocket, handler);
     }
 
     @Override
     public void onStop() {
         super.onStop();
         BluetoothBroadcastReceivers.unregisterBroadcastReceiver(this);
-        ChatServer.stopChatServer();
+        Support.tmp(String.format("ChatActivity onStop(): isfinishing() = %b", isFinishing()));
+        stopChatServer();
     }
 
     @Override
@@ -131,13 +132,38 @@ public class ChatActivity extends ActivityPrintStates implements ActivityExtensi
     public void onBluetoothToggle() {
         int state = BluetoothUtils.getBluetoothAdapter().getState();
         switch (state) {
+            case BluetoothAdapter.STATE_TURNING_ON: break;
+            case BluetoothAdapter.STATE_TURNING_OFF: break;
             case BluetoothAdapter.STATE_ON:
-                ChatServer.startChatServer(btChatSocket, handler);
+                startChatServer(btChatSocket, handler);
                 break;
             case BluetoothAdapter.STATE_OFF:
-                ChatServer.stopChatServer();
+                stopChatServer();
                 finish();
                 break;
+        }
+    }
+
+    private void startChatServer(BluetoothSocket btChatSocket,
+                                 ChatActivityHandler handler) {
+        if ((chatServer == null) && BluetoothUtils.getBluetoothAdapter().isEnabled()) {
+            Support.tmp("Chat Server: starting...");
+            try {
+                chatServer = new ChatServer(btChatSocket, handler);
+            }
+            catch (ChatServer.ChatServerException ca) {
+                // TBD: test this
+                Support.userMessageLong("Could not start Chat server.");
+                finish();
+            }
+            chatServer.start();
+        }
+    }
+
+    private void stopChatServer() {
+        if ((chatServer != null) && isFinishing()) {
+            chatServer.stopChatServer();
+            chatServer = null;
         }
     }
 
@@ -190,7 +216,7 @@ public class ChatActivity extends ActivityPrintStates implements ActivityExtensi
             return;
         }
 
-        ChatServer.writeChat(bytes);
+        chatServer.writeChat(bytes);
     }
 
     /**
