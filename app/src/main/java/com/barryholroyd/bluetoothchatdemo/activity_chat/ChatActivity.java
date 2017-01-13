@@ -216,6 +216,7 @@ public class ChatActivity extends ActivityPrintStates implements ActivityExtensi
             return;
         }
 
+        trace(String.format(Locale.US, "sent: %s", text));
         chatServer.writeChat(bytes);
     }
 
@@ -261,7 +262,7 @@ public class ChatActivity extends ActivityPrintStates implements ActivityExtensi
         @Override
         public void handleMessage(Message message) {
             if (message.what == FINISH) {
-                Support.trace("Exiting chat activity...");
+                trace("exiting chat activity...");
                 ChatActivity ca = wrca.get();
                 if (ca != null) {
                     ca.finish();
@@ -274,5 +275,9 @@ public class ChatActivity extends ActivityPrintStates implements ActivityExtensi
                 throw new IllegalStateException(msg);
             }
         }
+    }
+
+    private static void trace(String msg) {
+        Support.trace("ChatActivity: " + msg);
     }
 }

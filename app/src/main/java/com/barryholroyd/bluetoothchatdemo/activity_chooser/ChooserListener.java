@@ -37,7 +37,7 @@ class ChooserListener extends Thread
 
     static void startListener() {
         if (BluetoothUtils.isEnabled()) {
-            Support.trace("Starting listener...");
+            trace("starting...");
             chooserListener = new ChooserListener();
             chooserListener.start();
         }
@@ -52,12 +52,13 @@ class ChooserListener extends Thread
         if (btServerSocket == null)
             return;
 
-        Support.trace("Stopping listener...");
+        trace("stopping...");
         try {
                 btServerSocket.close();
         }
         catch (Exception e) {
-            Support.exception("Exception attempting to close Bluetooth server socket", e);
+            Support.exception(
+                    "Listener: exception attempting to close Bluetooth server socket", e);
         }
         finally {
             btServerSocket = null;
@@ -70,17 +71,17 @@ class ChooserListener extends Thread
      */
     public void run() {
         try {
-            Support.trace("Creating new server socket...");
+            trace("creating new server socket...");
             btServerSocket = BluetoothUtils.getBluetoothAdapter().
                     listenUsingRfcommWithServiceRecord(SERVICE_NAME, MY_UUID);
         } catch (IOException e) {
-            reportError("Failed to get Bluetooth server socket.");
+            reportError("Listener: failed to get Bluetooth server socket.");
             return;
         }
 
         // to keep the compiler happy
         if (btServerSocket == null) {
-            reportError("Failed to get Bluetooth server socket.");
+            reportError("Listener: failed to get Bluetooth server socket.");
         }
 
         // Bluetooth socket. ChatServer is responsible for closing it.
@@ -88,10 +89,10 @@ class ChooserListener extends Thread
         BluetoothSocket btChooserSocket = null;
 
         if (!BluetoothUtils.isEnabled()) {
-            Support.userMessageLong("Connection dropped.");
+            Support.userMessageLong("Listener: connection dropped.");
             return;
         }
-        Support.trace("Server: waiting for a new connection to accept...");
+        trace("waiting for a connection...");
 
         try {
             btChooserSocket = btServerSocket.accept();
@@ -103,7 +104,7 @@ class ChooserListener extends Thread
              *   To abort a blocked call such as accept(), call close() on the
              *   BluetoothServerSocket or BluetoothSocket from another thread.
              */
-            Support.trace("Listener: exiting...");
+            trace("exiting...");
             return;
         }
         finally {
@@ -121,7 +122,7 @@ class ChooserListener extends Thread
                     btServerSocket.close();
             }
             catch (IOException ioe) {
-                Support.trace("Listener: exiting...");
+                trace("exiting...");
             }
         }
 
@@ -153,5 +154,9 @@ class ChooserListener extends Thread
         else {
             Support.fatalError(a, msg);
         }
+    }
+
+    private static void trace(String msg) {
+        Support.trace("Listener: " + msg);
     }
 }

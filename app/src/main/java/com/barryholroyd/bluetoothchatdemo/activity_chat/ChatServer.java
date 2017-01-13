@@ -137,6 +137,7 @@ class ChatServer extends Thread
             Support.userMessageLong(msg);
             return;
         }
+        trace(String.format(Locale.US, "received: %s", text));
         TextView tv = ca.getTextViewReceive();
         tv.setText(text);
     }
@@ -158,7 +159,7 @@ class ChatServer extends Thread
     public void run() {
         while (true) {
             byte[] bytes = new byte[BUFSIZE];
-            Support.trace("Waiting to read input...");
+            trace("waiting to read input...");
             try {
                 //noinspection ResultOfMethodCallIgnored
                 btIn.read(bytes, 0, BUFSIZE);
@@ -169,7 +170,7 @@ class ChatServer extends Thread
                  * end closed it) or by a call to stopServer() (which closes btIn to force
                  * this exception to be generated).
                  */
-                Support.trace("Closing the connection...");
+                trace("closing the connection...");
                 try {
                     btSocket.close();
                 } catch (IOException ioe2) {
@@ -218,7 +219,7 @@ class ChatServer extends Thread
      * @see #run()
      */
     void stopChatServer() {
-        Support.trace("Chat Server: stopping...");
+        trace("stopping...");
         if (btIn == null) {
             throw new IllegalStateException("Bluetooth input stream already closed.");
         }
@@ -228,6 +229,10 @@ class ChatServer extends Thread
         catch (Exception e) {
             Support.exception("Exception attempting to close input stream", e);
         }
+    }
+
+    private static void trace(String msg) {
+        Support.trace("ChatServer: " + msg);
     }
 
     /**

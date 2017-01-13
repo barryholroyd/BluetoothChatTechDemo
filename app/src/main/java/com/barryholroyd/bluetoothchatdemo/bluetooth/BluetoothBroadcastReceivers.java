@@ -41,7 +41,7 @@ public class BluetoothBroadcastReceivers
         ifilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
 
         // Register the receiver.
-        Support.trace(String.format("Registering Broadcast Receiver for: %s",
+        trace(String.format("registering Broadcast Receiver for: %s",
                 c.getClass().getSimpleName()));
         broadcastReceivers.put(c, br);
         c.registerReceiver(br, ifilter);
@@ -53,7 +53,7 @@ public class BluetoothBroadcastReceivers
      * @param c the current Activity's Context.
      */
     public static void unregisterBroadcastReceiver(Context c) {
-        Support.trace(String.format("Unregistering Broadcast Receiver for: %s",
+        trace(String.format("unregistering Broadcast Receiver for: %s",
                 c.getClass().getSimpleName()));
         BroadcastReceiver mReceiver = broadcastReceivers.get(c);
         if (mReceiver != null) {
@@ -127,7 +127,10 @@ public class BluetoothBroadcastReceivers
 
         /** Wrapper for Bluetooth Broad Receiver log messages. */
         private static void brlog(String name, String s) {
-            Support.trace(String.format(Locale.US, "> Broadcast received by %s: %s", name, s));
+            trace(String.format(Locale.US, "> Broadcast received by %s: %s", name, s));
         }
+    }
+    private static void trace(String msg) {
+        Support.trace("BluetoothBroadcastReceivers: " + msg);
     }
 }

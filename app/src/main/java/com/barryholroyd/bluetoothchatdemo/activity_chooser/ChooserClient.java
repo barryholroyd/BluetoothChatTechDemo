@@ -73,7 +73,7 @@ public class ChooserClient
          */
         try{
             btChatSocket = btdevice.createRfcommSocketToServiceRecord( MY_UUID );
-            Support.trace("Attempting main approach to connect...");
+            trace("connecting...");
             btChatSocket.connect( );
         } catch ( IOException ioe ) {
             /*
@@ -154,6 +154,10 @@ public class ChooserClient
 
     static private void saveBtChatSocket(Activity a, BluetoothSocket btChatSocket) {
         ((ApplicationGlobalState)  a.getApplication()).setBtChatSocket(btChatSocket);
+    }
+
+    private static void trace(String msg) {
+        Support.trace("ChooserClient: " + msg);
     }
 }
 
