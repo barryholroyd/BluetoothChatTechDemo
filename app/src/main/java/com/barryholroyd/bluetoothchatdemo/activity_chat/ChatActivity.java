@@ -3,7 +3,6 @@ package com.barryholroyd.bluetoothchatdemo.activity_chat;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -113,6 +112,12 @@ public class ChatActivity extends ActivityPrintStates implements ActivityExtensi
         // Always register so that we can receive Bluetooth on/off broadcasts.
         BluetoothBroadcastReceivers.registerBroadcastReceiver(this, new ChatBroadcastReceiver());
         startChatServer(btChatSocket, handler);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Support.getGlobalState().setCurrentActivity(this);
     }
 
     @Override

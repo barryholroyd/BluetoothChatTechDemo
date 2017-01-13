@@ -8,9 +8,8 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.barryholroyd.bluetoothchatdemo.ActivityExtensions;
-import com.barryholroyd.bluetoothchatdemo.support.ActivityPrintStates;
-import com.barryholroyd.bluetoothchatdemo.support.ApplicationGlobalState;
 import com.barryholroyd.bluetoothchatdemo.R;
+import com.barryholroyd.bluetoothchatdemo.support.ActivityPrintStates;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothDevices;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothUtils;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothBroadcastReceivers;
@@ -84,15 +83,6 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
 
     // This Activity.
     private static ChooserActivity ca = null;
-    // Global state is stored at the app level.
-    private static ApplicationGlobalState ags;
-
-    /**
-     * Get the Application instance to use for storing global state.
-     *
-     * @return handle to the Application.
-     */
-    public  static ApplicationGlobalState getApplicationGlobalState() { return ags; }
 
     /**
      * Get the current Activity instance.
@@ -123,7 +113,6 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
         BluetoothUtils.init(this);
 
         ca = this;
-        ags = (ApplicationGlobalState) getApplication();
 
         // Display the "client" interface.
         setContentView(R.layout.activity_chooser);
@@ -142,6 +131,15 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
     }
 
     @Override
+    public void onRestart() {
+        super.onRestart();
+        if (!BluetoothUtils.isEnabled()) {
+            Support.userMessageLong(
+                    "Bluetooth disabled. Must enable in Android Settings to continue.");
+        }
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
 
@@ -151,22 +149,17 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
         // Always register so that we can receive Bluetooth on/off broadcasts.
         BluetoothBroadcastReceivers.registerBroadcastReceiver(this, new ChooserBroadcastReceiver());
 
-        if (BluetoothUtils.isEnabled()) {
-            // Ask user if the device should be discoverable (asks only once per app lifecycle).
-            BluetoothUtils.requestDiscoverable(this);
-            // Start listening for incoming connections.
-            ChooserListener.startListener();
-        }
-        else {
-            if (ags.isAppInitialized())
-                Support.userMessageLong("Bluetooth disabled. Must enable in Android Settings to continue.");
-        }
+        // Ask user if the device should be discoverable (asks only once per app lifecycle).
+        BluetoothUtils.requestDiscoverable(this);
+
+        // Start listening for incoming connections.
+        ChooserListener.startListener();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        ags.setAppInitialized();
+        Support.getGlobalState().setCurrentActivity(this);
     }
 
     @Override
@@ -255,12 +248,7 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
         refreshPaired(clearRequest);
         refreshDiscovered(clearRequest);
 
-        /*
-         * Only do this if Bluetooth is enabled and we haven't done it before
-         * in this app's lifecycle.
-         */
-        if (BluetoothUtils.isEnabled() && !ags.isAppInitialized())
-            BluetoothUtils.requestDiscoverable(this);
+        BluetoothUtils.requestDiscoverable(this);
     }
 
     /**

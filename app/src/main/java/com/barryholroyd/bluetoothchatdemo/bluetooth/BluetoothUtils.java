@@ -20,6 +20,8 @@ public class BluetoothUtils
     /** Reference to the device's Bluetooth adapter. */
     private static BluetoothAdapter mBluetoothAdapter = null;
 
+    private static boolean requestAlreadyAsked = false;
+
     /** Initialization -- check for Bluetooth adapter. */
     public static void init(Activity a) {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -58,16 +60,10 @@ public class BluetoothUtils
     }
 
     /**
-     * Ask the user for permission to make this device discoverable.
-     * The user will be asked to turn on Bluetooth if it is not already on.
+     * Ask the user for permission to make this device discoverable. Only ask once.
      */
     public static void requestDiscoverable(Context c) {
-        // Only do this once.
-        if (ChooserActivity.getApplicationGlobalState().isAppInitialized())
-            return;
-
-        // Only ask if Bluetooth is enabled.
-        if (!mBluetoothAdapter.isEnabled())
+        if (requestAlreadyAsked || !mBluetoothAdapter.isEnabled())
             return;
 
         Intent discoverableIntent = new
@@ -77,6 +73,8 @@ public class BluetoothUtils
             Support.userMessageLong("Can't make this device discoverable (no Context available).");
             return;
         }
+
+        requestAlreadyAsked = true;
         c.startActivity(discoverableIntent);
     }
 }

@@ -15,10 +15,12 @@ public class Support {
     private static Toaster toaster = null;
     private static String appLabel = null;
     private static final boolean traceEnabled = true;
+    private static GlobalState globalState = null;
 
     /** Initialization */
-    public static void init(Context c) {
-        Context ac = c.getApplicationContext();
+    public static void init(Activity a) {
+        globalState = (GlobalState) a.getApplication();
+        Context ac = a.getApplicationContext();
         if (toaster == null) {
             toaster = new Toaster(ac);
         }
@@ -34,6 +36,15 @@ public class Support {
         }
     }
 
+    /**
+     * Get the Application instance to use for storing global state.
+     *
+     * @return handle to the Application.
+     */
+
+    public static GlobalState getGlobalState() {
+        return globalState;
+    }
     /** Display a Dialog to the user indicating a fatal error, then exit the app. */
     public static void fatalError(Activity a, String msg) {
         if (a == null) {

@@ -61,69 +61,23 @@ public class ChooserClient
         Support.userMessageShort("Connecting...");
 
         /*
-         * Try to create a bt socket by providing an SDP UUID -- that will be used to
+         * Create a Bluetooth socket by providing an SDP UUID -- that will be used to
          * select a channel.
-         *
-         * DEL: ?
-         * Unfortunately there appears to be a bug in Bluetooth library implementation.
-         *   See: https://code.google.com/p/android/issues/detail?id=41415.
-         *
-         * The workaround is to call createRfcommSocket() -- that accepts an explicit
-         * channel # (in this case, '1') to use.
          */
         try{
             btChatSocket = btdevice.createRfcommSocketToServiceRecord( MY_UUID );
             trace("connecting...");
             btChatSocket.connect( );
         } catch ( IOException ioe ) {
-            /*
-             * TBD: when is this used?
-             */
-            throw new IllegalStateException(String.format(
-                    "HIT ALTERNATE APPROACH CODE: %s", ioe.getMessage()));
-
-// TBD: use this?
-//            try {
-//                btChatSocket.close();
-//            } catch ( IOException ioe2 ) {
-//                String msg = String.format(Locale.US, "IOException: %s", ioe2.getMessage());
-//                Support.userMessageLong(msg);
-//            }
-//            return;
-
-// DEL: ?
-//            /*
-//             * Even though this workaround always uses channel 1, and the RFCOMM protocol only
-//             * allows a single connection over a single channel, it would probably be o.k. to
-//             * loop on this since it appears that when a connection is set up a different
-//             * channel is allocated for the connection.
-//             * From: https://developer.android.com/guide/topics/connectivity/bluetooth.html
-//             *       #ConnectingAsAClient
-//             *   After a client calls this method [connect()], the system performs an SDP
-//             *   lookup to find the remote device with the matching UUID. If the lookup is
-//             *   successful and the remote device accepts the connection, it shares the
-//             *   RFCOMM channel to use during the connection, and the connect() method returns.
-//             */
-//            Support.trace("***** Attempting alternate approach to connect...");
-//            Support.userMessageLong("***** Attempting alternate approach to connect..."); // DEL:
-//            try {
-//                Method m = btdevice.getClass().getMethod("createRfcommSocket", int.class);
-//                btChatSocket = (BluetoothSocket) m.invoke(btdevice, 1);
-//                btChatSocket.connect();
-//            } catch (IOException ioe2) {
-//                String msg = String.format(Locale.US,
-//                        "Could not connect to remote device %s:%s. Is %s running on it?",
-//                        btdevice.getName(), btdevice.getAddress(), Support.getAppLabel());
-//                Support.userMessageLong(msg);
-//                closeSocket(btChatSocket);
-//                return;
-//            }
-//            catch (Exception e) {
-//                String msg = String.format(Locale.US, "Exception: %s", e.getMessage());
-//                Support.userMessageLong(msg);
-//                closeSocket(btChatSocket);
-//                return;
-//            }
+            try {
+                if (btChatSocket != null) {
+                    btChatSocket.close();
+                }
+            } catch ( IOException ioe2 ) {
+                String msg = String.format(Locale.US, "IOException: %s", ioe2.getMessage());
+                Support.userMessageLong(msg);
+            }
+            return;
         }
 
         Support.userMessageLong("Connected!");
