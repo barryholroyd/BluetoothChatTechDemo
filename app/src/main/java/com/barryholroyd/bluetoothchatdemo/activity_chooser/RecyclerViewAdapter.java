@@ -22,11 +22,6 @@ import java.util.Locale;
  */
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.MyViewHolder> {
     private final BluetoothDevices bluetoothDevices = new BluetoothDevices();
-
-    public RecyclerViewAdapter() {
-        Support.tmp("*** RECYCLER VIEW ADAPTER CALLED");
-    }
-
     /**
      * Standard ViewHolder class.
      * <p>

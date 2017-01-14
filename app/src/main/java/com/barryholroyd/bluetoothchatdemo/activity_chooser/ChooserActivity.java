@@ -13,7 +13,6 @@ import com.barryholroyd.bluetoothchatdemo.support.ActivityPrintStates;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothDevices;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothUtils;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothBroadcastReceivers;
-import com.barryholroyd.bluetoothchatdemo.support.GlobalState;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.util.Set;
@@ -124,15 +123,7 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
         super.onStart();
 
         // Picks up new pairing after chat with a new remote device completes.
-        // TBD: refreshPaired(false);
-        int i = 9;
-        i++; i++; i++;
-        int j = 9; j++;
-        int k = 9; k++;
-        int l = 9; l++;
-        int m = 9; m++;
-        int n = 9; n++;
-        int o = 9; o++;
+        refreshPaired(false);
 
         // Always register so that we can receive Bluetooth on/off broadcasts.
         BluetoothBroadcastReceivers.registerBroadcastReceiver(this, new ChooserBroadcastReceiver());
@@ -212,6 +203,8 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
     public void onBluetoothToggle() {
         int state = BluetoothUtils.getBluetoothAdapter().getState();
         switch (state) {
+            case BluetoothAdapter.STATE_TURNING_ON: break;
+            case BluetoothAdapter.STATE_TURNING_OFF: break;
             case BluetoothAdapter.STATE_ON:
                 refreshUI(false);
                 ChooserListener.startListener();
@@ -233,10 +226,8 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
      *     when Bluetooth is toggled.
      */
     void refreshUI(boolean clearRequest) {
-        Support.tmp(String.format("REFRESHING UI. clearRequest = %b", clearRequest));
         refreshPaired(clearRequest);
         refreshDiscovered(clearRequest);
-
         BluetoothUtils.requestDiscoverable(this);
     }
 
@@ -244,7 +235,6 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
      * Find and displayShort devices which are already paired with this one.
      */
     void refreshPaired(boolean clearRequest) {
-        Support.tmp("REFRESHING PAIRED");
         Set<BluetoothDevice> pairedDevices = BluetoothUtils.getPairedDevices();
         RecyclerViewAdapter recyclerViewAdapter = getRvmPaired().getAdapter();
         BluetoothDevices btds = recyclerViewAdapter.getDevices();
@@ -265,7 +255,6 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
      *     See {@link ChooserBroadcastReceiver#onReceive}.
      */
     void refreshDiscovered(boolean clearRequest) {
-        Support.tmp("REFRESHING DISCOVERED");
         RecyclerViewAdapter recyclerViewAdapter = getRvmDiscovered().getAdapter();
         BluetoothDevices btds = recyclerViewAdapter.getDevices();
         btds.clear();

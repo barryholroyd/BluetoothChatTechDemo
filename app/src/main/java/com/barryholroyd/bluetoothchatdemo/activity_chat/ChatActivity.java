@@ -123,7 +123,6 @@ public class ChatActivity extends ActivityPrintStates implements ActivityExtensi
     public void onStop() {
         super.onStop();
         BluetoothBroadcastReceivers.unregisterBroadcastReceiver(this);
-        Support.tmp(String.format("ChatActivity onStop(): isfinishing() = %b", isFinishing()));
         stopChatServer();
     }
 
@@ -151,7 +150,6 @@ public class ChatActivity extends ActivityPrintStates implements ActivityExtensi
     private void startChatServer(BluetoothSocket btChatSocket,
                                  ChatActivityHandler handler) {
         if ((chatServer == null) && BluetoothUtils.getBluetoothAdapter().isEnabled()) {
-            Support.tmp("Chat Server: starting...");
             try {
                 chatServer = new ChatServer(btChatSocket, handler);
             }
