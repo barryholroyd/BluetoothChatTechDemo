@@ -85,7 +85,7 @@ public class ChooserClient extends Thread
                 if (btChatSocket != null) {
                     btChatSocket.close();
                 }
-                Support.userMessageShort("Could not connect...");
+                Support.userMessageShort("Could not connect.");
             } catch ( IOException ioe2 ) {
                 String msg = String.format(Locale.US, "IOException: %s", ioe2.getMessage());
                 Support.userMessageLong(msg);

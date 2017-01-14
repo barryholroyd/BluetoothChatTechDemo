@@ -180,7 +180,6 @@ public class ChatActivity extends ActivityPrintStates implements ActivityExtensi
         TextView receive = (TextView) findViewById(R.id.text_receive);
         receive.setHorizontallyScrolling(true);
         receive.setMovementMethod(new ScrollingMovementMethod());
-        receive.setHint("text received"); // with scrolling, doesn't work from XML for some reason
     }
 
     /** Set the title of the chat window to reflect the name and MAC address of the remote device. */
