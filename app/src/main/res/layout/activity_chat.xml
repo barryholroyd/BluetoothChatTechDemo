@@ -62,6 +62,7 @@
                     android:background="@color/blue_cyan"
                     android:scrollbars="horizontal|vertical"
                     android:hint="@string/text_received"
+                    android:freezesText="true"
                     android:id="@+id/text_receive"
                     />
             </LinearLayout>
