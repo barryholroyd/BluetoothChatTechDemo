@@ -41,7 +41,7 @@
                     <android.support.v7.widget.RecyclerView
                         android:id="@+id/rv_discovered"
                         style="@style/RecyclerViewStyle"
-                        android:background="@color/color_interactive">
+                        >
                     </android.support.v7.widget.RecyclerView>
 
                     <Button
@@ -60,7 +60,7 @@
                     <android.support.v7.widget.RecyclerView
                         android:id="@+id/rv_paired"
                         style="@style/RecyclerViewStyle"
-                        android:background="@color/color_interactive">
+                        >
                     </android.support.v7.widget.RecyclerView>
                     <Button
                         style="@style/ButtonStyle"

@@ -12,7 +12,6 @@ import com.barryholroyd.bluetoothchatdemo.activity_chat.ChatActivity;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.Locale;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -59,20 +58,19 @@ public class ChooserClient
         }
 
         Support.userMessageShort("Connecting...");
-
         /*
          * Create a Bluetooth socket by providing an SDP UUID -- that will be used to
          * select a channel.
          */
-        try{
+        try {
             btChatSocket = btdevice.createRfcommSocketToServiceRecord( MY_UUID );
-            trace("connecting...");
             btChatSocket.connect( );
         } catch ( IOException ioe ) {
             try {
                 if (btChatSocket != null) {
                     btChatSocket.close();
                 }
+                Support.userMessageShort("Could not connect...");
             } catch ( IOException ioe2 ) {
                 String msg = String.format(Locale.US, "IOException: %s", ioe2.getMessage());
                 Support.userMessageLong(msg);
@@ -80,7 +78,7 @@ public class ChooserClient
             return;
         }
 
-        Support.userMessageLong("Connected!");
+        Support.userMessageShort("Connected!");
 
         saveBtChatSocket(a, btChatSocket);
 

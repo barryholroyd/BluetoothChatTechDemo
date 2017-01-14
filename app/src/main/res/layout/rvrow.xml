@@ -4,16 +4,25 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/colorPrimary"
 >
-    <TextView
-        android:id="@+id/row_text"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <TextView
-        android:id="@+id/row_mac"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        />
+        android:layout_height="wrap_content"
+        android:padding="2dp"
+        >
+        <TextView
+            android:id="@+id/row_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/color_interactive"
+            />
+        <TextView
+            android:id="@+id/row_mac"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            />
+    </FrameLayout>
 </LinearLayout>
 

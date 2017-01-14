@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -78,8 +79,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         @Override
         public void onClick(View v) {
             TextView tvText = (TextView) v;
-            LinearLayout ll = (LinearLayout) tvText.getParent();
-            TextView tvMac = (TextView) ll.findViewById(R.id.row_mac);
+            FrameLayout fl = (FrameLayout) tvText.getParent();
+            TextView tvMac = (TextView) fl.findViewById(R.id.row_mac);
             String mac = (String) tvMac.getText();
             BluetoothDevice btdevice = bluetoothDevices.getDevice(mac);
             if (btdevice == null) {
