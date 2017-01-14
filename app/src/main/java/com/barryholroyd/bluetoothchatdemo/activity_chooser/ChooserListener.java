@@ -130,18 +130,7 @@ class ChooserListener extends Thread
             reportError("Failed to get Bluetooth socket.");
         }
         else {
-            /*
-             * Pass control to the ChatActivity.
-             * Make the Bluetooth socket available to ChatActivity.
-             * ChatActivity is responsible for closing it.
-             */
-            Support.userMessageLong("Connected!");
-            Support.getGlobalState().setBtChatSocket(btChooserSocket);
-            Context ac = ChooserActivity.getAppContext();
-            Intent intent = new Intent(ac, ChatActivity.class);
-            intent.putExtra(ChatActivity.BUNDLE_KEY_BTDEVICE, btChooserSocket.getRemoteDevice());
-            intent.addFlags(FLAG_ACTIVITY_NEW_TASK); // required since an App Context is used
-            ac.startActivity(intent);
+            ChooserSupport.startChatActivity(btChooserSocket);
         }
     }
 

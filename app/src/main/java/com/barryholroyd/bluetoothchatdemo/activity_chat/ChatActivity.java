@@ -68,7 +68,7 @@ public class ChatActivity extends ActivityPrintStates implements ActivityExtensi
 
     /**
      * Display the chat window for the user, get the BluetoothSocket stored in
-     * ApplicationGlobalState by ChooserClient or ChooserListener, configure a
+     * GlobalState by ChooserClient or ChooserListener, configure a
      * callback Handler to exit the Activity is requested by the worker thread and
      * then start the ChatServer worker thread to handle the actual reads and writes
      * from the connection.

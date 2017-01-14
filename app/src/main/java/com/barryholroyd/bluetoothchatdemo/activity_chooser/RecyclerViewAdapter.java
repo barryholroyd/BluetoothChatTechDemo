@@ -71,13 +71,21 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     /**
      * Callback to handle clicks on a row in either the "discovered" or "paired"
-     * list. Rows in both lists have the MAC address of a remote device; that is
-     * used by the onClick() method to create a Bluetooth connection. This effectively
-     * makes this end the "client" (initiator) of the Bluetooth chat session.
+     * list.
+     * <p>
+     *     Rows in both lists have the MAC address of a remote device; that is
+     *     used by the onClick() method to create a Bluetooth connection. This effectively
+     *     makes this end the "client" (initiator) of the Bluetooth chat session.
      */
     private class OnClickListenerConnectDevice implements View.OnClickListener {
         @Override
         public void onClick(View v) {
+            /* Check for Bluetooth... it may have been turned off. */
+            if (!BluetoothUtils.isEnabled()) {
+                Support.userMessageShort("Bluetooth must be turned on.");
+                return;
+            }
+
             TextView tvText = (TextView) v;
             FrameLayout fl = (FrameLayout) tvText.getParent();
             TextView tvMac = (TextView) fl.findViewById(R.id.row_mac);
@@ -88,14 +96,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 throw new IllegalStateException(msg);
             }
 
-            /* Check for Bluetooth... it may have been turned off. */
-            if (!BluetoothUtils.isEnabled()) {
-                Support.userMessageShort("Bluetooth must be turned on.");
-                return;
-            }
-
-            // Set up a Bluetooth client connection to the remote device.
-            ChooserClient.connect(ChooserActivity.getActivity(), btdevice);
+            /*
+             * Set up a Bluetooth client connection to the remote device.
+             * We can assume that one isn't already running (or we would be interacting
+             * with the Chat screen rather than the Chooser screen). The ChooserClient
+             * thread will exit after it has made the connection and passed it off to
+             * ChatActivity.
+             */
+            (new ChooserClient(btdevice)).start();
         }
     }
 }

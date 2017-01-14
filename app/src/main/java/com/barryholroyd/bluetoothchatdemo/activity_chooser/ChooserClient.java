@@ -4,11 +4,13 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.Intent;
 
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothUtils;
 import com.barryholroyd.bluetoothchatdemo.support.ApplicationGlobalState;
 import com.barryholroyd.bluetoothchatdemo.activity_chat.ChatActivity;
+import com.barryholroyd.bluetoothchatdemo.support.GlobalState;
 import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import java.io.IOException;
@@ -27,10 +29,23 @@ import static com.barryholroyd.bluetoothchatdemo.activity_chooser.ChooserListene
  *     allowed at a time that only introduced a lot of complexity, so I now
  *     do the connection set up on the main thread and make the user wait.
  */
-public class ChooserClient
+public class ChooserClient extends Thread
 {
+    /** The remote Bluetooth device. */
+    private BluetoothDevice btdevice;
+
     /** Chat client socket. ChatServer is responsible for closing it. */
-    private static BluetoothSocket btChatSocket = null;
+    private BluetoothSocket btChatSocket = null;
+
+    /**
+     * Create a client connection to a remote device, then kick off
+     * the ChatActivity to run the Chat session.
+     *
+     * @param _btdevice remote Bluetooth device.
+     */
+    ChooserClient(BluetoothDevice _btdevice) {
+        btdevice = _btdevice;
+    }
 
     /**
      * Create a connection to a remote Bluetooth server and then pass it to ChatServer
@@ -38,9 +53,9 @@ public class ChooserClient
      *
      * The check to ensure that Bluetooth is enabled is done before starting this worker thread.
      *
-     * @param btdevice remote Bluetooth device.
      */
-    static void connect(Activity a, BluetoothDevice btdevice) {
+    @Override
+    public void run() {
         if ((btChatSocket != null) && btChatSocket.isConnected()) {
             Support.userMessageShort("Dropping current connection...");
             closeSocket(btChatSocket);
@@ -78,22 +93,19 @@ public class ChooserClient
             return;
         }
 
-        Support.userMessageShort("Connected!");
-
-        saveBtChatSocket(a, btChatSocket);
-
         /*
-          * Pass control to the chat Activity.
-          * ChooserListener will be stopped by ChooserActivity.onStop().
-          */
-        Intent intent = new Intent(a, ChatActivity.class);
-        intent.putExtra(ChatActivity.BUNDLE_KEY_BTDEVICE, btdevice);
-        intent.addFlags(FLAG_ACTIVITY_NEW_TASK); // required since an App Context is used
-        a.startActivity(intent);
+        * Pass control to the chat Activity.
+        *
+        * ChooserListener is running, waiting for an incoming connection, but it
+        * will be stopped by ChooserActivity.onStop(). (Ideally it should be stopped
+        * while an outgoing connection attempt is being made, but that is beyond
+        * the scope of this demo.)
+        */
+        ChooserSupport.startChatActivity(btChatSocket);
     }
 
     /** Local method to close the btChatSocket if it hasn't been passed to ChatServer yet. */
-    static private void closeSocket(BluetoothSocket btChatSocket) {
+    private void closeSocket(BluetoothSocket btChatSocket) {
         try   {
             if (btChatSocket != null) {
                 btChatSocket.close();
@@ -104,11 +116,7 @@ public class ChooserClient
         }
     }
 
-    static private void saveBtChatSocket(Activity a, BluetoothSocket btChatSocket) {
-        ((ApplicationGlobalState)  a.getApplication()).setBtChatSocket(btChatSocket);
-    }
-
-    private static void trace(String msg) {
+    private void trace(String msg) {
         Support.trace("ChooserClient: " + msg);
     }
 }
