@@ -58,7 +58,6 @@ public class ChatActivity extends ActivityPrintStates implements ActivityExtensi
     /** Only allow a single running server thread at a time. */
     private static ChatServer chatServer = null;
 
-
     /**
      * Get the current Activity instance.
      *

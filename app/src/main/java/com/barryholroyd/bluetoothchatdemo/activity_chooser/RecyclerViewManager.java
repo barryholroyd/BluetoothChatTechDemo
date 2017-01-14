@@ -28,7 +28,6 @@ public class RecyclerViewManager
         // Use a LinearLayout for the RecyclerView.
         mRecyclerView.setLayoutManager(new LinearLayoutManager(a));
 
-        // Set the adapter. It is the same for both RecyclerViews.
         mAdapter = new RecyclerViewAdapter();
         mRecyclerView.setAdapter(mAdapter);
     }

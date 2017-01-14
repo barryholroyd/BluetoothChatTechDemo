@@ -46,13 +46,12 @@ import java.util.Set;
  */
 public class ChooserActivity extends ActivityPrintStates implements ActivityExtensions
 {
-
     /** Request codes for onActivityResult(). */
     private static final int RT_BT_ENABLED = 1;
 
     // Private non-static fields.
-    private RecyclerViewManager rvmDiscovered;
-    private RecyclerViewManager rvmPaired;
+    private static RecyclerViewManager rvmDiscovered; // TBD: make non-static
+    private static RecyclerViewManager rvmPaired; // TBD: make non-static
 
     // This Activity.
     private static ChooserActivity ca = null;
@@ -77,6 +76,9 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
     /** Get the "Paired" RecyclerViewManager for the current ChooserActivity instance. */
     RecyclerViewManager  getRvmPaired() { return rvmPaired; }
 
+    /** True only until onResume() is called for the first time. */
+    private static boolean appStarting = true;
+
     /** Display client interface, initialize Bluetooth, start server worker thread. */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,9 +87,6 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
         Support.init(this);
         BluetoothUtils.init(this);
         Support.getGlobalState().setMainThreadId();
-
-        Support.tmp(String.format("MAIN THREAD ID IS: %d",
-                Support.getGlobalState().getMainThreadId()));
 
         ca = this;
 
@@ -99,7 +98,8 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
 
         //Ensure Bluetooth is enabled; if not, ask the user for permission.
         if (BluetoothUtils.isEnabled()) {
-            refreshUI(false);
+            if (appStarting)
+                refreshUI(false);
         }
         else {
             Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -121,7 +121,15 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
         super.onStart();
 
         // Picks up new pairing after chat with a new remote device completes.
-        refreshPaired(false);
+        // TBD: refreshPaired(false);
+        int i = 9;
+        i++; i++; i++;
+        int j = 9; j++;
+        int k = 9; k++;
+        int l = 9; l++;
+        int m = 9; m++;
+        int n = 9; n++;
+        int o = 9; o++;
 
         // Always register so that we can receive Bluetooth on/off broadcasts.
         BluetoothBroadcastReceivers.registerBroadcastReceiver(this, new ChooserBroadcastReceiver());
@@ -137,6 +145,7 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
     public void onResume() {
         super.onResume();
         Support.getGlobalState().setCurrentActivity(this);
+        appStarting = false;
     }
 
     @Override
@@ -163,7 +172,6 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
             Support.userMessageShort("Bluetooth must be turned on.");
             return;
         }
-        Support.userMessageShort("Refreshing list of discovered devices...");
         refreshDiscovered(false);
     }
 
@@ -222,6 +230,7 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
      *     when Bluetooth is toggled.
      */
     void refreshUI(boolean clearRequest) {
+        Support.tmp(String.format("REFRESHING UI. clearRequest = %b", clearRequest));
         refreshPaired(clearRequest);
         refreshDiscovered(clearRequest);
 
@@ -232,6 +241,7 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
      * Find and displayShort devices which are already paired with this one.
      */
     void refreshPaired(boolean clearRequest) {
+        Support.tmp("REFRESHING PAIRED");
         Set<BluetoothDevice> pairedDevices = BluetoothUtils.getPairedDevices();
         RecyclerViewAdapter recyclerViewAdapter = getRvmPaired().getAdapter();
         BluetoothDevices btds = recyclerViewAdapter.getDevices();
@@ -252,6 +262,7 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
      *     See {@link ChooserBroadcastReceiver#onReceive}.
      */
     void refreshDiscovered(boolean clearRequest) {
+        Support.tmp("REFRESHING DISCOVERED");
         RecyclerViewAdapter recyclerViewAdapter = getRvmDiscovered().getAdapter();
         BluetoothDevices btds = recyclerViewAdapter.getDevices();
         btds.clear();
@@ -260,6 +271,7 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
             recyclerViewAdapterDiscovered.notifyDataSetChanged();
         }
         else {
+            Support.userMessageShort("Refreshing list of discovered devices...");
             BluetoothUtils.startDiscovery();
         }
     }

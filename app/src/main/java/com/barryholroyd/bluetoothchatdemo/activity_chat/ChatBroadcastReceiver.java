@@ -9,6 +9,7 @@ import android.content.Intent;
 
 import com.barryholroyd.bluetoothchatdemo.ActivityExtensions;
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothBroadcastReceivers;
+import com.barryholroyd.bluetoothchatdemo.support.Support;
 
 import static android.bluetooth.BluetoothAdapter.EXTRA_STATE;
 
@@ -45,6 +46,8 @@ public class ChatBroadcastReceiver extends BroadcastReceiver
             case BluetoothAdapter.ACTION_STATE_CHANGED:
                 ca.onBluetoothToggle();
                 break;
+            case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
+                Support.userMessageShort("Discovery Finished");
         }
     }
 }

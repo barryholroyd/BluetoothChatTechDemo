@@ -63,7 +63,7 @@ public class BluetoothUtils
      * Ask the user for permission to make this device discoverable. Only ask once.
      */
     public static void requestDiscoverable(Context c) {
-        if (requestAlreadyAsked || !mBluetoothAdapter.isEnabled())
+        if (requestAlreadyAsked || !mBluetoothAdapter.isEnabled()) // TBD: need ALready Asked still?
             return;
 
         Intent discoverableIntent = new
