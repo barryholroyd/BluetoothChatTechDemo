@@ -50,8 +50,11 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
     private static final int RT_BT_ENABLED = 1;
 
     // Private non-static fields.
-    private static RecyclerViewManager rvmDiscovered; // TBD: make non-static
-    private static RecyclerViewManager rvmPaired; // TBD: make non-static
+    private RecyclerViewManager rvmDiscovered;
+    private RecyclerViewManager rvmPaired;
+
+    private static RecyclerViewAdapter mAdapterDiscovered = new RecyclerViewAdapter();
+    private static RecyclerViewAdapter mAdapterPaired = new RecyclerViewAdapter();
 
     // This Activity.
     private static ChooserActivity ca = null;
@@ -93,8 +96,8 @@ public class ChooserActivity extends ActivityPrintStates implements ActivityExte
         // Display the "client" interface.
         setContentView(R.layout.activity_chooser);
 
-        rvmPaired         = new RecyclerViewManager(this, R.id.rv_paired);
-        rvmDiscovered     = new RecyclerViewManager(this, R.id.rv_discovered);
+        rvmPaired         = new RecyclerViewManager(this, R.id.rv_paired, mAdapterPaired);
+        rvmDiscovered     = new RecyclerViewManager(this, R.id.rv_discovered, mAdapterDiscovered);
 
         //Ensure Bluetooth is enabled; if not, ask the user for permission.
         if (BluetoothUtils.isEnabled()) {
