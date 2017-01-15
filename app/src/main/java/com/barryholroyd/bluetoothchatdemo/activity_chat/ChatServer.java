@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.barryholroyd.bluetoothchatdemo.bluetooth.BluetoothUtils;
@@ -138,6 +139,7 @@ class ChatServer extends Thread
             return;
         }
         trace(String.format(Locale.US, "received: %s", text));
+        tmpPrint(String.format(Locale.US, "received: %s", text));
         TextView tv = ca.getTextViewReceive();
         tv.setText(text);
     }
@@ -160,9 +162,14 @@ class ChatServer extends Thread
         while (true) {
             byte[] bytes = new byte[BUFSIZE];
             trace("waiting to read input...");
+            tmpPrint("waiting to read");
             try {
                 //noinspection ResultOfMethodCallIgnored
                 btIn.read(bytes, 0, BUFSIZE);
+
+                // TBD: print "read" here instead of on UI thread
+
+                tmpPrint("just read");
             }
             catch (IOException ioe) {
                 /*
@@ -188,7 +195,15 @@ class ChatServer extends Thread
             }
             Message m = uiHandler.obtainMessage(CHATTEXT, bytes);
             uiHandler.sendMessage(m);
+            Log.d("BLUETOOTH_CHAT_DEMO", "333");
         }
+    }
+
+    static void tmpPrint(String msg) {
+        long id = Thread.currentThread().getId();
+        String s = String.format("### ChatServerTmp: [%d] %s", id, msg);
+        Log.d("BLUETOOTH_CHAT_DEMO", s);
+
     }
 
     /**
