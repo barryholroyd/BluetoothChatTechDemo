@@ -97,11 +97,6 @@ class ChatServer extends Thread
         };
     }
 
-    // TBD: Adjust, per https://developer.android.com/guide/topics/connectivity/bluetooth.html
-    //   #ConnectingAsAClient.
-    // Use Messages to send text back to the caller for display.
-    // Make write() a non-static method.
-
     /**
      * Convert the incoming message into a text string and displayShort it.
      * Called by the UI handler.
@@ -138,7 +133,6 @@ class ChatServer extends Thread
             return;
         }
         trace(String.format(Locale.US, "received: %s", text));
-        tmpPrint(String.format(Locale.US, "received: %s", text));
         TextView tv = ca.getTextViewReceive();
         tv.setText(text);
     }
@@ -161,14 +155,9 @@ class ChatServer extends Thread
         while (true) {
             byte[] bytes = new byte[BUFSIZE];
             trace("waiting to read input...");
-            tmpPrint("waiting to read");
             try {
                 //noinspection ResultOfMethodCallIgnored
                 btIn.read(bytes, 0, BUFSIZE);
-
-                // TBD: print "read" here instead of on UI thread
-
-                tmpPrint("just read");
             }
             catch (IOException ioe) {
                 /*
@@ -196,13 +185,6 @@ class ChatServer extends Thread
             uiHandler.sendMessage(m);
             Log.d("BLUETOOTH_CHAT_DEMO", "333");
         }
-    }
-
-    static void tmpPrint(String msg) {
-        long id = Thread.currentThread().getId();
-        String s = String.format("### ChatServerTmp: [%d] %s", id, msg);
-        Log.d("BLUETOOTH_CHAT_DEMO", s);
-
     }
 
     /**

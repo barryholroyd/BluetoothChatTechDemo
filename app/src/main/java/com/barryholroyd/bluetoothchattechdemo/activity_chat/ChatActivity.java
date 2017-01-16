@@ -154,7 +154,6 @@ public class ChatActivity extends ActivityPrintStates implements ActivityExtensi
                 chatServer = new ChatServer(btChatSocket, handler);
             }
             catch (ChatServer.ChatServerException ca) {
-                // TBD: test this
                 Support.userMessageLong("Could not start Chat server.");
                 finish();
             }

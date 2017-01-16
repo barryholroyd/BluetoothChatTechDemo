@@ -14,7 +14,7 @@ import java.util.Locale;
 public class Support {
     private static Toaster toaster = null;
     private static String appLabel = null;
-    private static final boolean traceEnabled = true;
+    private static final boolean traceEnabled = false;
     private static GlobalState globalState = null;
 
     /** Initialization */
@@ -62,8 +62,6 @@ public class Support {
         if (traceEnabled)
             log(msg);
     }
-
-    public static void tmp(String msg) { trace(msg); } // DEL: when no longer needed.
 
     /** External access to logging -- leave on in production. */
     public static void error(String msg) {

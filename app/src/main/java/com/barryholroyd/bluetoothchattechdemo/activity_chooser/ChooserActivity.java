@@ -17,22 +17,6 @@ import com.barryholroyd.bluetoothchattechdemo.support.Support;
 
 import java.util.Set;
 
-/*
- * TBD: brief code review
- * TBD: finish up comments.
- * TBD: clean out TBDs, etc.
- * TBD: turn off tracing.
- * TBD: Update overview.html:
- * Design parameter: can only have a single chat going at once.
- * For both Activities, their background network threads are
- * controlled by onStart() and onStop(). In both cases, the network threads are
- * implemented as Singletons controlled by static start()/stop() methods.
- * Changes to Bluetooth settings (on/off) are
- * caught by their respective BroadcastReceivers, which use onBluetoothToggle()
- * callbacks to also start and stop the background threads.
- * This also ensures everything necessary has been initialized
- */
-
 /**
  * Display client UI to initiate connection requests and fork off a worker
  * thread to listen for incoming connection requests. Use ChooserClient
