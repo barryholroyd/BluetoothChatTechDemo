@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.barryholroyd.bluetoothchatdemo">
+    package="com.barryholroyd.bluetoothchattechdemo">
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -13,16 +13,16 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name=".support.ApplicationGlobalState"
+        android:name="com.barryholroyd.bluetoothchattechdemo.support.ApplicationGlobalState"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name="com.barryholroyd.bluetoothchatdemo.activity_chooser.ChooserActivity">
+        <activity android:name="com.barryholroyd.bluetoothchattechdemo.activity_chooser.ChooserActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name="com.barryholroyd.bluetoothchatdemo.activity_chat.ChatActivity"
+            android:name="com.barryholroyd.bluetoothchattechdemo.activity_chat.ChatActivity"
             android:windowSoftInputMode="stateVisible|adjustResize"
             >
         </activity>

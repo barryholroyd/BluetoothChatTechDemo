@@ -5,7 +5,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion "24.0.0"
     defaultConfig {
-        applicationId "com.barryholroyd.bluetoothchatdemo"
+        applicationId "com.barryholroyd.bluetoothchattechdemo"
         minSdkVersion 19
         /*
          * Bug in SDK 23, 24. Device discovery fails.
