@@ -18,15 +18,11 @@ public class RecyclerViewManager
      * @param a current Activity instance used to find the RecyclerView of interest.
      * @param id    The RecyclerView to find and initialize.
      */
-    public RecyclerViewManager(Activity a, int id, RecyclerViewAdapter _mAdapter) {
+    RecyclerViewManager(Activity a, int id, RecyclerViewAdapter _mAdapter) {
         mAdapter = _mAdapter;
-        // Get the desired RecyclerView.
         RecyclerView mRecyclerView = (RecyclerView) a.findViewById(id);
         mRecyclerView.setHasFixedSize(true);
-
-        // Use a LinearLayout for the RecyclerView.
         mRecyclerView.setLayoutManager(new LinearLayoutManager(a));
-
         mRecyclerView.setAdapter(mAdapter);
     }
 
@@ -35,6 +31,6 @@ public class RecyclerViewManager
      *
      * @return the RecyclerView's adapter.
      */
-    public RecyclerViewAdapter getAdapter() { return mAdapter; }
+    RecyclerViewAdapter getAdapter() { return mAdapter; }
 }
 

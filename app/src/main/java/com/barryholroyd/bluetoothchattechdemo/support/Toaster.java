@@ -25,14 +25,14 @@ class Toaster {
     private static Handler mHandler = null;
 
     /**
-     * Toaster constructor.
+     * Toaster initialization.
      * <p>
      *     Create a Handler to tbe main thread so that we can use the
      *     Toaster from background threads.
      *
      * @param c standard Context
      */
-    Toaster(Context c) {
+    public static void init(Context c) {
         // Make sure we have the Application's Context.
         final Context ac = c.getApplicationContext();
         mHandler = new Handler(Looper.getMainLooper()) {

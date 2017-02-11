@@ -12,7 +12,6 @@ import java.util.Locale;
  * General static support methods.
  */
 public class Support {
-    private static Toaster toaster = null;
     private static String appLabel = null;
     private static final boolean traceEnabled = false;
     private static GlobalState globalState = null;
@@ -21,9 +20,7 @@ public class Support {
     public static void init(Activity a) {
         globalState = (GlobalState) a.getApplication();
         Context ac = a.getApplicationContext();
-        if (toaster == null) {
-            toaster = new Toaster(ac);
-        }
+        Toaster.init(ac);
         if (appLabel == null) {
             PackageManager pm = ac.getPackageManager();
             try {

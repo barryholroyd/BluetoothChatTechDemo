@@ -17,10 +17,6 @@ import static com.barryholroyd.bluetoothchattechdemo.activity_chooser.ChooserLis
  * <p>
  *     Given a remote device, create a connection to it and then call start
  *     ChatActivity to connect a chat session.
- * <p>
- *     This was originally a worker thread, but since only one connection is
- *     allowed at a time that only introduced a lot of complexity, so I now
- *     do the connection set up on the main thread and make the user wait.
  */
 public class ChooserClient extends Thread
 {

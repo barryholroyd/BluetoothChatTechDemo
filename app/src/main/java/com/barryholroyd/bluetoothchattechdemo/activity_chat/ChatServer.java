@@ -173,7 +173,7 @@ class ChatServer extends Thread
                 }
 
                 /*
-                 * If the exception was not requested by ChatActivity calling stopServer(),
+                 * If the exception was not requested by ChatActivity calling stopChatServer(),
                  * then we need to tell the running ChatActivity instance to exit. Doing this
                  * is o.k. even if the ChatActivity did trigger this exception.
                  */
@@ -183,7 +183,6 @@ class ChatServer extends Thread
             }
             Message m = uiHandler.obtainMessage(CHATTEXT, bytes);
             uiHandler.sendMessage(m);
-            Log.d("BLUETOOTH_CHAT_DEMO", "333");
         }
     }
 

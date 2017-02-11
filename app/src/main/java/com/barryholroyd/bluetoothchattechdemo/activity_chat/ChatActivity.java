@@ -1,5 +1,6 @@
 package com.barryholroyd.bluetoothchattechdemo.activity_chat;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -52,8 +53,9 @@ public class ChatActivity extends ActivityPrintStates implements ActivityExtensi
     /** Handler providing callback to exit the current ChatActivity instance. */
     private static ChatActivityHandler handler = null;
 
-    /** This Activity instance. */
-    private static ChatActivity ca = null;
+    /** This Activity instance. Cleared in onDestroy(). */
+    @SuppressLint("StaticFieldLeak")
+    static ChatActivity ca = null;
 
     /** Only allow a single running server thread at a time. */
     private static ChatServer chatServer = null;
@@ -68,7 +70,7 @@ public class ChatActivity extends ActivityPrintStates implements ActivityExtensi
     /**
      * Display the chat window for the user, get the BluetoothSocket stored in
      * GlobalState by ChooserClient or ChooserListener, configure a
-     * callback Handler to exit the Activity is requested by the worker thread and
+     * callback Handler to exit the Activity if requested by the worker thread and
      * then start the ChatServer worker thread to handle the actual reads and writes
      * from the connection.
      *
@@ -97,6 +99,8 @@ public class ChatActivity extends ActivityPrintStates implements ActivityExtensi
          * We create a static ChatActivityHandler class and pass it a WeakReference to the
          * current ChatActivity instance to avoid possible memory leaks.
          */
+        // TBD: does "handler" have to be static?
+        // TBD: do we really need to use a WeakReference here?
         WeakReference<ChatActivity> wrca = new WeakReference<>(this);
         handler = new ChatActivityHandler(wrca);
     }

@@ -14,6 +14,7 @@ import com.barryholroyd.bluetoothchattechdemo.bluetooth.BluetoothUtils;
 import com.barryholroyd.bluetoothchattechdemo.bluetooth.BluetoothDevices;
 import com.barryholroyd.bluetoothchattechdemo.support.Support;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 /**
@@ -22,6 +23,7 @@ import java.util.Locale;
  */
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.MyViewHolder> {
     private final BluetoothDevices bluetoothDevices = new BluetoothDevices();
+
     /**
      * Standard ViewHolder class.
      * <p>
@@ -42,7 +44,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     // For adding/deleting devices from the list.
-    public BluetoothDevices getDevices() { return bluetoothDevices; }
+    BluetoothDevices getDevices() { return bluetoothDevices; }
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -102,6 +104,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
              * thread will exit after it has made the connection and passed it off to
              * ChatActivity.
              */
+            // Bug: rapidly clicking on a device can cause multiple ChooserClients to get started. Behavior is unclear.
             (new ChooserClient(btdevice)).start();
         }
     }
